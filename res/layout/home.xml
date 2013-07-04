@@ -49,17 +49,6 @@
             custom:spacingWeight=".33"
             custom:maxItems="12"
         />
-        <net.bradmont.holograph.BarGraph 
-            android:id="@+id/totals_graph"
-            android:layout_width="fill_parent"
-            android:layout_height="400px"
-            android:padding="8dp"
-            custom:colors="#33b5e5,#ffbb33,#ff4444"
-            custom:lineColor="#707070"
-            custom:barWeight="1"
-            custom:spacingWeight=".75"
-            custom:maxItems="8"
-        />
         <!-- recent stuff -->
         <LinearLayout
             android:orientation="horizontal"

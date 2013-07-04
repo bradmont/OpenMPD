@@ -83,19 +83,6 @@ public class HomeFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-        // old graph
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            "select month, sum(amount) from gift group by month order by month;", null);
-        values = new Float[cur.getCount()];
-        cur.moveToFirst();
-        for (int i = 0; i < cur.getCount(); i++){
-            values[i] = new Float( ((float)cur.getInt(1))/100f);
-            cur.moveToNext();
-        }
-        cur.close();
-        BarGraph graph = (BarGraph) getView().findViewById(R.id.totals_graph);
-        graph.setValues(values);
-
         // magic graph
         Float [] [] vals = null;
 
