@@ -28,7 +28,7 @@ public class OnBootScheduler extends BroadcastReceiver {
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar cal = new GregorianCalendar();
-        // DEBUG cal.set(Calendar.HOUR_OF_DAY, 2);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
 
         ModelList accounts = helper.getReferenceModel("service_account").getAll();
         if  (accounts.size() == 0){

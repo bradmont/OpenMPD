@@ -90,7 +90,7 @@ public class OpenMPD extends BaseActivity {
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar cal = new GregorianCalendar();
-        cal.set(Calendar.HOUR_OF_DAY, 2);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
         
 
         ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
