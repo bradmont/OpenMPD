@@ -21,8 +21,7 @@ import net.bradmont.supergreen.models.*;
 
 
 public class TntImportService extends IntentService {
-    //static final int UPDATE_FREQUENCY = 3; // import values every 3 days
-    static final int UPDATE_FREQUENCY = 0; // import values every 3 days
+    static final int UPDATE_FREQUENCY = 3; // import values every 3 days
 
     public TntImportService(){
         super("TntImportService");
@@ -30,6 +29,7 @@ public class TntImportService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent){
         Bundle b = intent.getExtras();
+        boolean newdata = false;
         if (MPDDBHelper.get() == null){
             MPDDBHelper dbh = new MPDDBHelper(this);
         }
@@ -52,6 +52,7 @@ public class TntImportService extends IntentService {
                 TntImporter importer = new TntImporter(this, account, builder);
                 importer.run();
                 stopForeground(true);
+                newdata = true;
             } else {
                 builder.setContentText("Not stale, not updating.");
                 notificationManager.notify(0, builder.build());
@@ -65,6 +66,7 @@ public class TntImportService extends IntentService {
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
                     stopForeground(true);
+                    newdata = true;
                 } else {
                     builder.setContentText("Not stale, not updating.");
                     notificationManager.notify(0, builder.build());
@@ -72,13 +74,15 @@ public class TntImportService extends IntentService {
             }
         }
 
-        // Evaluate contacts
-        ContactsEvaluator evaluator = new ContactsEvaluator(this, builder);
-        builder.setContentTitle("Evaluating Contacts")
-            .setContentText(" ");
-        startForeground(evaluator.NOTIFICATION_ID, builder.build());
-        evaluator.run();
-        stopForeground(true);
+        // Evaluate contacts if we have newly imported data
+        if (newdata == true){
+            ContactsEvaluator evaluator = new ContactsEvaluator(this, builder);
+            builder.setContentTitle("Evaluating Contacts")
+                .setContentText(" ");
+            startForeground(evaluator.NOTIFICATION_ID, builder.build());
+            evaluator.run();
+            stopForeground(true);
+        }
     }
 
     private boolean isOld(ServiceAccount account){
