@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OpenMPD</string>
+    <string name="fragment_name">Main Fragment</string>
+    <string name="help">Help</string>
+    <string name="download">Download</string>
+    <string name="evaluate">Evaluate</string>
+    <string name="contacts">Contacts</string>
+    <string name="monthly_average">Monthly Average</string>
+    <string name="_and_"> and </string>
+    <string name="add">Add</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="never">Never</string>
+    <string name="data_import">Importing Data</string>
+
+    <!-- partner types -->
+    <string name="unknown">Unknown</string>
+    <string name="none">None</string>
+    <string name="onetime">One Time</string>
+    <string name="occasional"> Occasional</string>
+    <string name="annual">/yr</string>
+    <string name="regular">/?mo</string>
+    <string name="monthly">/mo</string>
+
+    <string name="last_gift">Last Gift: </string>
+    <string name="last_contact">Last Contact: </string>
+
+    <string name="service_provider">Service Provider</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="last_import">Last import: </string>
+
+    <string name="add_account">Add Account</string>
+
+</resources>

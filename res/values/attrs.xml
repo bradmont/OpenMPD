@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <declare-styleable name="BarGraph">
+       <attr name="colors" format="string" />
+       <attr name="lineColor" format="color" />
+       <attr name="axisPadding" format="integer" />
+       <attr name="maxItems" format="integer" />
+       <attr name="minItems" format="integer" />
+       <attr name="barWeight" format="float" />
+       <attr name="spacingWeight" format="float" />
+   </declare-styleable>
+</resources>

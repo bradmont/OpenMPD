@@ -1,0 +1,38 @@
+{
+    "EXAMPLE" : {
+        "COMMENT" : "Only name and base_url are required. Other fields have",
+        "COMMENT2": "default values equal to this EXAMPLE service.",
+        "COMMENT3": "formdata strings are completed using String.format, in",
+        "COMMENT4": "the same order as below (username, password [,date]).",
+        "COMMENT5" : "http_auth signifies a need for HTTP username/password",
+
+        "name" : "Example TntDataServer Service",
+        "base_url" : "https://example.org/serviceroot/",
+
+        "http_auth" : false,
+
+        "balance_url" : "account_balance.php",
+        "balance_formdata" : "Action=TntBalance&Username=%s&Password=%s",
+
+        "donations_url" : "donordata.php",
+        "donations_formdata" : "Action=TntDonList&Username=%s&Password=%s&DateFrom=%s&DateTo=%s",
+        "addresses_url" : "donordata.php",
+        "addresses_formdata" : "Action=TntAddrList&Username=%s&Password=%s&DateFrom=%s",
+        "addresses_by_personids_url" : "donordata.php",
+        "addresses_by_personids_formdata" : "Action=TntAddrList&Username=%s&Password=%s&PID=%s"
+    },
+
+    "P2C" : {
+        "name" : "Power to Change",
+        "base_url" : "https://focus.powertochange.org/tntmpd/",
+        "http_auth" : true
+    },
+    "CCC" : {
+        "name" : "Campus Crusade for Christ",
+        "base_url" : "https://staffweb.cru.org:443/ss/servlet/TntMPDServlet/",
+        "balance_url" : "",
+        "donations_url" : "",
+        "addresses_url" : "",
+        "addresses_by_personids_url" : ""
+    }
+}

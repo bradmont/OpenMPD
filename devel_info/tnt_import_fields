@@ -1,0 +1,50 @@
+PEOPLE_ID - tnt_people_id
+ACCT_NAME - tnt_acct_name
+PERSON_TYPE - tnt_person_type
+LAST_NAME_ORG - lname
+FIRST_NAME - fname
+MIDDLE_NAME - mname
+TITLE - title
+SUFFIX - suffix
+
+SP_LAST_NAME   |
+SP_FIRST_NAME  |
+SP_MIDDLE_NAME | - Separate contact
+SP_TITLE       |
+SP_SUFFIX      |
+
+ADDR1 - addr1               )
+ADDR2 - addr2               )
+ADDR3 - addr3               )
+ADDR4 - addr4               )
+CITY - city                 )
+STATE - region              ) - Address object
+ZIP - post_code             )
+COUNTRY - country_short     )
+CNTRY_DESCR - country_long  )
+ADDR_CHANGED - valid_from   )
+ADDR_DELIVERABLE - deliverable )
+PHONE               |
+PHONE_CHANGED       | - Phone object
+PHONE_OPERATIONAL   |
+label
+
+EMAIL               |
+EMAIL_CHANGED       | - email object
+EMAIL_OPERATIONAL   |
+label
+
+- Contact and spouse are stored as separate contacts
+- variables starting with tnt_ are duplicated between the two 
+
+
+
+Gift:
+
+PEOPLE_ID - tnt_people_id
+ACCT_NAME - (drop)
+DISPLAY_DATE - date
+AMOUNT - amount
+MOTIVATION motivation_code
+DESIGNATION - account
+DONATION_ID - tnt_donation_id
