@@ -46,8 +46,10 @@ public class TntImportService extends IntentService {
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account)){
+                startForeground(account.getID(), builder.build());
                 TntImporter importer = new TntImporter(this, account, builder);
                 importer.run();
+                stopForeground(true);
             } else {
                 builder.setContentText("Not stale, not updating.");
                 notificationManager.notify(0, builder.build());
@@ -57,8 +59,10 @@ public class TntImportService extends IntentService {
             for (int i = 0; i < ids.length; i++){
                 ServiceAccount account = new ServiceAccount(ids[i]);
                 if (isOld(account)){
+                    startForeground(account.getID(), builder.build());
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
+                    stopForeground(true);
                 } else {
                     builder.setContentText("Not stale, not updating.");
                     notificationManager.notify(0, builder.build());
