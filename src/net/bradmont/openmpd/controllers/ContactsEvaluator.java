@@ -2,7 +2,6 @@ package net.bradmont.openmpd.controllers;
 
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.Service;
 import net.bradmont.supergreen.models.*;
 
 import org.apache.http.*;
