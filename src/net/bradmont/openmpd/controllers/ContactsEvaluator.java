@@ -12,8 +12,12 @@ import org.apache.http.impl.client.*;
 import org.apache.http.client.entity.*;
 import org.apache.http.message.*;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.widget.ProgressBar;
-import android.util.Log;
+
+import android.support.v4.app.NotificationCompat;
+
 
 import java.lang.Runnable;
 import java.lang.Thread;
@@ -31,22 +35,46 @@ import java.io.BufferedReader;
 
 public class ContactsEvaluator implements Runnable{
 
-    private OpenMPD app;
-    private ProgressBar progressbar;
+    private ProgressBar progressbar=null;
+    private NotificationCompat.Builder builder = null;
+    private NotificationManager notifyManager = null;
+    private Context context;
 
-    public ContactsEvaluator(OpenMPD app, ProgressBar progressbar){
-        this.app = app;
+    public final static int NOTIFICATION_ID = 0;
+
+
+    public ContactsEvaluator(Context context, ProgressBar progressbar){
         this.progressbar = progressbar;
+        this.context = context;
+    }
+
+    public ContactsEvaluator(Context context, NotificationCompat.Builder builder){
+        this.builder = builder;
+        this.context = context;
     }
 
     public void run(){
-        progressbar.setIndeterminate(true);
         ModelList contacts = new Contact().getAll(); // all!
-        progressbar.setIndeterminate(false);
-        progressbar.setMax(contacts.size());
+
+        if (progressbar != null){
+            progressbar.setIndeterminate(false);
+            progressbar.setMax(contacts.size());
+        }
+        if (builder != null){
+            builder.setProgress(contacts.size(), 0, false);
+            notifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notifyManager.notify(NOTIFICATION_ID, builder.build());
+        }
+
         for (int i=0; i < contacts.size(); i++){
             ((Contact) contacts.get(i)).updateStatus();
-            progressbar.incrementProgressBy(1);
+            if (progressbar != null){
+                progressbar.incrementProgressBy(1);
+            }
+            if (builder != null){
+                builder.setProgress(contacts.size(), i, false);
+                notifyManager.notify(NOTIFICATION_ID, builder.build());
+            }
         }
     }
 

@@ -138,7 +138,7 @@ public class ContactList extends ListFragment implements OnClickListener{
         pb.setVisibility(View.VISIBLE);
         layout.setVisibility(View.GONE);
 
-        app.queueTask( new ContactsEvaluator(app, pb));
+        app.queueTask( new ContactsEvaluator(getActivity(), pb));
 
         // Queue a task to hide the progressbar once our task is done.
         app.queueTask( new Runnable(){

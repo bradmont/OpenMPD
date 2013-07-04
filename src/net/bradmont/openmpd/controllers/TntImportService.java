@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.ServiceAccount;
 import net.bradmont.openmpd.controllers.TntImporter;
+import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.supergreen.models.*;
 
 
@@ -35,14 +36,15 @@ public class TntImportService extends IntentService {
         NotificationCompat.Builder builder =
             new NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("Importing Data")
-            .setContentText("foo");
+            .setContentTitle("Importing Contacts")
+            .setContentText(" ");
 
         NotificationManager notificationManager =
             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //notificationManager.notify(0, builder.build());
 
 
+        // import our stuff
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account)){
@@ -69,6 +71,14 @@ public class TntImportService extends IntentService {
                 }
             }
         }
+
+        // Evaluate contacts
+        ContactsEvaluator evaluator = new ContactsEvaluator(this, builder);
+        builder.setContentTitle("Evaluating Contacts")
+            .setContentText(" ");
+        startForeground(evaluator.NOTIFICATION_ID, builder.build());
+        evaluator.run();
+        stopForeground(true);
     }
 
     private boolean isOld(ServiceAccount account){
