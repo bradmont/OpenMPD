@@ -74,7 +74,6 @@ public class HomeFragment extends Fragment {
 
 
 
-    Float [] values = null;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.home, null);
@@ -88,10 +87,8 @@ public class HomeFragment extends Fragment {
 
         Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(
             BASE_GIVING_SQL, null);
-        values = new Float[cur.getCount()];
         Cursor cur2 = MPDDBHelper.get().getReadableDatabase().rawQuery(
             BASE_GIVING_SQL_EXTRA, null);
-        values = new Float[cur.getCount()];
         Cursor cur3 = MPDDBHelper.get().getReadableDatabase().rawQuery(
             REGULAR_NONMONTHLY_GIVING, null);
         Cursor cur4 = MPDDBHelper.get().getReadableDatabase().rawQuery(
@@ -112,7 +109,7 @@ public class HomeFragment extends Fragment {
             cur4.moveToNext();
         }
         cur1.close(); cur2.close(); cur3.close(); cur4.close();
-        graph = (BarGraph) getView().findViewById(R.id.magic_graph);
+        BarGraph graph = (BarGraph) getView().findViewById(R.id.magic_graph);
         graph.setValues(vals);
 	}
 }
