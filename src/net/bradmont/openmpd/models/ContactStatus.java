@@ -54,8 +54,9 @@ public class ContactStatus extends DBModel{
     // kinda ugly to do this way, but I can't think of a better option
     public static final String [] REGEXES = {
         // Monthly partners:
-        "[1-9]{4}0?$", // gifts in last four months
+        "[1-9]{3}0?$", // gifts in last three months
         "[1-9]0[1-9]{3}|[1-9]{2}0[1-9]{2}|[1-9]{3}0[1-9]$", // missed one of last 5 months
+        "000[1-9]{2}0?$", // Gifts in last two months (new partner)
         "[1-9]{4}0{2,4}$", 
         "[1-9]{4}0{5,12}$",
         "[1-9]{4}0{13}0*$",
@@ -97,6 +98,7 @@ public class ContactStatus extends DBModel{
         // Monthly partners:
         { PARTNER_MONTHLY, 1, 1, STATUS_CURRENT},
         { PARTNER_MONTHLY, 1, 1, STATUS_CURRENT},
+        { PARTNER_MONTHLY, 1, 1, STATUS_NEW},
         { PARTNER_MONTHLY, 1, 1, STATUS_LATE},
         { PARTNER_MONTHLY, 1, 1, STATUS_LAPSED},
         { PARTNER_MONTHLY, 1, 1, STATUS_DROPPED},

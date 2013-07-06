@@ -12,7 +12,7 @@ import android.database.sqlite.*;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 4;
+    private static int DATABASE_VERSION = 5;
 
     @Override
     protected void registerModels(){
@@ -25,6 +25,7 @@ public class MPDDBHelper extends DBHelper{
         registerModel(new ContactStatus());
         registerModel(new TntService());
         registerModel(new ServiceAccount());
+        registerModel(new Notification());
     }
 
     public MPDDBHelper(Context c) {

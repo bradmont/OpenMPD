@@ -38,6 +38,7 @@ public class ContactsEvaluator implements Runnable{
     private NotificationCompat.Builder builder = null;
     private NotificationManager notifyManager = null;
     private Context context;
+    private boolean initialImport = false; // suppress notifications
 
     public final static int NOTIFICATION_ID = 0;
 
@@ -47,9 +48,19 @@ public class ContactsEvaluator implements Runnable{
         this.context = context;
     }
 
+    public ContactsEvaluator(Context context, ProgressBar progressbar, boolean initialImport){
+        this(context, progressbar);
+        this.initialImport = initialImport;
+    }
+
     public ContactsEvaluator(Context context, NotificationCompat.Builder builder){
         this.builder = builder;
         this.context = context;
+    }
+
+    public ContactsEvaluator(Context context, NotificationCompat.Builder builder, boolean initialImport){
+        this(context, builder);
+        this.initialImport = initialImport;
     }
 
     public void run(){
@@ -66,7 +77,7 @@ public class ContactsEvaluator implements Runnable{
         }
 
         for (int i=0; i < contacts.size(); i++){
-            ((Contact) contacts.get(i)).updateStatus();
+            ((Contact) contacts.get(i)).updateStatus(initialImport);
             if (progressbar != null){
                 progressbar.incrementProgressBy(1);
             }
