@@ -6,6 +6,7 @@ import net.bradmont.supergreen.fields.constraints.*;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Date;
+import java.util.Calendar;
 
 import android.database.Cursor;
 import android.widget.*;
@@ -186,7 +187,7 @@ public abstract class DBField {
     public boolean getBoolean(){
         throw (new NotImplementedException("getBoolean"));
     }
-    public Date getDate(){
+    public Calendar getCalendar(){
         throw (new NotImplementedException("getInt"));
     }
 
@@ -239,7 +240,7 @@ public abstract class DBField {
     /**
      * Set a field's default value to a Date, for supported fields.
      */
-    public void setDefault(Date value){
+    public void setDefault(Calendar value){
         setValue(value);
     }
 
@@ -271,8 +272,8 @@ public abstract class DBField {
     /**
      * Set the value of a field to a related DBModel (foreign keys only)
      */
-    public void setValue(Date value){
-        throw (new NotImplementedException("setValue(Date)"));
+    public void setValue(Calendar value){
+        throw (new NotImplementedException("setValue(Calendar)"));
     }
 
     public void setValue(DBModel value){

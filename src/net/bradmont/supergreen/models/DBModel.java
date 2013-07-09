@@ -16,7 +16,7 @@ import android.content.SharedPreferences;
 
 import android.util.Log;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -185,8 +185,8 @@ public abstract class DBModel {
     /**
      * Directly retrieve the Date value of a field
      */
-    public Date getDate(String fieldName){
-        return getField(fieldName).getDate();
+    public Calendar getCalendar(String fieldName){
+        return getField(fieldName).getCalendar();
     }
     /**
      * Directly retrieve a DBModel of a related field
@@ -287,7 +287,7 @@ public abstract class DBModel {
     /**
      * Set the value of a field to a Date, for supported fields
      */
-    public void setValue(String fieldName, Date value){
+    public void setValue(String fieldName, Calendar value){
         getField(fieldName).setValue(value);
     }
 
