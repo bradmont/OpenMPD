@@ -33,8 +33,8 @@ manage your donor base, please feel free to let us know.
 - [x] Evaluate monthly giving divided into monthly, regular, and special gifts
 - [x] Intelligently display donor statuses
 - [x] Automatic background updating of gifts & donor statuses
-- [ ] Notifications of changes in donor status (for new, late, delinquent, dropped)
-- [ ] Notifications of special gifts
+- [x] Notifications of changes in donor status (for new, late, delinquent, dropped)
+- [x] Notifications of special gifts
 - [ ] Beautiful, Holo-themed user interface
 - [ ] Simple, discoverable UI
 
