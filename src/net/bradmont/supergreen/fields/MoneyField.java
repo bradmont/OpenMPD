@@ -31,4 +31,7 @@ public class MoneyField extends IntField {
     public String getString(){
         return String.format("%.2f", ((float) getInt())/100.0f );
     }
+    public float getFloat(){
+        return (float) value;
+    }
 }

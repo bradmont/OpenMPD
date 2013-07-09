@@ -14,7 +14,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.ServiceAccount;
+import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.supergreen.models.*;
@@ -82,6 +82,108 @@ public class TntImportService extends IntentService {
             startForeground(evaluator.NOTIFICATION_ID, builder.build());
             evaluator.run();
             stopForeground(true);
+        }
+
+        // notify of important changes
+        ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
+        for (int i = 0; i < notifications.size(); i++){
+            Notification n = (Notification) notifications.get(i);
+            // notify the user
+            Contact contact = (Contact) n.getRelated("contact");
+            ContactStatus status = (ContactStatus)MPDDBHelper
+                    .getReferenceModel("contact_status")
+                    .getByField("contact_id", contact.getInt("id"));
+            
+            boolean notify = true;
+            builder.setContentText("");
+            if (n.getInt("type") == Notification.CHANGE_PARTNER_TYPE){
+                int partnership = status.partnership(status.getInt("partner_type"));
+                if (partnership == R.string.monthly){
+                    builder.setContentTitle("New monthly parner!");
+                    builder.setContentText(
+                        String.format("%s %s at $%.2f",
+                            contact.getString("fname"),
+                            contact.getString("lname"),
+                            status.getFloat("giving_amount")/100f)
+                    );
+                } else if (partnership == R.string.regular){
+                    builder.setContentTitle("New regular parner!");
+                    builder.setContentText(
+                        String.format("%s %s at $%.2f/%dmo",
+                            contact.getString("fname"),
+                            contact.getString("lname"),
+                            status.getFloat("giving_amount")/100f,
+                            status.getInt("gift_frequency"))
+                    );
+                }
+            } else if (n.getInt("type") == Notification.CHANGE_STATUS){
+                if (status.getInt("status") == ContactStatus.STATUS_LATE) {
+                    builder.setContentTitle("Late donor");
+                    builder.setContentText(
+                        String.format("%s %s at $%.2f/%dmo",
+                            contact.getString("fname"),
+                            contact.getString("lname"),
+                            status.getFloat("giving_amount")/100f,
+                            status.getInt("gift_frequency"))
+                    );
+                } else if (status.getInt("status") == ContactStatus.STATUS_LAPSED) {
+                    builder.setContentTitle("Lapsed donor");
+                    builder.setContentText(
+                        String.format("%s %s at $%.2f/%dmo",
+                            contact.getString("fname"),
+                            contact.getString("lname"),
+                            status.getFloat("giving_amount")/100f,
+                            status.getInt("gift_frequency"))
+                    );
+                } else if (status.getInt("status") == ContactStatus.STATUS_CURRENT) {
+                    try {
+                        int temp = Integer.parseInt(status.getString("text"));
+                        if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
+                            builder.setContentTitle("Restarted donor!");
+                            builder.setContentText(
+                                String.format("%s %s at $%.2f/%dmo",
+                                    contact.getString("fname"),
+                                    contact.getString("lname"),
+                                    status.getFloat("giving_amount")/100f,
+                                    status.getInt("gift_frequency"))
+                            );
+                        } else {
+                            notify = false;
+                        }
+                    }catch (Exception e){ notify=false;}
+                } else if (status.getInt("status") == ContactStatus.STATUS_DROPPED) {
+                    notify=false;
+                } 
+
+            } else if (n.getInt("type") == Notification.CHANGE_AMOUNT){
+                builder.setContentTitle("Donor amount changed");
+                builder.setContentText(
+                    String.format("%s %s at $%.2f/%dmo",
+                        contact.getString("fname"),
+                        contact.getString("lname"),
+                        status.getFloat("giving_amount")/100f,
+                        status.getInt("gift_frequency"))
+                );
+            } else if (n.getInt("type") == Notification.SPECIAL_GIFT){
+                builder.setContentTitle("Special Gift");
+                float amount = 0f;
+                try { 
+                    amount = Float.parseFloat(n.getString("text"));
+                } catch (Exception e){}
+                builder.setContentText(
+                    String.format("%s %s gave $%.2f",
+                        contact.getString("fname"),
+                        contact.getString("lname"),
+                        amount/100f,
+                        status.getInt("gift_frequency"))
+                );
+            }
+
+
+            if (notify == true){
+                notificationManager.notify(n.getID(), builder.build());
+            }
+            n.setValue("status", Notification.STATUS_NOTIFIED);
         }
     }
 

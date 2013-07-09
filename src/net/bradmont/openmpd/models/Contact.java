@@ -141,6 +141,7 @@ public class Contact extends DBModel{
                 note.dirtySave();
             } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
                 note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                note.setValue("text", Integer.toString(oldStatus.getInt("partner_type")));
                 note.dirtySave();
             } else if (oldStatus.getInt("status") != cs.getInt("status")){
                 note.setValue("type", Notification.CHANGE_STATUS);
