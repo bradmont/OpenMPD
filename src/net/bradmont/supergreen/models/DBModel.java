@@ -252,7 +252,9 @@ public abstract class DBModel {
 
         if (c.getCount() == 0) { return null;}
         c.moveToFirst();
-        return newInstance(c.getInt(0));
+        DBModel result = newInstance(c.getInt(0));
+        c.close();
+        return result;
     }
 
     // Directly assign values to fields:
@@ -321,6 +323,7 @@ public abstract class DBModel {
             }
             cur.moveToFirst();
             loadRecord(cur);
+            cur.close();
             record_exists = true;
         }
     }
@@ -362,8 +365,7 @@ public abstract class DBModel {
     public void update(){
         setupDbw();
         dbw.update(TABLE_NAME, buildContentValues(true), String.format("%s=%d", primaryKey.getColumnName(), id), null);
-        Log.i("net.bradmont.supergreen", String.format("update: %s %s=%d", TABLE_NAME,
-            primaryKey.getColumnName(), id));
+        //Log.i("net.bradmont.supergreen", String.format("update: %s %s=%d", TABLE_NAME, primaryKey.getColumnName(), id));
     }
 
     public void delete(){

@@ -134,39 +134,52 @@ public class Contact extends DBModel{
 
         // create notifications for changes in status
         if (initialImport == false){
-            Notification note = new Notification();
-            note.setValue("contact", this);
-            if (oldStatus == null){
-                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.dirtySave();
-            } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
-                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.setValue("text", Integer.toString(oldStatus.getInt("partner_type")));
-                note.dirtySave();
-            } else if (oldStatus.getInt("status") != cs.getInt("status")){
-                note.setValue("type", Notification.CHANGE_STATUS);
-                note.setValue("text", Integer.toString(oldStatus.getInt("status")));
-                note.dirtySave();
-            } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
-                note.setValue("type", Notification.CHANGE_AMOUNT);
-                note.setValue("text", Integer.toString(oldStatus.getInt("giving_amount")));
-                note.dirtySave();
+            // check if we've already made a notification for this partner's last gift
+            SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+            String lastGift = "";
+            cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+            if (cur.getCount() > 0){
+                cur.moveToFirst();
+                lastGift = cur.getString(0);
             }
-            // we want to allow getting 2 notifications, eg, for a new one-time donor
-            // we'll notify "new donor" and "gave a special gift".
-            note = new Notification();
-            note.setValue("contact", this);
-            int monthAmount = getMonthAmount();
-            if (monthAmount != 0){
-                if (cs.getInt("partner_type") == ContactStatus.PARTNER_OCCASIONAL 
-                    || cs.getInt("partner_type") == ContactStatus.PARTNER_ONETIME ){
-                    note.setValue("type", Notification.SPECIAL_GIFT);
-                    note.setValue("text", Integer.toString(monthAmount));
+            cur.close();
+            if (lastGift != cs.getString("last_notify")){
+                cs.setValue("last_notify", lastGift);
+                cs.dirtySave();
+                Notification note = new Notification();
+                note.setValue("contact", this);
+                if (oldStatus == null){
+                    note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
                     note.dirtySave();
-                } else if (monthAmount != getInt("giving_amount")){
-                    note.setValue("type", Notification.SPECIAL_GIFT);
-                    note.setValue("text", Integer.toString(monthAmount));
+                } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
+                    note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                    note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
                     note.dirtySave();
+                } else if (oldStatus.getInt("status") != cs.getInt("status")){
+                    note.setValue("type", Notification.CHANGE_STATUS);
+                    note.setValue("message", Integer.toString(oldStatus.getInt("status")));
+                    note.dirtySave();
+                } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
+                    note.setValue("type", Notification.CHANGE_AMOUNT);
+                    note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
+                    note.dirtySave();
+                }
+                // we want to allow getting 2 notifications, eg, for a new one-time donor
+                // we'll notify "new donor" and "gave a special gift".
+                note = new Notification();
+                note.setValue("contact", this);
+                int monthAmount = getMonthAmount();
+                if (monthAmount != 0){
+                    if (cs.getInt("partner_type") == ContactStatus.PARTNER_OCCASIONAL 
+                        || cs.getInt("partner_type") == ContactStatus.PARTNER_ONETIME ){
+                        note.setValue("type", Notification.SPECIAL_GIFT);
+                        note.setValue("message", Integer.toString(monthAmount));
+                        note.dirtySave();
+                    } else if (monthAmount != cs.getInt("giving_amount")){
+                        note.setValue("type", Notification.SPECIAL_GIFT);
+                        note.setValue("message", Integer.toString(monthAmount));
+                        note.dirtySave();
+                    }
                 }
             }
         }
@@ -197,24 +210,46 @@ public class Contact extends DBModel{
       */
     private int getMonthAmount(){
         String SQL = 
-            "select _id, sum(amount) as amount from gift "+
-            "    where tnt_people_id=? "+
-            "    group by month " +
-            "    order by date desc "+
-            "    limit 5; ";
+            " select distinct month from gift order by month desc limit 2";
+        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, null);
+        String [] args = null;
+        if (cur.getCount() > 1){
+            cur.moveToPosition(1);
+            String lastMonth = cur.getString(0);
+            SQL = "select month, sum(amount) from gift "+
+                  "     where tnt_people_id=? and month >= ? "+
+                  "     group by month "+
+                  "     order by month desc;";
+            args = new String [2];
+            args[0] = Integer.toString(getInt("tnt_people_id"));
+            args[1] = lastMonth;
+        }  else {
+            SQL = "select month, sum(amount) from gift "+
+                  "     where tnt_people_id=? "+
+                  "     group by month "+
+                  "     order by month desc;";
+            args = new String [1];
+            args[0] = Integer.toString(getInt("tnt_people_id"));
+        }
 
-        String [] args = new String [1];
-        args[0] = Integer.toString(getInt("tnt_people_id"));
+        cur.close();
 
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
         if (cur.getCount() == 0){
+            cur.close();
             return 0;
         }
         cur.moveToFirst();
-        int mode = cur.getInt(0);
+        int result = cur.getInt(1);
+        if (result == 0){
+            // check last two months, as end-of-month gifts can show up when there's already
+            // gifts from the next month
+            cur.moveToNext();
+            result = cur.getInt(1);
+        }
         cur.close();
 
-        return mode;
+        return result;
     }
     private int getGivingAmount(){
         // giving amount is mode of last 5 months' gift totals

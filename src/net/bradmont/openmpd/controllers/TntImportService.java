@@ -96,6 +96,7 @@ public class TntImportService extends IntentService {
             
             boolean notify = true;
             builder.setContentText("");
+            builder.setProgress(0, 0, false); // remove progress bar
             if (n.getInt("type") == Notification.CHANGE_PARTNER_TYPE){
                 int partnership = status.partnership(status.getInt("partner_type"));
                 if (partnership == R.string.monthly){
@@ -137,7 +138,7 @@ public class TntImportService extends IntentService {
                     );
                 } else if (status.getInt("status") == ContactStatus.STATUS_CURRENT) {
                     try {
-                        int temp = Integer.parseInt(status.getString("text"));
+                        int temp = Integer.parseInt(status.getString("message"));
                         if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
                             builder.setContentTitle("Restarted donor!");
                             builder.setContentText(
@@ -168,7 +169,7 @@ public class TntImportService extends IntentService {
                 builder.setContentTitle("Special Gift");
                 float amount = 0f;
                 try { 
-                    amount = Float.parseFloat(n.getString("text"));
+                    amount = Float.parseFloat(n.getString("message"));
                 } catch (Exception e){}
                 builder.setContentText(
                     String.format("%s %s gave $%.2f",
