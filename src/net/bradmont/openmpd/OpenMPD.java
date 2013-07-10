@@ -78,7 +78,7 @@ public class OpenMPD extends BaseActivity {
 		.commit();
 		
 		// customize the SlidingMenu
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 
         // if it hasn't been done, populate our TntService table
         TntService t = new TntService();

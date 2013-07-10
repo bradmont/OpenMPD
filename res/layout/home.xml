@@ -11,7 +11,7 @@
         android:orientation="vertical"
 	    android:layout_width="match_parent"
         android:background="#fff"
-	    android:layout_height="match_parent" >
+	    android:layout_height="fill_parent" >
 
         <!-- Summary header -->
         <LinearLayout
@@ -19,7 +19,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-        >
+            >
             <TextView
                 android:id="@+id/monthly_average"
                 android:textColor="#707070"
@@ -50,6 +50,11 @@
             custom:maxItems="12"
         />
         <!-- recent stuff -->
+        <com.fima.cardsui.views.CardUI
+            android:id="@+id/cardsui"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            />
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"

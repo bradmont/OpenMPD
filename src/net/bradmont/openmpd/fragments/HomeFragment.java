@@ -15,7 +15,10 @@ import android.widget.ListView;
 
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.MPDDBHelper;
+import net.bradmont.openmpd.views.MyCard;
 import net.bradmont.holograph.BarGraph;
+
+import com.fima.cardsui.views.CardUI;
 
 
 public class HomeFragment extends Fragment {
@@ -111,5 +114,13 @@ public class HomeFragment extends Fragment {
         cur1.close(); cur2.close(); cur3.close(); cur4.close();
         BarGraph graph = (BarGraph) getView().findViewById(R.id.magic_graph);
         graph.setValues(vals);
+
+        // cards UI
+        CardUI cardsui = (CardUI) getView().findViewById(R.id.cardsui);
+        cardsui.setSwipeable(true);
+        MyCard card = new MyCard("Test card");
+        cardsui.addCard(card);
+        cardsui.refresh();
+
 	}
 }
