@@ -74,4 +74,5 @@ Depends
 
 - ActionBarSherlock (actionbarsherlock.com) - Apache License 2.0
 - SlidingMenu ( https://github.com/jfeinstein10/SlidingMenu ) - Apache License 2.0 
+- CardsUI (https://github.com/Androguide/cardsui-for-android) 
 - Android support library v4 - Apache License 2.0
