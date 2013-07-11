@@ -1,4 +1,4 @@
-package net.bradmont.openmpd.views;
+package net.bradmont.openmpd.views.cards;
 
 import net.bradmont.openmpd.*;
 
