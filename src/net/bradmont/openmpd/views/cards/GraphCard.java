@@ -46,7 +46,20 @@ public class GraphCard extends Card {
     // (they gave extra in a given month)
     // This is confusing but necessary
     private static final String BASE_GIVING_SQL_EXTRA =
-        "select month, sum(giving_amount) "+
+    "select months.month, total from "+
+        "(select distinct month from gift) months left outer join  "+
+            "(select month, sum(giving_amount)  as total "+
+            "from  "+
+                "( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
+                "join  "+
+                "(select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B  "+
+                "on A.tnt_people_id = B.tnt_people_id  "+
+            "where total_gifts>giving_amount  "+
+            "group by month ) main_query "+
+        "on main_query.month=months.month "+
+            "order by months.month; ";
+ 
+        /*"select month, sum(giving_amount) "+
         "    from "+
         "        ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
         "        join "+
@@ -54,13 +67,27 @@ public class GraphCard extends Card {
         "        on A.tnt_people_id = B.tnt_people_id "+
         "    where total_gifts>giving_amount "+
         "    group by month "+
-        "    order by month; ";
+        "    order by month; ";*/
 
 
     // gifts above monthly giving
     // Eg, all special gifts (including for regular donors who gave extra)
     private static final String SPECIAL_SQL =
-        "    select month, sum(total_gifts) - sum(giving_amount) "+
+    "select months.month, giving from "+
+        "(select distinct month from gift) months "+
+        "left outer join "+
+        "(select month, sum(total_gifts) - sum(giving_amount)  as giving "+
+            "from  "+
+                "(select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
+                "join  "+
+                "(select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B  "+
+                "on A.tnt_people_id = B.tnt_people_id  "+
+            "where total_gifts>giving_amount)  "+
+            "group by month ) as dataset "+
+        "on months.month=dataset.month "+
+            "order by dataset.month; ";
+
+        /*"    select month, sum(total_gifts) - sum(giving_amount) "+
         "    from "+
         "        (select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
         "        join "+
@@ -68,7 +95,7 @@ public class GraphCard extends Card {
         "        on A.tnt_people_id = B.tnt_people_id "+
         "    where total_gifts>giving_amount) "+
         "    group by month "+
-        "    order by month; ";
+        "    order by month; ";*/
 
 	public GraphCard(){
 		super();
@@ -76,6 +103,7 @@ public class GraphCard extends Card {
 
 	@Override
 	public View getCardContent(Context context) {
+        // TODO: cursors may not return same number of rows. Deal with this gracefully
 		View view = LayoutInflater.from(context).inflate(R.layout.card_graph, null);
 
 		((TextView) view.findViewById(R.id.title)).setText(R.string.giving_summary);
@@ -99,9 +127,22 @@ public class GraphCard extends Card {
         cur3.moveToFirst();
         cur4.moveToFirst();
         for (int i = 0; i < cur1.getCount(); i++){
-            vals[i][0] = ((float) cur1.getInt(1) + cur2.getInt(1)) / 100f;
-            vals[i][1] = ((float) cur3.getInt(2)) / 100f;
-            vals[i][2] = ((float) cur4.getInt(1)) / 100f;
+            if (i < cur2.getCount()){
+                // sometimes this happens....
+                vals[i][0] = ((float) cur1.getInt(1) + cur2.getInt(1)) / 100f;
+            } else {
+                vals[i][0] = ((float) cur1.getInt(1) ) / 100f;
+            }
+            if (i < cur3.getCount()){
+                vals[i][1] = ((float) cur3.getInt(2)) / 100f;
+            } else {
+                vals[i][1] = 0f;
+            }
+            if (i < cur4.getCount()){
+                vals[i][2] = ((float) cur4.getInt(1)) / 100f;
+            } else {
+                vals[i][1] = 0f;
+            }
             cur1.moveToNext();
             cur2.moveToNext();
             cur3.moveToNext();
