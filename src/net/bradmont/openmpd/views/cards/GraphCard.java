@@ -14,7 +14,8 @@ import com.fima.cardsui.objects.Card;
 
 public class GraphCard extends Card {
 
-    // monthly giving == regular giving
+    // monthly giving, where a month's total gifts == donor's regular giving
+    // eg, if they gave an extra gift, their entire giving will be excluded
     private static final String BASE_GIVING_SQL =
         "select month, sum(total_gifts) "+
         "    from "+
@@ -41,7 +42,9 @@ public class GraphCard extends Card {
     "    on months.month=gifts.month "+
     "    order by month;";
 
-    // monthly giving where month's gifts > regular giving
+    // Regular from monthly donors where month's gifts > regular giving
+    // (they gave extra in a given month)
+    // This is confusing but necessary
     private static final String BASE_GIVING_SQL_EXTRA =
         "select month, sum(giving_amount) "+
         "    from "+
@@ -55,6 +58,7 @@ public class GraphCard extends Card {
 
 
     // gifts above monthly giving
+    // Eg, all special gifts (including for regular donors who gave extra)
     private static final String SPECIAL_SQL =
         "    select month, sum(total_gifts) - sum(giving_amount) "+
         "    from "+
