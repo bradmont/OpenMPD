@@ -35,7 +35,15 @@ public class HomeFragment extends Fragment {
         CardUI cardsui = (CardUI) getView().findViewById(R.id.cardsui);
         cardsui.setSwipeable(true);
 
-        cardsui.addCard(new GraphCard());
+
+        SummaryCard summaryCard = new SummaryCard();
+        summaryCard.setIsSwipeable(false); // uses minor mod to cardsui for dev purposes
+                                           // can be savely removed 
+        cardsui.addCard(summaryCard);
+
+        GraphCard graphCard = new GraphCard();
+        graphCard.setIsSwipeable(false);
+        cardsui.addCardToLastStack(graphCard);
 
         MyCard card = new MyCard("Test card");
         cardsui.addCard(card);

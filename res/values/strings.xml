@@ -34,4 +34,13 @@
 
     <string name="add_account">Add Account</string>
 
+    <!-- summary card strings -->
+    <string name="summary_card_title">Monthly Average: %s</string>
+    <string name="stable_monthly_giving">Stable Monthly Giving:</string>
+    <string name="late_giving">Late Giving (avg):</string>
+    <string name="lapsed_giving">Lapsed Giving (avg):</string>
+    <string name="stable_regular_giving">Stable Regular Giving (avg):</string>
+    <string name="average_special_giving">Average Monthly Special Gifts:</string>
+    <string name="next_month_stable_giving">Next Month Stable Giving:</string>
+
 </resources>
