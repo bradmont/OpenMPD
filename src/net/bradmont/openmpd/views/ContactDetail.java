@@ -84,7 +84,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
         ListView gift_list = (ListView) layout.findViewById(R.id.gift_list);
         ModelList gifts = MPDDBHelper
                 .getReferenceModel("gift")
-                .filter("tnt_people_id", contact.getInt("tnt_people_id"));
+                .filter("tnt_people_id", contact.getString("tnt_people_id"));
         gifts.setOrderBy("date desc");
         cursor = gifts.getCursor();
 
@@ -121,7 +121,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
         super.onActivityCreated(savedInstanceState);
         final OpenMPD app = (OpenMPD)getActivity();
         String [] args = new String [1];
-        args[0] = Integer.toString(contact.getInt("tnt_people_id"));
+        args[0] = contact.getString("tnt_people_id");
 
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
             "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);

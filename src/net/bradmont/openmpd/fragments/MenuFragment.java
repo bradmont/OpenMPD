@@ -23,9 +23,9 @@ public class MenuFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		String[] colors = getResources().getStringArray(R.array.color_names);
+		String[] menu_items = getResources().getStringArray(R.array.menu_items);
 		ArrayAdapter<String> colorAdapter = new ArrayAdapter<String>(getActivity(), 
-				android.R.layout.simple_list_item_1, android.R.id.text1, colors);
+				android.R.layout.simple_list_item_1, android.R.id.text1, menu_items);
 		setListAdapter(colorAdapter);
 	}
 

@@ -51,7 +51,7 @@ public class Gift extends DBModel{
         getField("id").setColumnName("_id");
         getField("id").setExtraArguments("autoincrement");
 
-        addField(new IntField("tnt_people_id"));
+        addField(new StringField("tnt_people_id"));
         addField(new DateField("date"));
         addField(new StringField("month"));
         addField(new MoneyField("amount"));

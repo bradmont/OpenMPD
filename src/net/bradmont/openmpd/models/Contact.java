@@ -61,7 +61,7 @@ public class Contact extends DBModel{
         getField("id").setColumnName("_id");
         getField("id").setExtraArguments("autoincrement");
 
-        addField(new IntField("tnt_people_id"));
+        addField(new StringField("tnt_people_id"));
         getField("tnt_people_id").setExtraArguments("unique");
         addField(new StringField("tnt_account_name"));
         addField(new StringField("tnt_person_type"));
@@ -105,7 +105,7 @@ public class Contact extends DBModel{
         "   group by grouper;";
 
         String [] args = new String [1];
-        args[0] = Integer.toString(getInt("tnt_people_id"));
+        args[0] = getString("tnt_people_id");
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
         cur.moveToFirst();
         String giftPattern = cur.getString(1);
@@ -221,7 +221,7 @@ public class Contact extends DBModel{
                   "     group by month "+
                   "     order by month desc;";
             args = new String [2];
-            args[0] = Integer.toString(getInt("tnt_people_id"));
+            args[0] = getString("tnt_people_id");
             args[1] = lastMonth;
         }  else {
             SQL = "select month, sum(amount) from gift "+
@@ -229,7 +229,7 @@ public class Contact extends DBModel{
                   "     group by month "+
                   "     order by month desc;";
             args = new String [1];
-            args[0] = Integer.toString(getInt("tnt_people_id"));
+            args[0] = getString("tnt_people_id");
         }
 
         cur.close();
@@ -269,7 +269,7 @@ public class Contact extends DBModel{
             "   order by gift_count desc;";
 
         String [] args = new String [1];
-        args[0] = Integer.toString(getInt("tnt_people_id"));
+        args[0] = getString("tnt_people_id");
 
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
         if (cur.getCount() == 0){

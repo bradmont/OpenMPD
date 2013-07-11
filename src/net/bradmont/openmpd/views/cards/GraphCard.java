@@ -19,7 +19,7 @@ public class GraphCard extends Card {
     private static final String BASE_GIVING_SQL =
         "select month, sum(total_gifts) "+
         "    from "+
-        "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id>0) A "+
+        "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
         "        join "+
         "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
         "        on A.tnt_people_id = B.tnt_people_id "+
@@ -33,7 +33,7 @@ public class GraphCard extends Card {
     "select * from  "+
     "   (select distinct month from gift) months left outer join (select month, sum(total_gifts) "+
     "    from "+
-    "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id>0) A "+
+    "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
     "        join "+
     "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
     "        on A.tnt_people_id = B.tnt_people_id "+
@@ -48,7 +48,7 @@ public class GraphCard extends Card {
     private static final String BASE_GIVING_SQL_EXTRA =
         "select month, sum(giving_amount) "+
         "    from "+
-        "        ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id>0) A "+
+        "        ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
         "        join "+
         "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
         "        on A.tnt_people_id = B.tnt_people_id "+
@@ -62,7 +62,7 @@ public class GraphCard extends Card {
     private static final String SPECIAL_SQL =
         "    select month, sum(total_gifts) - sum(giving_amount) "+
         "    from "+
-        "        (select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id>0) A "+
+        "        (select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
         "        join "+
         "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
         "        on A.tnt_people_id = B.tnt_people_id "+

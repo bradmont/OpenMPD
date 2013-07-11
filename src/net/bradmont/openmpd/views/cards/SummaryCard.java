@@ -49,7 +49,7 @@ public class SummaryCard extends Card {
         "select avg(total_gifts) from "+
             "(select month, sum(total_gifts) - sum(giving_amount)  as total_gifts "+
                 "from  "+
-                    "(select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id>0) A  "+
+                    "(select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
                     "join  "+
                     "(select tnt_people_id, month, sum(amount) as total_gifts from gift where month!=? group by tnt_people_id,month) B  "+
                     "on A.tnt_people_id = B.tnt_people_id  "+
