@@ -45,6 +45,14 @@ public class HomeFragment extends Fragment {
         graphCard.setIsSwipeable(false);
         cardsui.addCardToLastStack(graphCard);
 
+
+        // notifications
+        ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
+        for (int i = 0; i < notifications.size(); i++){
+            Notification n = (Notification) notifications.get(i);
+            cardsui.addCard(new NotificationCard(n));
+        }
+
         MyCard card = new MyCard("Test card");
         cardsui.addCard(card);
         cardsui.refresh();

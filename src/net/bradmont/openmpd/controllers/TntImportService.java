@@ -30,6 +30,7 @@ public class TntImportService extends IntentService {
     protected void onHandleIntent(Intent intent){
         Bundle b = intent.getExtras();
         boolean newdata = false;
+        boolean initialImport = false;
         if (MPDDBHelper.get() == null){
             MPDDBHelper dbh = new MPDDBHelper(this);
         }
@@ -48,6 +49,7 @@ public class TntImportService extends IntentService {
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account)){
+                if (account.getString("last_import") == null) {initialImport = true;}
                 startForeground(account.getID(), builder.build());
                 TntImporter importer = new TntImporter(this, account, builder);
                 importer.run();
@@ -62,6 +64,7 @@ public class TntImportService extends IntentService {
             for (int i = 0; i < ids.length; i++){
                 ServiceAccount account = new ServiceAccount(ids[i]);
                 if (isOld(account)){
+                    if (account.getString("last_import") == null) {initialImport = true;}
                     startForeground(account.getID(), builder.build());
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
@@ -76,7 +79,7 @@ public class TntImportService extends IntentService {
 
         // Evaluate contacts if we have newly imported data
         if (newdata == true){
-            ContactsEvaluator evaluator = new ContactsEvaluator(this, builder);
+            ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
             startForeground(evaluator.NOTIFICATION_ID, builder.build());

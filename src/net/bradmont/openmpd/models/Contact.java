@@ -132,8 +132,29 @@ public class Contact extends DBModel{
         cs.setValue("partner_type", partner);
         cs.dirtySave();
 
-        // create notifications for changes in status
+        // create notifications for changes in status (unless we're importing
+        // data for a new account)
+        // TODO: generate notifications for the last month on initial import
         if (initialImport == false){
+            Notification note = new Notification();
+            note.setValue("contact", this);
+            if (oldStatus == null){
+                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                note.dirtySave();
+            } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
+                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
+                note.dirtySave();
+            } else if (oldStatus.getInt("status") != cs.getInt("status")){
+                note.setValue("type", Notification.CHANGE_STATUS);
+                note.setValue("message", Integer.toString(oldStatus.getInt("status")));
+                note.dirtySave();
+            } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
+                note.setValue("type", Notification.CHANGE_AMOUNT);
+                note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
+                note.dirtySave();
+            }
+
             // check if we've already made a notification for this partner's last gift
             SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
             String lastGift = "";
@@ -143,27 +164,17 @@ public class Contact extends DBModel{
                 lastGift = cur.getString(0);
             }
             cur.close();
-            if (lastGift != cs.getString("last_notify")){
+
+            if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
+                /*Log.i("net.bradmont.openmpd", String.format("lastGift: '%s'; last_notify: '%s'",
+                    lastGift, oldStatus.getString("last_notify")));
+                if (lastGift != oldStatus.getString("last_notify")){
+                    Log.i("net.bradmont.openmpd", String.format("lastGift: '%d'; last_notify: '%d'",
+                    lastGift.length(), oldStatus.getString("last_notify").length()));
+                    
+                }*/
                 cs.setValue("last_notify", lastGift);
                 cs.dirtySave();
-                Notification note = new Notification();
-                note.setValue("contact", this);
-                if (oldStatus == null){
-                    note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                    note.dirtySave();
-                } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
-                    note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                    note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
-                    note.dirtySave();
-                } else if (oldStatus.getInt("status") != cs.getInt("status")){
-                    note.setValue("type", Notification.CHANGE_STATUS);
-                    note.setValue("message", Integer.toString(oldStatus.getInt("status")));
-                    note.dirtySave();
-                } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
-                    note.setValue("type", Notification.CHANGE_AMOUNT);
-                    note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
-                    note.dirtySave();
-                }
                 // we want to allow getting 2 notifications, eg, for a new one-time donor
                 // we'll notify "new donor" and "gave a special gift".
                 note = new Notification();
@@ -196,7 +207,12 @@ public class Contact extends DBModel{
                 cs.setValue("partner_type", ContactStatus.STATUSES[i][0]);
                 cs.setValue("gift_frequency", ContactStatus.STATUSES[i][1]);
                 if (ContactStatus.STATUSES[i][2] == 1) {
-                    cs.setValue("giving_amount", getGivingAmount());
+                    boolean current = false;
+                    if (ContactStatus.STATUSES[i][3] == ContactStatus.STATUS_CURRENT
+                        ||ContactStatus.STATUSES[i][3] == ContactStatus.STATUS_NEW){
+                            current = true;
+                        }
+                    cs.setValue("giving_amount", getGivingAmount(current));
                 }
                 cs.setValue("status", ContactStatus.STATUSES[i][3]);
                 return ContactStatus.STATUSES[i][0];
@@ -251,23 +267,45 @@ public class Contact extends DBModel{
 
         return result;
     }
-    private int getGivingAmount(){
+    private int getGivingAmount(boolean current){
         // giving amount is mode of last 5 months' gift totals
         // SQL groups last 5 months by amount, sorts by the number
         // of gifts of that amount.
         // First record in cursor holds the most common of the last 5
         // gifts (the mode). 
-        String SQL = 
-            " select amount, count(_id) as gift_count " +
-            "   from "+
-            "       (select _id, sum(amount) as amount from gift "+
-            "           where tnt_people_id=? "+
-            "           group by month " +
-            "           order by date desc "+
-            "           limit 5) "+
-            "   group by amount "+
-            "   order by gift_count desc;";
-
+        String SQL;
+        if (current == false){
+            SQL = 
+                " select amount, count(_id) as gift_count " +
+                "   from "+
+                "       (select _id, sum(amount) as amount from gift "+
+                "           where tnt_people_id=? "+
+                "           group by month " +
+                "           order by date desc "+
+                "           limit 5) "+
+                "   group by amount "+
+                "   order by gift_count desc;";
+        }else {
+            // if the donor is current, we have to account for
+            // periods of inactivity, in case a donor drops then
+            // resumes at a different amount. We cannot do this
+            // for late, lapsed or dropped donors, as it will
+            // change their giving_amount to 0
+            SQL = 
+                "select amount, count(month) as gift_count from "+
+                       "(select months.month, amount from  "+
+                       "(select distinct month from gift) months "+
+                       "left outer join "+
+                       "(select month, sum(amount) as amount  "+
+                        "from gift "+
+                        "where tnt_people_id=? "+
+                        "group by month) B "+
+                        "on months.month=B.month "+
+                        "order by months.month desc "+
+                        "limit 5) "+
+                    "group by amount "+
+                    "order by amount is null, gift_count desc;";
+        }
         String [] args = new String [1];
         args[0] = getString("tnt_people_id");
 
