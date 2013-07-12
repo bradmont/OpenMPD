@@ -28,7 +28,7 @@ manage your donor base, please feel free to let us know.
 ### Release 1 Goals
 - [ ] **"Zero User Input" data analysis release**
 - [x] Import donor data and donation histories from TntMPD.DataServer
-- [ ] Support for multiple data sources (Currently only Power to Change is verified working)
+- [x] Support for multiple data sources (p2c & CCCi working; adding others should be fairly easy)
 - [x] Classify partners into monthly, regular (quarterly, semiannual, etc), annual, occasional or one-time
 - [x] Evaluate monthly giving divided into monthly, regular, and special gifts
 - [x] Intelligently display donor statuses
