@@ -58,15 +58,15 @@ public class HomeFragment extends Fragment {
             Notification n = (Notification) notifications.get(i);
             NotificationCard card = NotificationCardFactory.newCard(n);
 
-            if (card instanceof SpecialGiftCard){
+            if (card instanceof SpecialGiftCard ||
+                card instanceof AmountChangeCard){
                 specialStack.add(card);
             } else if (card instanceof LatePartnerCard ||
                     card instanceof LapsedPartnerCard ||
                     card instanceof DroppedPartnerCard){
                 sadStack.add(card);
             } else if (card instanceof NewRegularPartnerCard ||
-                    card instanceof RestartedPartnerCard ||
-                    card instanceof AmountChangeCard){
+                    card instanceof RestartedPartnerCard ){
                 happyStack.add(card);
             } else if (card != null) {
                 cardsui.addCard(card);
