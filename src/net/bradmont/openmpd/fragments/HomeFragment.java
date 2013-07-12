@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
                     card instanceof RestartedPartnerCard ||
                     card instanceof AmountChangeCard){
                 happyStack.add(card);
-            } else {
+            } else if (card != null) {
                 cardsui.addCard(card);
             }
         }

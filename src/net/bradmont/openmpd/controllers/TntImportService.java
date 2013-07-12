@@ -55,9 +55,6 @@ public class TntImportService extends IntentService {
                 importer.run();
                 stopForeground(true);
                 newdata = true;
-            } else {
-                builder.setContentText("Not stale, not updating.");
-                notificationManager.notify(0, builder.build());
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
             int [] ids = b.getIntArray("net.bradmont.openmpd.account_ids");
@@ -70,9 +67,6 @@ public class TntImportService extends IntentService {
                     importer.run();
                     stopForeground(true);
                     newdata = true;
-                } else {
-                    builder.setContentText("Not stale, not updating.");
-                    notificationManager.notify(0, builder.build());
                 }
             }
         }
@@ -86,108 +80,87 @@ public class TntImportService extends IntentService {
             evaluator.run();
             stopForeground(true);
 
+
             // notify of important changes
             ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
+            
+            int new_partners, late_partners, lapsed_partners, restarted_partners, amount_changes, special_gifts;
+            new_partners = late_partners = lapsed_partners = restarted_partners = amount_changes = special_gifts = 0;
+
             for (int i = 0; i < notifications.size(); i++){
+
                 Notification n = (Notification) notifications.get(i);
-                // notify the user
                 Contact contact = (Contact) n.getRelated("contact");
                 ContactStatus status = (ContactStatus)MPDDBHelper
                         .getReferenceModel("contact_status")
                         .getByField("contact_id", contact.getInt("id"));
-                
-                boolean notify = true;
-                builder.setContentText("");
-                builder.setProgress(0, 0, false); // remove progress bar
-                if (n.getInt("type") == Notification.CHANGE_PARTNER_TYPE){
-                    int partnership = status.partnership(status.getInt("partner_type"));
-                    if (partnership == R.string.monthly){
-                        builder.setContentTitle("New monthly partner!");
-                        builder.setContentText(
-                            String.format("%s %s at $%.2f",
-                                contact.getString("fname"),
-                                contact.getString("lname"),
-                                status.getFloat("giving_amount")/100f)
-                        );
-                    } else if (partnership == R.string.regular){
-                        builder.setContentTitle("New regular partner!");
-                        builder.setContentText(
-                            String.format("%s %s at $%.2f/%dmo",
-                                contact.getString("fname"),
-                                contact.getString("lname"),
-                                status.getFloat("giving_amount")/100f,
-                                status.getInt("gift_frequency"))
-                        );
-                    }
-                } else if (n.getInt("type") == Notification.CHANGE_STATUS){
-                    if (status.getInt("status") == ContactStatus.STATUS_LATE) {
-                        builder.setContentTitle("Late donor");
-                        builder.setContentText(
-                            String.format("%s %s at $%.2f/%dmo",
-                                contact.getString("fname"),
-                                contact.getString("lname"),
-                                status.getFloat("giving_amount")/100f,
-                                status.getInt("gift_frequency"))
-                        );
-                    } else if (status.getInt("status") == ContactStatus.STATUS_LAPSED) {
-                        builder.setContentTitle("Lapsed donor");
-                        builder.setContentText(
-                            String.format("%s %s at $%.2f/%dmo",
-                                contact.getString("fname"),
-                                contact.getString("lname"),
-                                status.getFloat("giving_amount")/100f,
-                                status.getInt("gift_frequency"))
-                        );
-                    } else if (status.getInt("status") == ContactStatus.STATUS_CURRENT) {
-                        try {
-                            int temp = Integer.parseInt(status.getString("message"));
-                            if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
-                                builder.setContentTitle("Restarted donor!");
-                                builder.setContentText(
-                                    String.format("%s %s at $%.2f/%dmo",
-                                        contact.getString("fname"),
-                                        contact.getString("lname"),
-                                        status.getFloat("giving_amount")/100f,
-                                        status.getInt("gift_frequency"))
-                                );
-                            } else {
-                                notify = false;
-                            }
-                        }catch (Exception e){ notify=false;}
-                    } else if (status.getInt("status") == ContactStatus.STATUS_DROPPED) {
-                        notify=false;
-                    } 
 
-                } else if (n.getInt("type") == Notification.CHANGE_AMOUNT){
-                    builder.setContentTitle("Donor amount changed");
-                    builder.setContentText(
-                        String.format("%s %s at $%.2f/%dmo",
-                            contact.getString("fname"),
-                            contact.getString("lname"),
-                            status.getFloat("giving_amount")/100f,
-                            status.getInt("gift_frequency"))
-                    );
-                } else if (n.getInt("type") == Notification.SPECIAL_GIFT){
-                    builder.setContentTitle("Special Gift");
-                    float amount = 0f;
-                    try { 
-                        amount = Float.parseFloat(n.getString("message"));
-                    } catch (Exception e){}
-                    builder.setContentText(
-                        String.format("%s %s gave $%.2f",
-                            contact.getString("fname"),
-                            contact.getString("lname"),
-                            amount/100f,
-                            status.getInt("gift_frequency"))
-                    );
-                }
+                switch (n.getInt("type")){
+                    case Notification.CHANGE_PARTNER_TYPE:
+                        int partnership = status.partnership(status.getInt("partner_type"));
+                        if (partnership == R.string.monthly || partnership == R.string.regular){
+                            new_partners++;
+                        }
+                        break;
 
+                    case Notification.CHANGE_STATUS:
+                        switch(status.getInt("status")){
+                            case ContactStatus.STATUS_LATE:
+                                late_partners++;
+                                break;
+                            case ContactStatus.STATUS_LAPSED:
+                                lapsed_partners++;
+                                break;
+                            case ContactStatus.STATUS_CURRENT:
+                                try{
+                                    int temp = Integer.parseInt(status.getString("message"));
+                                    if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
+                                        restarted_partners++;
+                                    }
+                                } catch (Exception e){ }
+                                break;
 
-                if (notify == true){
-                    notificationManager.notify(n.getID(), builder.build());
+                        }
+                        break;
+
+                    case Notification.CHANGE_AMOUNT:
+                        amount_changes++;
+                        break;
+                    case Notification.SPECIAL_GIFT:
+                        special_gifts++;
                 }
                 n.setValue("status", Notification.STATUS_NOTIFIED);
                 n.dirtySave();
+            }
+
+            int total = new_partners + late_partners + lapsed_partners + restarted_partners + amount_changes + special_gifts;
+
+            if (total > 0){
+                builder.setContentTitle(String.format("%d MPD notifications", total));
+                String content = "";
+
+                if (new_partners >  0){
+                    content += String.format("%d new partner(s). ", new_partners);
+                }
+                if ( restarted_partners  > 0){
+                    content += String.format("%d restarted partner(s). ", restarted_partners);
+                } 
+                if ( special_gifts > 0) { 
+                    content += String.format("%d special gift(s). ", special_gifts);
+                }
+                if ( late_partners  > 0){
+                    content += String.format("%d late partner(s). ", late_partners);
+                } 
+                if ( lapsed_partners  > 0){
+                    content += String.format("%d lapsed partner(s). ", lapsed_partners);
+                } 
+                if ( amount_changes  > 0){
+                    content += String.format("%d amount change(s). ", amount_changes);
+                } 
+
+                builder.setContentText(content);
+                builder.setProgress(0, 0, false); // remove progress bar
+                notificationManager.notify(1, builder.build());
             }
         }
     }

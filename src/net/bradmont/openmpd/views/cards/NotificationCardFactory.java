@@ -38,13 +38,17 @@ public class NotificationCardFactory {
                         return new DroppedPartnerCard(n, contact, status);
 
                     case ContactStatus.STATUS_CURRENT:
-                        int oldstatus = Integer.parseInt(status.getString("message"));
-                        if (oldstatus == ContactStatus.STATUS_LATE || 
-                            oldstatus == ContactStatus.STATUS_LAPSED || 
-                            oldstatus == ContactStatus.STATUS_DROPPED){
-                            return new RestartedPartnerCard(n, contact, status);
-                        } else {
-                            return null;
+                        try {
+                            int oldstatus = Integer.parseInt(status.getString("message"));
+                            if (oldstatus == ContactStatus.STATUS_LATE || 
+                                oldstatus == ContactStatus.STATUS_LAPSED || 
+                                oldstatus == ContactStatus.STATUS_DROPPED){
+                                return new RestartedPartnerCard(n, contact, status);
+                            } else {
+                                return null;
+                            }
+                        } catch (Exception e){
+                                return null;
                         }
                     }
             case Notification.CHANGE_AMOUNT:

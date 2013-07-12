@@ -33,7 +33,7 @@
     <string name="last_import">Last import: </string>
 
     <string name="add_account">Add Account</string>
-    <string name="welcome_string">Welcome to OpenMPD. We're here to help decode your financial partnership. Get started by adding your organisation accounts on the settings panel.</string>
+    <string name="welcome_string">Welcome to OpenMPD. We\'re here to help decode your financial partnership. Get started by adding your organisation accounts on the settings panel.</string>
 
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>
