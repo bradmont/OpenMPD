@@ -55,6 +55,13 @@ public class MPDDBHelper extends DBHelper{
             .filter(field_name, value);
     }
 
+    public static DBModel getModelByField(String table_name, String field_name, String value){
+        return getReferenceModel(table_name).getByField(field_name, value);
+    }
+    public static DBModel getModelByField(String table_name, String field_name, int value){
+        return getReferenceModel(table_name).getByField(field_name, value);
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db){
         super.onCreate(db);

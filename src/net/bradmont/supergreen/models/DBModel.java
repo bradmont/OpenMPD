@@ -244,9 +244,17 @@ public abstract class DBModel {
       * sanity checking is done, so verify that row is unique.
       */
     public DBModel getByField(String field, int value){
+        return getByField(field, Integer.toString(value));
+    }
+
+    /**
+      * Get an instance by a unique value other than primary key. No
+      * sanity checking is done, so verify that row is unique.
+      */
+    public DBModel getByField(String field, String value){
         String [] args = new String[1];
         String [] columns = new String[1];
-        args[0] = Integer.toString(value);
+        args[0] = value;
         columns[0] = getPrimaryKey().getColumnName();
         Cursor c = getDbr().query(getTableName(), columns, String.format("%s = ?", field), args, null, null, null);
 

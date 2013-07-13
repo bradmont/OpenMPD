@@ -24,8 +24,8 @@ import android.widget.*;
 import java.lang.Runnable;
 
 public class ContactDetail extends Fragment implements OnClickListener{
-    public static final String [] columns = {"fname", "lname", "spouse_fname", "partner_type", "giving_amount", "status", "notes"};
-    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes};
+    public static final String [] columns = {"fname", "lname", "spouse_fname", "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short"};
+    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short};
 
     private Cursor cursor = null;
     private LinearLayout header = null;
@@ -57,7 +57,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
 
         layout = inflater.inflate(R.layout.contact_detail, null);
 
-        String [] values = new String[7];
+        String [] values = new String[columns.length];
         values[0] = contact.getString("fname");
         values[1] = contact.getString("lname");
 
@@ -75,8 +75,45 @@ public class ContactDetail extends Fragment implements OnClickListener{
             values[4] = "$" + Integer.toString(status.getInt("giving_amount")/100);
             values[5] = Integer.toString(status.getInt("status"));
             values[6] = status.getString("notes");
+            values[7] = status.getString("last_gift");
         } catch (Exception e){
-            values[3] = values[4] = values[5] = values[6] = "";
+            values[3] = values[4] = values[5] = values[6] = values[7] = "";
+        }
+
+        // email
+        try {
+            EmailAddress email = (EmailAddress) MPDDBHelper
+                    .getModelByField("email_address", "contact_id", contact.getInt("id"));
+            values[8] = email.getString("address");
+        } catch (Exception e){
+            values[8] = "";
+        }
+
+        // phone number
+        try {
+            PhoneNumber phone = (PhoneNumber) MPDDBHelper
+                    .getModelByField("phone_number", "contact_id", contact.getInt("id"));
+            values[9] = phone.getString("number");
+        } catch (Exception e){
+            values[9] = "";
+        }
+
+        // address
+        try {
+            Address address = (Address) MPDDBHelper
+                    .getModelByField("address", "contact_id", contact.getInt("id"));
+
+            values[9] = address.getString("addr1");
+            values[11] = address.getString("addr2");
+            values[12] = address.getString("addr3");
+            values[13] = address.getString("addr4");
+            values[14] = address.getString("city");
+            values[15] = address.getString("region");
+            values[16] = address.getString("post_code");
+            values[17] = address.getString("country_short");
+        } catch (Exception e){
+            values[9] = values[11] = values[12] = values[13] = values[14] = 
+                values[15] = values[16] = values[17] = "";
         }
         populateView(layout, fields, values);
 
@@ -88,7 +125,6 @@ public class ContactDetail extends Fragment implements OnClickListener{
         gifts.setOrderBy("date desc");
         cursor = gifts.getCursor();
 
-        Log.i("net.bradmont.openmpd", "gifts: " + cursor.getCount());
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_gift_list_item,
             cursor,
@@ -98,9 +134,9 @@ public class ContactDetail extends Fragment implements OnClickListener{
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 switch (columnIndex){
-                    case 3:
+                    case 1:
                     TextView tv = (TextView) view;
-                    tv.setText( String.format("$%.2f", cursor.getFloat(3)/100f));
+                    tv.setText( String.format("$%.2f", cursor.getFloat(1)/100f));
                     return true;
                 }
                 return false;
