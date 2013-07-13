@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
@@ -68,12 +69,24 @@ public class SummaryCard extends Card {
                 "limit ?); ";
 
 
+    private View content = null;
 	public SummaryCard(){
 		super();
 	}
 
 	@Override
 	public View getCardContent(Context context) {
+        if (content == null){
+            content = buildContent(context);
+            return content;
+        }
+        if (content.getParent() != null){
+            ((ViewGroup)content.getParent()).removeView(content);
+        }
+        return content;
+
+    }
+	public View buildContent(Context context) {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_summary, null);
 
         int stable_monthly = getSqlInt(STABLE_MONTHLY_SQL);

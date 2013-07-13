@@ -17,7 +17,7 @@ public class RestartedPartnerCard extends NotificationCard {
 	}
 
 	@Override
-	public View getCardContent(Context context) {
+	public View buildCardContent(Context context) {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_notification, null);
 		TextView title = ((TextView) view.findViewById(R.id.title));
 		TextView description = ((TextView) view.findViewById(R.id.description));

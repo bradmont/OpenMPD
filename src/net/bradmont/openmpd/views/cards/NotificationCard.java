@@ -6,15 +6,19 @@ import net.bradmont.openmpd.models.*;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
-public class NotificationCard extends Card {
+public abstract class NotificationCard extends Card {
 
     protected Notification n = null;
     protected Contact contact;
     protected ContactStatus status;
+
+    protected View content;
+
 	public NotificationCard(Notification n, Contact contact, ContactStatus status){
 		super();
         this.n = n;
@@ -33,13 +37,18 @@ public class NotificationCard extends Card {
         n.dirtySave();
     }
 	@Override
-	public View getCardContent(Context context) {
-		View view = LayoutInflater.from(context).inflate(R.layout.card_notification, null);
+    public View getCardContent(Context context) {
+        if (content == null){
+            content = buildCardContent(context);
+            return content;
+        }
+        if (content.getParent() != null){
+            ((ViewGroup)content.getParent()).removeView(content);
+        }
+        return content;
 
-		return view;
-	}
+    }
 
-	
-	
+    public abstract View buildCardContent(Context context);
 	
 }
