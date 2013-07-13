@@ -21,7 +21,7 @@ If you have suggestions or requests that would help you raise support or
 manage your donor base, please feel free to let us know.
 
 ### Current Status:
-- Much of the Release 1 features and heavy lifting are done.
+- Most of the Release 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
 - Much work remains on the User Interface side
 - We will require substantial testing before a stable release
 
