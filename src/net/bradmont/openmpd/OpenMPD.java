@@ -40,7 +40,11 @@ public class OpenMPD extends BaseActivity {
 	
 	private Fragment mContent;
     private static DBHelper db;
-    private ContactList currentFrag = null;
+    public static HomeFragment homeFragment = null;
+    public static DebugFragment debugFragment = null;
+    public static ContactList contactList = null;
+    public static GiftList giftList = null;
+    public static ServiceAccountList serviceAccountList = null;
 
     final static ExecutorService workExecutor = Executors.newSingleThreadExecutor();
 
@@ -60,8 +64,9 @@ public class OpenMPD extends BaseActivity {
 		if (savedInstanceState != null)
 			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
 		if (mContent == null)
-			//mContent = new ContactList();
-			mContent = new HomeFragment();
+            homeFragment = new HomeFragment();
+			mContent = homeFragment;
+
 		
 		// set the Above View
 		setContentView(R.layout.content_frame);
@@ -79,6 +84,9 @@ public class OpenMPD extends BaseActivity {
 		
 		// customize the SlidingMenu
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+		getSlidingMenu().setBehindWidthRes(R.dimen.menu_width);
+		getSlidingMenu().setBehindScrollScale(0);
+        setSlidingActionBarEnabled(false);
 
         // if it hasn't been done, populate our TntService table
         TntService t = new TntService();
@@ -98,9 +106,11 @@ public class OpenMPD extends BaseActivity {
         for (int i = 0; i < accounts.size(); i++){
             account_ids[i] = accounts.get(i).getID();
         }
-        alarmManager.setInexactRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, 
-        //alarmManager.setInexactRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, 
-            PendingIntent.getService(this, 0, new Intent(this, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
+        alarmManager.setInexactRepeating(AlarmManager.RTC, 
+            cal.getTimeInMillis(), 
+            AlarmManager.INTERVAL_HALF_DAY, 
+            PendingIntent.getService(this, 0, 
+                new Intent(this, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
             PendingIntent.FLAG_UPDATE_CURRENT)
             );
 	}
