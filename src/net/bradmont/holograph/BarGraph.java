@@ -94,6 +94,7 @@ public class BarGraph extends View {
         spacingWidth = factor * spacingWeight;
 
         barHeightFactor = height / getMaxValue();
+        setDrawingCacheEnabled(false);
     }
 
     @Override
@@ -126,6 +127,9 @@ public class BarGraph extends View {
         // draw axes
         canvas.drawLine(canvas_left, canvas_bottom, canvas_left, canvas_top, linePaint);
         canvas.drawLine(canvas_left, canvas_bottom, canvas_right, canvas_bottom, linePaint);
+
+        // cache it
+        setDrawingCacheEnabled(true);
     }
 
     private float sumValues(Object [] list){
@@ -191,6 +195,7 @@ public class BarGraph extends View {
         this.values = values;
 
         init();
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
         //Log.i("BarGraph", "setValues");
@@ -201,6 +206,7 @@ public class BarGraph extends View {
     }
     public void setMaxItems(int maxItems) {
         this.maxItems= maxItems;
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
     }
@@ -209,6 +215,7 @@ public class BarGraph extends View {
     }
     public void setMinItems(int minItems) {
         this.minItems= minItems;
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
     }
@@ -217,6 +224,7 @@ public class BarGraph extends View {
     }
     public void setBarWeight(int barWeight) {
         this.barWeight= barWeight;
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
     }
@@ -225,6 +233,7 @@ public class BarGraph extends View {
     }
     public void setSpacingWeight(int spacingWeight) {
         this.spacingWeight= spacingWeight;
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
     }
@@ -236,6 +245,7 @@ public class BarGraph extends View {
         for (int i = 0; i < colors.length; i++){
             this.colors[i] = colors[i];
         }
+        setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
     }
