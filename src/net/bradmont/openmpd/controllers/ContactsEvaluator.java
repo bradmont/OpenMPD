@@ -40,7 +40,7 @@ public class ContactsEvaluator implements Runnable{
     private Context context;
     private boolean initialImport = false; // suppress notifications
 
-    public final static int NOTIFICATION_ID = 0;
+    public final static int NOTIFICATION_ID = 1;
 
 
     public ContactsEvaluator(Context context, ProgressBar progressbar){

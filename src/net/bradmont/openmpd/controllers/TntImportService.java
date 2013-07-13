@@ -46,14 +46,13 @@ public class TntImportService extends IntentService {
 
 
         // import our stuff
+        startForeground(ContactsEvaluator.NOTIFICATION_ID, builder.build());
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account)){
                 if (account.getString("last_import") == null) {initialImport = true;}
-                startForeground(account.getID(), builder.build());
                 TntImporter importer = new TntImporter(this, account, builder);
                 importer.run();
-                stopForeground(true);
                 newdata = true;
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
@@ -62,10 +61,8 @@ public class TntImportService extends IntentService {
                 ServiceAccount account = new ServiceAccount(ids[i]);
                 if (isOld(account)){
                     if (account.getString("last_import") == null) {initialImport = true;}
-                    startForeground(account.getID(), builder.build());
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
-                    stopForeground(true);
                     newdata = true;
                 }
             }
@@ -76,9 +73,7 @@ public class TntImportService extends IntentService {
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
-            startForeground(evaluator.NOTIFICATION_ID, builder.build());
             evaluator.run();
-            stopForeground(true);
 
 
             // notify of important changes
@@ -160,9 +155,10 @@ public class TntImportService extends IntentService {
 
                 builder.setContentText(content);
                 builder.setProgress(0, 0, false); // remove progress bar
-                notificationManager.notify(1, builder.build());
+                notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
             }
         }
+        stopForeground(true);
     }
 
     private boolean isOld(ServiceAccount account){
