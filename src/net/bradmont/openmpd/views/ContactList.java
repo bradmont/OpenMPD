@@ -35,7 +35,6 @@ public class ContactList extends ListFragment implements OnClickListener{
             .getReadableDatabase();
     private Cursor cursor = null;
 
-    private LinearLayout header = null;
     private SimpleCursorAdapter adapter = null;
 
     @Override
@@ -46,10 +45,7 @@ public class ContactList extends ListFragment implements OnClickListener{
         ListView lv = (ListView)  inflater.inflate(R.layout.list, null);
         LayoutInflater layoutInflater = (LayoutInflater)getActivity()
                 .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        header = (LinearLayout)layoutInflater
-                .inflate( R.layout.contact_list_header, null, false );
 
-        lv.addHeaderView( header );
         return lv;
     }
 
@@ -110,14 +106,6 @@ public class ContactList extends ListFragment implements OnClickListener{
 
     @Override
     public void onClick(View view){
-        switch (view.getId()){
-            case R.id.download_button:
-                tntImport();
-                break;
-            case R.id.evaluate_button:
-                evaluate();
-                break;
-        }
     }
 
     public void tntImport(){
@@ -127,31 +115,6 @@ public class ContactList extends ListFragment implements OnClickListener{
             getActivity().startService(new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_id", accounts.get(i).getID()) );
         }
 
-    }
-    public void evaluate(){
-        final OpenMPD app = (OpenMPD)getActivity();
-
-        final ProgressBar pb = (ProgressBar) header.findViewById(R.id.progress_bar);
-        final LinearLayout layout = (LinearLayout) header.findViewById(R.id.contacts_button_bar);
-        final SimpleCursorAdapter cursorAdapter = adapter;
-        // Show ProgressBar, hide buttons
-        pb.setVisibility(View.VISIBLE);
-        layout.setVisibility(View.GONE);
-
-        app.queueTask( new ContactsEvaluator(getActivity(), pb));
-
-        // Queue a task to hide the progressbar once our task is done.
-        app.queueTask( new Runnable(){
-            public void run(){
-                app.runOnUiThread(new Runnable(){
-                    public void run(){
-                        pb.setVisibility(View.GONE);
-                        layout.setVisibility(View.VISIBLE);
-                        cursorAdapter.getCursor().requery();
-                    }
-                });
-            }
-        });
     }
 
     @Override
