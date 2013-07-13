@@ -39,6 +39,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class OpenMPD extends BaseActivity {
 	
 	private Fragment mContent;
+    private static OpenMPD instance = null;
     private static DBHelper db;
     public static HomeFragment homeFragment = null;
     public static DebugFragment debugFragment = null;
@@ -56,6 +57,7 @@ public class OpenMPD extends BaseActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+        instance = this;
         db = new MPDDBHelper(this);
 		super.onCreate(savedInstanceState);
         
@@ -170,6 +172,9 @@ public class OpenMPD extends BaseActivity {
 		.replace(R.id.content_frame, fragment)
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 		.commit();
+    }
+    public static OpenMPD getInstance(){
+        return instance;
     }
 
 }

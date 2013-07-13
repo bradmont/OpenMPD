@@ -2,10 +2,12 @@ package net.bradmont.openmpd.views.cards;
 
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.views.ContactDetail;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -28,6 +30,13 @@ public abstract class NotificationCard extends Card {
             @Override
             public void onCardSwiped(Card card, View layout) {
                 ((NotificationCard)card).dismissNotification();
+            }
+        });
+        final int contact_id = n.getInt("contact");
+        setOnClickListener( new OnClickListener(){
+            @Override
+            public void onClick(View v){
+                OpenMPD.getInstance().moveToFragment(new ContactDetail(contact_id));
             }
         });
 	}
