@@ -15,17 +15,17 @@ user's account(s) with TntMPD.DataServer instances provided by his missions
 organisations.
 
 
-Release Goals
--------------
+Milestone Goals
+---------------
 If you have suggestions or requests that would help you raise support or
 manage your donor base, please feel free to let us know.
 
 ### Current Status:
-- Most of the Release 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
+- Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
 - Much work remains on the User Interface side
 - We will require substantial testing before a stable release
 
-### Release 1 Goals
+### Milestone 1 Goals
 - [ ] **"Zero User Input" data analysis release**
 - [x] Import donor data and donation histories from TntMPD.DataServer
 - [x] Support for multiple data sources (p2c & Cru working; adding others should be fairly easy)
@@ -39,14 +39,14 @@ manage your donor base, please feel free to let us know.
 - [ ] Simple, discoverable UI
 
 
-### Release 2 Goals
+### Milestone 2 Goals
 - [ ] **"MPM/Partner communications" release**
 - [ ] Manage, track regular contact with regular partners
 - [ ] Integration with MailChimp, etc to evaluate partner engagement?
 - [ ] Social network integration?
     
 
-### Release 3 Goals
+### Milestone 3 Goals
 - [ ] **"Let's Raise Support" release**
 - [ ] Namestorming features
 - [ ] Appointment scheduling
