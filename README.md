@@ -42,15 +42,16 @@ manage your donor base, please feel free to let us know.
 ### Milestone 2 Goals
 - [ ] **"MPM/Partner communications" release**
 - [ ] Manage, track regular contact with regular partners
-- [ ] Integration with MailChimp, etc to evaluate partner engagement?
-- [ ] Social network integration?
+- [ ] Integration with MailChimp, etc to evaluate partner engagement
+- [ ] Social network integration
     
 
 ### Milestone 3 Goals
-- [ ] **"Let's Raise Support" release**
+- [ ] **MPD release**
 - [ ] Namestorming features
 - [ ] Appointment scheduling
 - [ ] Followup scheduling/automation
+- [ ] Web beacon support for emails
 
 ### Other development goals
 - [ ] Networked Use, to coordinate couples or groups developing support together
