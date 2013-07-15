@@ -4,120 +4,147 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:padding="8dp"
     >
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
-        <TextView android:id="@+id/lname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=", " />
-        <TextView android:id="@+id/fname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" " />
-        <TextView android:id="@+id/spouse_fname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-        <TextView
-            android:id="@+id/partner_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" " />
-        <TextView
-            android:id="@+id/giving_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
+        <TextView android:id="@+id/name"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text=" " />
-        <TextView
-            android:id="@+id/status"
+            android:textSize="@dimen/big_text"
+            />
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
+            android:layout_height="wrap_content" >
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+                <TextView
+                    android:id="@+id/giving_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/medium_text"
+                    android:text="amnt" />
+                <TextView
+                    android:id="@+id/partner_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/medium_text"
+                    android:text="typ" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text=" " />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/small_text"
+                android:text="st" />
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
-        <TextView
-            android:id="@+id/last_gift"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/email_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/phone_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/addr1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/addr2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/addr3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/addr4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/region"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/post_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
-        <TextView
-            android:id="@+id/country_short"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unknown" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content" >
+            <TextView android:id="@+id/addr1"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               />
+            <TextView android:id="@+id/addr2"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+               />
+            <TextView android:id="@+id/addr3"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0px"
+                android:visibility="gone"
+               />
+            <TextView android:id="@+id/addr4"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0px"
+                android:visibility="gone"
+               />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+                <TextView android:id="@+id/city"
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                   />
+                <TextView 
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=", " />
+                <TextView android:id="@+id/region"
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                   />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+                <TextView android:id="@+id/post_code"
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                   />
+                <TextView 
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=", " />
+                <TextView android:id="@+id/country_short"
+                    android:textSize="@dimen/small_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                   />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content" >
+            <TextView android:id="@+id/last_gift"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView android:id="@+id/email_address"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+            <TextView android:id="@+id/phone_number"
+                android:textSize="@dimen/small_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               />
+        </LinearLayout>
     </LinearLayout>
     <net.bradmont.holograph.BarGraph 
         android:id="@+id/gifts_graph"
@@ -127,7 +154,7 @@
         custom:colors="#33b5e5,#ffbb33,#ff4444"
         custom:lineColor="#707070"
         custom:barWeight="1"
-        custom:spacingWeight=".75"
+        custom:spacingWeight=".33"
         custom:maxItems="13"
     />
 
@@ -140,6 +167,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:paddingRight="4dp"
             android:text="Unknown" />
         <TextView
             android:id="@+id/notes"

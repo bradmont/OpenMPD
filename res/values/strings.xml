@@ -8,6 +8,7 @@
     <string name="contacts">Contacts</string>
     <string name="monthly_average">Monthly Average</string>
     <string name="_and_"> and </string>
+    <string name="and">and</string>
     <string name="add">Add</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
@@ -23,6 +24,13 @@
     <string name="annual">/yr</string>
     <string name="regular">/?mo</string>
     <string name="monthly">/mo</string>
+
+    <!-- partner statuses -->
+    <string name="dropped">Dropped</string>
+    <string name="lapsed">Lapsed</string>
+    <string name="late">Late</string>
+    <string name="new_">New</string>
+    <string name="current">Current</string>
 
     <string name="last_gift">Last Gift: </string>
     <string name="last_contact">Last Contact: </string>

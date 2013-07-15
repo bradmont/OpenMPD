@@ -21,11 +21,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import java.util.HashMap;
 import java.lang.Runnable;
 
 public class ContactDetail extends Fragment implements OnClickListener{
-    public static final String [] columns = {"fname", "lname", "spouse_fname", "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short"};
-    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short};
+    public static final String [] columns = {"fname", "lname", "spouse_fname", "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short", "name"};
+    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short, R.id.name};
+    private HashMap<String, String> values = new HashMap();
 
     private Cursor cursor = null;
     private LinearLayout header = null;
@@ -57,86 +59,105 @@ public class ContactDetail extends Fragment implements OnClickListener{
 
         layout = inflater.inflate(R.layout.contact_detail, null);
 
-        String [] values = new String[columns.length];
-        values[0] = contact.getString("fname");
-        values[1] = contact.getString("lname");
+        values.put("fname", contact.getString("fname"));
+        values.put("lname", contact.getString("lname"));
 
         try {
             spouse = (Contact) contact.getRelated("spouse");
-            values[2] = spouse.getString("fname");
-        } catch (Exception e){
-            values[2] = "";
+            values.put("spouse_fname", spouse.getString("fname"));
+            if (spouse.getString("lname").equals(contact.getString("lname"))){
+                values.put("name", 
+                    contact.getString("fname") + " "+
+                        getActivity().getResources().getString(R.string.and) + " " +
+                        spouse.getString("fname") + " " +
+                        contact.getString("lname")
+                );
+            } else {
+                values.put("name", 
+                    contact.getString("fname") + " "+
+                        contact.getString("lname") + " " +
+                        getActivity().getResources().getString(R.string.and) + " " +
+                        spouse.getString("fname") + " " +
+                        spouse.getString("lname"));
+            }
+        } catch (Exception e){ 
+            values.put("name", 
+                contact.getString("fname") + " "+
+                    contact.getString("lname"));
         }
 
         try {
             status = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status").getByField("contact_id", contact.getInt("id"));
-            values[3] = getActivity().getResources()
-                            .getString(ContactStatus.partnership(status.getInt("partner_type")));
-            values[4] = "$" + Integer.toString(status.getInt("giving_amount")/100);
-            values[5] = Integer.toString(status.getInt("status"));
-            values[6] = status.getString("notes");
-            values[7] = status.getString("last_gift");
-        } catch (Exception e){
-            values[3] = values[4] = values[5] = values[6] = values[7] = "";
-        }
+            values.put("partner_type", getActivity().getResources()
+                            .getString(ContactStatus.partnership(status.getInt("partner_type"))));
+            values.put("giving_amount", "$" + Integer.toString(status.getInt("giving_amount")/100));
+            values.put("status", 
+                getActivity().getResources().getString(
+                    ContactStatus.getStatusStringRes(status.getInt("status"))
+                ));
+            
+            values.put("notes", status.getString("notes"));
+            values.put("last_gift", status.getString("last_gift"));
+        } catch (Exception e){ }
 
         // email
         try {
             EmailAddress email = (EmailAddress) MPDDBHelper
                     .getModelByField("email_address", "contact_id", contact.getInt("id"));
-            values[8] = email.getString("address");
-        } catch (Exception e){
-            values[8] = "";
-        }
+            values.put("email_address", email.getString("address"));
+        } catch (Exception e){ }
 
         // phone number
         try {
             PhoneNumber phone = (PhoneNumber) MPDDBHelper
                     .getModelByField("phone_number", "contact_id", contact.getInt("id"));
-            values[9] = phone.getString("number");
-        } catch (Exception e){
-            values[9] = "";
-        }
+            values.put("phone_number", phone.getString("number"));
+        } catch (Exception e){ }
 
         // address
         try {
             Address address = (Address) MPDDBHelper
                     .getModelByField("address", "contact_id", contact.getInt("id"));
 
-            values[9] = address.getString("addr1");
-            values[11] = address.getString("addr2");
-            values[12] = address.getString("addr3");
-            values[13] = address.getString("addr4");
-            values[14] = address.getString("city");
-            values[15] = address.getString("region");
-            values[16] = address.getString("post_code");
-            values[17] = address.getString("country_short");
-        } catch (Exception e){
-            values[9] = values[11] = values[12] = values[13] = values[14] = 
-                values[15] = values[16] = values[17] = "";
-        }
-        populateView(layout, fields, values);
+            values.put("addr1", address.getString("addr1"));
+            if (address.getString("addr2") != null
+                && !address.getString("addr2").equals("")){
+                values.put("addr2", address.getString("addr2"));
+            }
+            if (address.getString("addr3") != null
+                && !address.getString("addr3").equals("")){
+                values.put("addr3", address.getString("addr3"));
+            }
+            if (address.getString("addr4") != null
+                && !address.getString("addr4").equals("")){
+                values.put("addr4", address.getString("addr4"));
+            }
+            values.put("city", address.getString("city"));
+            values.put("region", address.getString("region"));
+            values.put("post_code", address.getString("post_code"));
+            values.put("country_short", address.getString("country_short"));
+        } catch (Exception e){ }
+        populateView(layout, values);
 
         // set up gift list
         ListView gift_list = (ListView) layout.findViewById(R.id.gift_list);
-        ModelList gifts = MPDDBHelper
-                .getReferenceModel("gift")
-                .filter("tnt_people_id", contact.getString("tnt_people_id"));
-        gifts.setOrderBy("date desc");
-        cursor = gifts.getCursor();
+        String [] args = new String [1];
+        args[0] = contact.getString("tnt_people_id");
+        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+            "select _id, date, amount as amount from gift where tnt_people_id=? order by date desc; " , args);
 
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_gift_list_item,
-            cursor,
+            cur,
             new String [] {"date", "amount"},
             new int [] {R.id.date, R.id.amount});
 
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 switch (columnIndex){
-                    case 1:
+                    case 2:
                     TextView tv = (TextView) view;
-                    tv.setText( String.format("$%.2f", cursor.getFloat(1)/100f));
+                    tv.setText( String.format("$%.2f", cursor.getFloat(2)/100f));
                     return true;
                 }
                 return false;
@@ -146,10 +167,15 @@ public class ContactDetail extends Fragment implements OnClickListener{
         return layout;
     }
 
-    private void populateView(View layout, int [] fields, String [] values){
+    private void populateView(View layout, HashMap<String, String> values){
         for (int i = 0; i < fields.length; i++){
-            TextView v = (TextView) layout.findViewById(fields[i]);
-            v.setText(values[i]);
+            if (values.containsKey(columns[i])){
+                TextView v = (TextView) layout.findViewById(fields[i]);
+                if (v != null){
+                    v.setText(values.get(columns[i]));
+                    v.setVisibility(View.VISIBLE);
+                }
+            }
         }
     }
     @Override
@@ -158,7 +184,6 @@ public class ContactDetail extends Fragment implements OnClickListener{
         final OpenMPD app = (OpenMPD)getActivity();
         String [] args = new String [1];
         args[0] = contact.getString("tnt_people_id");
-
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
             "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
         Float [][] values = new Float[cur.getCount()][];

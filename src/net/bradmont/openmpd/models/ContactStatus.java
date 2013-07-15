@@ -158,6 +158,23 @@ public class ContactStatus extends DBModel{
         }
         return 0;
     }
+    public static int getStatusStringRes(int p){
+        switch(p){
+            case STATUS_CURRENT:
+                return R.string.current;
+            case STATUS_NEW:
+                return R.string.new_;
+            case STATUS_LATE:
+                return R.string.late;
+            case STATUS_LAPSED:
+                return R.string.lapsed;
+            case STATUS_DROPPED:
+                return R.string.dropped;
+            case STATUS_NONE:
+                return R.string.none;
+        }
+        return R.string.unknown;
+    }
 
     public ContactStatus(){
         super(MPDDBHelper.get(), TABLE);
