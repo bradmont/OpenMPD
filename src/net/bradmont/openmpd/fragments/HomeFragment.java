@@ -26,9 +26,6 @@ import com.fima.cardsui.objects.CardStack;
 
 public class HomeFragment extends Fragment {
 
-    protected CardStack happyStack = new CardStack();
-    protected CardStack sadStack = new CardStack();
-    protected CardStack specialStack = new CardStack();
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.home, null);
@@ -52,6 +49,9 @@ public class HomeFragment extends Fragment {
         cardsui.addCardToLastStack(graphCard);
 
 
+        CardStack happyStack = new CardStack();
+        CardStack sadStack = new CardStack();
+        CardStack specialStack = new CardStack();
         // notifications
         ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NOTIFIED);
         for (int i = 0; i < notifications.size(); i++){
