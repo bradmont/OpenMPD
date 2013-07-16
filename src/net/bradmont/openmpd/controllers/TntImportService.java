@@ -3,10 +3,14 @@ package net.bradmont.openmpd.controllers;
 import android.os.Bundle;
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -159,6 +163,16 @@ public class TntImportService extends IntentService {
 
                 builder.setContentText(content);
                 builder.setProgress(0, 0, false); // remove progress bar
+
+                Intent homeIntent = new Intent(this, OpenMPD.class);
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                stackBuilder.addParentStack(OpenMPD.class);
+                stackBuilder.addNextIntent(homeIntent);
+                PendingIntent homePendingIntent =
+                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.setContentIntent(homePendingIntent);
+
+
                 notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
             }
         }
