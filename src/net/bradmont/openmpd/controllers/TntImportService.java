@@ -60,7 +60,11 @@ public class TntImportService extends IntentService {
             for (int i = 0; i < ids.length; i++){
                 ServiceAccount account = new ServiceAccount(ids[i]);
                 if (isOld(account)){
-                    if (account.getString("last_import") == null) {initialImport = true;}
+                    if (account.getString("last_import") == null) {
+                        initialImport = true;
+                    } else { 
+                        initialImport = false;
+                    }
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
                     newdata = true;

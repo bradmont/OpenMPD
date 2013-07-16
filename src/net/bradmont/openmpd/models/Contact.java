@@ -123,9 +123,32 @@ public class Contact extends DBModel{
         cs.setValue("contact_id", this);
 
         // a copy for comparison
-        ContactStatus oldStatus = (ContactStatus)MPDDBHelper
-                .getReferenceModel("contact_status")
-                .getByField("contact_id", getInt("id"));
+        ContactStatus oldStatus;
+        if (initialImport == true ){
+        }
+            // If this is our first data import, we evaluate twice, once
+            // with data from two months ago, and again with the latest
+            // data, then compare the two to generate notifications. This
+            // allows us to give recent notifications for new users,
+            // without flooding them with years of history.
+            oldStatus = new ContactStatus();
+            int partner = 0;
+            if (giftPattern.length > 2){
+                String oldPattern = giftPattern.subSequence(0, giftPattern.length-3);
+                partner = evaluate(oldPattern, oldStatus);
+                oldStatus.setValue("partner_type", partner);
+            }  else {
+                // if the user has less than 2 months history, they wont
+                // get any notifications.
+                partner = evaluate(giftPattern, oldStatus);
+                oldStatus.setValue("partner_type", partner);
+            }
+
+        } else {
+            oldStatus = (ContactStatus)MPDDBHelper
+                    .getReferenceModel("contact_status")
+                    .getByField("contact_id", getInt("id"));
+        }
 
 
         int partner = evaluate(giftPattern, cs);
@@ -135,62 +158,60 @@ public class Contact extends DBModel{
         // create notifications for changes in status (unless we're importing
         // data for a new account)
         // TODO: generate notifications for the last month on initial import
-        if (initialImport == false){
-            Notification note = new Notification();
+        Notification note = new Notification();
+        note.setValue("contact", this);
+        if (oldStatus == null){
+            note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+            note.dirtySave();
+        } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
+            note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+            note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
+            note.dirtySave();
+        } else if (oldStatus.getInt("status") != cs.getInt("status")){
+            note.setValue("type", Notification.CHANGE_STATUS);
+            note.setValue("message", Integer.toString(oldStatus.getInt("status")));
+            note.dirtySave();
+        } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
+            note.setValue("type", Notification.CHANGE_AMOUNT);
+            note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
+            note.dirtySave();
+        }
+
+        // check if we've already made a notification for this partner's last gift
+        SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+        String lastGift = "";
+        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+        if (cur.getCount() > 0){
+            cur.moveToFirst();
+            lastGift = cur.getString(0);
+        }
+        cur.close();
+
+        if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
+            /*Log.i("net.bradmont.openmpd", String.format("lastGift: '%s'; last_notify: '%s'",
+                lastGift, oldStatus.getString("last_notify")));
+            if (lastGift != oldStatus.getString("last_notify")){
+                Log.i("net.bradmont.openmpd", String.format("lastGift: '%d'; last_notify: '%d'",
+                lastGift.length(), oldStatus.getString("last_notify").length()));
+                
+            }*/
+            cs.setValue("last_notify", lastGift);
+            cs.dirtySave();
+            // we want to allow getting 2 notifications, eg, for a new one-time donor
+            // we'll notify "new donor" and "gave a special gift".
+            note = new Notification();
             note.setValue("contact", this);
-            if (oldStatus == null){
-                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.dirtySave();
-            } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
-                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
-                note.dirtySave();
-            } else if (oldStatus.getInt("status") != cs.getInt("status")){
-                note.setValue("type", Notification.CHANGE_STATUS);
-                note.setValue("message", Integer.toString(oldStatus.getInt("status")));
-                note.dirtySave();
-            } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
-                note.setValue("type", Notification.CHANGE_AMOUNT);
-                note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
-                note.dirtySave();
-            }
-
-            // check if we've already made a notification for this partner's last gift
-            SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
-            String lastGift = "";
-            cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
-            if (cur.getCount() > 0){
-                cur.moveToFirst();
-                lastGift = cur.getString(0);
-            }
-            cur.close();
-
-            if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-                /*Log.i("net.bradmont.openmpd", String.format("lastGift: '%s'; last_notify: '%s'",
-                    lastGift, oldStatus.getString("last_notify")));
-                if (lastGift != oldStatus.getString("last_notify")){
-                    Log.i("net.bradmont.openmpd", String.format("lastGift: '%d'; last_notify: '%d'",
-                    lastGift.length(), oldStatus.getString("last_notify").length()));
-                    
-                }*/
-                cs.setValue("last_notify", lastGift);
-                cs.dirtySave();
-                // we want to allow getting 2 notifications, eg, for a new one-time donor
-                // we'll notify "new donor" and "gave a special gift".
-                note = new Notification();
-                note.setValue("contact", this);
-                int monthAmount = getMonthAmount();
-                if (monthAmount != 0){
-                    if (cs.getInt("partner_type") == ContactStatus.PARTNER_OCCASIONAL 
-                        || cs.getInt("partner_type") == ContactStatus.PARTNER_ONETIME ){
-                        note.setValue("type", Notification.SPECIAL_GIFT);
-                        note.setValue("message", Integer.toString(monthAmount));
-                        note.dirtySave();
-                    } else if (monthAmount != cs.getInt("giving_amount")){
-                        note.setValue("type", Notification.SPECIAL_GIFT);
-                        note.setValue("message", Integer.toString(monthAmount));
-                        note.dirtySave();
-                    }
+            int monthAmount = getMonthAmount();
+            if (monthAmount != 0){
+                if (cs.getInt("partner_type") == ContactStatus.PARTNER_OCCASIONAL 
+                    || cs.getInt("partner_type") == ContactStatus.PARTNER_ONETIME ){
+                    note.setValue("type", Notification.SPECIAL_GIFT);
+                    note.setValue("message", Integer.toString(monthAmount));
+                    note.dirtySave();
+                } else if (monthAmount != cs.getInt("giving_amount")){
+                    note.setValue("type", Notification.SPECIAL_GIFT);
+                    note.setValue("message", Integer.toString(monthAmount));
+                    note.dirtySave();
                 }
             }
         }
