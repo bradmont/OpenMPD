@@ -123,9 +123,8 @@ public class Contact extends DBModel{
         cs.setValue("contact_id", this);
 
         // a copy for comparison
-        ContactStatus oldStatus;
+        ContactStatus oldStatus = null;
         if (initialImport == true ){
-        }
             // If this is our first data import, we evaluate twice, once
             // with data from two months ago, and again with the latest
             // data, then compare the two to generate notifications. This
@@ -133,8 +132,8 @@ public class Contact extends DBModel{
             // without flooding them with years of history.
             oldStatus = new ContactStatus();
             int partner = 0;
-            if (giftPattern.length > 2){
-                String oldPattern = giftPattern.subSequence(0, giftPattern.length-3);
+            if (giftPattern.length() > 2){
+                String oldPattern = giftPattern.substring(0, giftPattern.length()-3);
                 partner = evaluate(oldPattern, oldStatus);
                 oldStatus.setValue("partner_type", partner);
             }  else {
@@ -143,7 +142,6 @@ public class Contact extends DBModel{
                 partner = evaluate(giftPattern, oldStatus);
                 oldStatus.setValue("partner_type", partner);
             }
-
         } else {
             oldStatus = (ContactStatus)MPDDBHelper
                     .getReferenceModel("contact_status")
