@@ -155,7 +155,6 @@ public class Contact extends DBModel{
 
         // create notifications for changes in status (unless we're importing
         // data for a new account)
-        // TODO: generate notifications for the last month on initial import
         Notification note = new Notification();
         note.setValue("contact", this);
         if (oldStatus == null){
@@ -190,18 +189,8 @@ public class Contact extends DBModel{
         cur.close();
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-            /*Log.i("net.bradmont.openmpd", String.format("lastGift: '%s'; last_notify: '%s'",
-                lastGift, oldStatus.getString("last_notify")));
-            if (lastGift != oldStatus.getString("last_notify")){
-                Log.i("net.bradmont.openmpd", String.format("lastGift: '%d'; last_notify: '%d'",
-                lastGift.length(), oldStatus.getString("last_notify").length()));
-                
-            }*/
             cs.setValue("last_notify", lastGift);
             cs.dirtySave();
-            // we want to allow getting 2 notifications, eg, for a new one-time donor
-            // we'll notify "new donor" and "gave a special gift".
-            note = new Notification();
             note.setValue("contact", this);
             int monthAmount = getMonthAmount();
             if (monthAmount != 0){

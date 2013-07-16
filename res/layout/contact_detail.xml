@@ -149,7 +149,7 @@
     <net.bradmont.holograph.BarGraph 
         android:id="@+id/gifts_graph"
         android:layout_width="fill_parent"
-        android:layout_height="300px"
+        android:layout_height="165dp"
         android:padding="8dp"
         custom:colors="#33b5e5,#ffbb33,#ff4444"
         custom:lineColor="#707070"

@@ -39,7 +39,7 @@
         <net.bradmont.holograph.BarGraph 
             android:id="@+id/magic_graph"
             android:layout_width="fill_parent"
-            android:layout_height="400px"
+            android:layout_height="200dp"
             android:padding="8dp"
             custom:colors="#33b5e5,#ffbb33,#ff4444"
             custom:lineColor="#707070"
