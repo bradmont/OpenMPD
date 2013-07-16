@@ -11,15 +11,8 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/download_button"
-            android:text="@string/download"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClick"
-            />
-        <Button
-            android:id="@+id/evaluate_button"
-            android:text="@string/evaluate"
+            android:id="@+id/clear_data_button"
+            android:text="@string/clear_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"

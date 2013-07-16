@@ -210,7 +210,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
     @Override
     public void onClick(View view){
         switch (view.getId()){
-            case R.id.evaluate_button:
+            case 0: 
                 break;
         }
     }

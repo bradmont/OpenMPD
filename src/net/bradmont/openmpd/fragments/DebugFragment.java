@@ -30,7 +30,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 
-public class DebugFragment extends SherlockFragment {
+public class DebugFragment extends SherlockFragment implements OnClickListener{
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -74,4 +74,19 @@ public class DebugFragment extends SherlockFragment {
         }
         return false;
     }
+    @Override
+    public void onClick(View view){
+        switch (view.getId()){
+            case R.id.clear_data_button:
+                String [] tables = { "address", "contact_status", "email_address", "gift", "notification", "phone_number", "contact" };
+                for (String table : tables){
+                    MPDDBHelper.get().getWritableDatabase()
+                        .execSQL(String.format("delete from %s;", table));
+                }
+                MPDDBHelper.get().getWritableDatabase()
+                    .execSQL(String.format("update service_account set last_import = null;"));
+            break;
+        }
+    }
+
 }
