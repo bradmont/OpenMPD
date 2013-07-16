@@ -169,7 +169,11 @@ public class Contact extends DBModel{
             note.setValue("type", Notification.CHANGE_STATUS);
             note.setValue("message", Integer.toString(oldStatus.getInt("status")));
             note.dirtySave();
-        } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount")){
+        } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount") && 
+                (cs.getInt("partner_type") == ContactStatus.PARTNER_MONTHLY ||
+                cs.getInt("partner_type") == ContactStatus.PARTNER_REGULAR ||
+                cs.getInt("partner_type") == ContactStatus.PARTNER_ANNUAL)
+                ){
             note.setValue("type", Notification.CHANGE_AMOUNT);
             note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
             note.dirtySave();
