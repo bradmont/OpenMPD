@@ -17,7 +17,7 @@ public class MyCard extends Card {
 
 	@Override
 	public View getCardContent(Context context) {
-		View view = LayoutInflater.from(context).inflate(R.layout.card_notification_old, null);
+		View view = LayoutInflater.from(context).inflate(R.layout.card_notification_plain, null);
 
 		((TextView) view.findViewById(R.id.title)).setText(title);
 
