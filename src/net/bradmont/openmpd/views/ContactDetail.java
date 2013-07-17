@@ -41,6 +41,9 @@ public class ContactDetail extends Fragment implements OnClickListener{
         contact = new Contact(id);
     }
 
+    public ContactDetail(){
+        this.contact = null;
+    }
     public ContactDetail(Contact contact){
         this.contact=contact;
     }
@@ -56,6 +59,11 @@ public class ContactDetail extends Fragment implements OnClickListener{
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, 
             Bundle savedInstanceState) {
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("contact_id")){
+            contact = new Contact(savedInstanceState.getInt("contact_id"));
+        }
+
 
         layout = inflater.inflate(R.layout.contact_detail, null);
 
@@ -165,6 +173,13 @@ public class ContactDetail extends Fragment implements OnClickListener{
         });
         gift_list.setAdapter(adapter);
         return layout;
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle outState){
+        if (contact != null){
+            outState.putInt("contact_id", contact.getID());
+        }
     }
 
     private void populateView(View layout, HashMap<String, String> values){
