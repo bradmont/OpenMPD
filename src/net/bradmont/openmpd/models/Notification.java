@@ -64,7 +64,7 @@ public class Notification extends DBModel{
         addField(new IntField("status"));
         getField("status").setDefault(STATUS_NEW);
 
-        addField(new StringField("message")); // not currently used
+        addField(new StringField("message")); 
 
 
         TABLE_NAME=TABLE;

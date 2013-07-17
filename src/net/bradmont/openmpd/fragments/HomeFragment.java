@@ -53,7 +53,9 @@ public class HomeFragment extends Fragment {
         CardStack sadStack = new CardStack();
         CardStack specialStack = new CardStack();
         // notifications
-        ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NOTIFIED);
+        ModelList notifications = MPDDBHelper
+                .filter("notification", "status", Notification.STATUS_NOTIFIED)
+                .orderBy("message");
         for (int i = 0; i < notifications.size(); i++){
             Notification n = (Notification) notifications.get(i);
             NotificationCard card = NotificationCardFactory.newCard(n);

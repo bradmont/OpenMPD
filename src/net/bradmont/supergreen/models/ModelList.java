@@ -49,9 +49,10 @@ public class ModelList {
         db = referenceInstance.getDbh().getReadableDatabase();
     }
     
-    public void setOrderBy(String orderBy){
+    public ModelList orderBy(String orderBy){
         this.orderBy = orderBy;
         setUnInitialised();
+        return this;
     }
 
     private void setUnInitialised(){
