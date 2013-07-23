@@ -158,8 +158,10 @@ public class Contact extends DBModel{
         Notification note = new Notification();
         note.setValue("contact", this);
         if (oldStatus == null){
-            note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-            note.dirtySave();
+            if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE){
+                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                note.dirtySave();
+            }
         } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
             note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
             note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
@@ -170,8 +172,9 @@ public class Contact extends DBModel{
             note.dirtySave();
         } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount") && 
                 (cs.getInt("partner_type") == ContactStatus.PARTNER_MONTHLY ||
-                cs.getInt("partner_type") == ContactStatus.PARTNER_REGULAR ||
-                cs.getInt("partner_type") == ContactStatus.PARTNER_ANNUAL)
+                 cs.getInt("partner_type") == ContactStatus.PARTNER_REGULAR ||
+                 cs.getInt("partner_type") == ContactStatus.PARTNER_ANNUAL)
+                && cs.getInt("giving_amount") != 0
                 ){
             note.setValue("type", Notification.CHANGE_AMOUNT);
             note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));

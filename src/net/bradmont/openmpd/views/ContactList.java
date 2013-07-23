@@ -28,8 +28,8 @@ import android.widget.*;
 import java.lang.Runnable;
 
 public class ContactList extends ListFragment implements OnClickListener{
-    public static final String [] columns = {"fname", "lname", "s_fname", "partner_type", "giving_amount"};
-    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.status, R.id.amount};
+    public static final String [] columns = {"fname", "partner_type", "giving_amount"};
+    public static final int [] fields = {R.id.name, R.id.status, R.id.amount};
 
     private SQLiteDatabase db_read = MPDDBHelper.get()
             .getReadableDatabase();
@@ -68,13 +68,17 @@ public class ContactList extends ListFragment implements OnClickListener{
                 TextView tv = (TextView) view;
                 switch(columnIndex){
                     // 0: fname, 1:lname, 2:s_name, 3:_id, 4:partner_type, 5:giving_amount, 6: status, 7: gift_frequency
-                    case 2:
-                        if (cursor.getString(2) != null){
-                            tv.setText(app.getResources().getString(R.string._and_) + " " + cursor.getString(2));
-                        } else {
-                            tv.setText("");
+                    case 0: 
+                        String temp = cursor.getString(1);
+                        if (cursor.getString(0) != null && !cursor.getString(0).equals("")){
+                            temp = temp +", "+ cursor.getString(0);
                         }
+                        if (cursor.getString(2) != null){
+                            temp = temp + " " +app.getResources().getString(R.string._and_) + " " + cursor.getString(2);
+                        }
+                        tv.setText(temp);
                         return true;
+
                     case 4:
                         // partner type
                         String text = app.getResources()

@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.lang.Runnable;
 
 public class ContactDetail extends Fragment implements OnClickListener{
-    public static final String [] columns = {"fname", "lname", "spouse_fname", "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short", "name"};
-    public static final int [] fields = {R.id.fname, R.id.lname, R.id.spouse_fname, R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short, R.id.name};
+    public static final String [] columns = { "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short", "name"};
+    public static final int [] fields = { R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short, R.id.name};
     private HashMap<String, String> values = new HashMap();
 
     private Cursor cursor = null;
