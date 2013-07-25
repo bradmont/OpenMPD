@@ -77,6 +77,8 @@ public class Contact extends DBModel{
 
         addField(new ForeignKeyField("spouse", this)); // don't want to make an infinite recursion loop, do we?
         getField("spouse").setColumnName("spouse_id");
+        addField(new ForeignKeyField("account", MPDDBHelper.get().getReferenceModel("service_account"))); // don't want to make an infinite recursion loop, do we?
+        getField("account").setColumnName("account_id");
 
         TABLE_NAME=TABLE;
         super.init();
@@ -333,5 +335,13 @@ public class Contact extends DBModel{
         cur.close();
 
         return mode;
+    }
+    @Override
+    public String [] generateUpdateSQL(int oldVersion){
+        if (oldVersion < 7){
+            String [] sqls = {"alter table contact add account_id int;"};
+            return sqls;
+        }
+        return null;
     }
 }

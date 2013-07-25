@@ -3,10 +3,13 @@ OpenMPD
 
 OpenMPD is a [Free Software](https://en.wikipedia.org/wiki/Free_software) Ministry Partner Development tool for Android.
 
+![The Home Screen](http://i.imgur.com/aOxP1We.png)
+
 The goal of OpenMPD is to automate as much of the data management involved in
-MPD and MPM (Ministry Partner Maintenance) as possible. For releases 1 and 2,
-we are primarily targeting MPM use cases, but hope to expand to a full MPD
-toolkit as development continues.
+MPD and MPM (Ministry Partner Maintenance) as possible, and to mine your donor
+data to help you more deeply understand, and serve, your partnership base. For 
+releases 1 and 2, we are primarily targeting MPM use cases, but hope to expand 
+to a full MPD toolkit as development continues.
 
 For release 1, our design philosophy is ***"Zero User Input."*** The time we spend
 anaysing donor data is much better done by a computer, so OpenMPD aims to
@@ -24,6 +27,15 @@ manage your donor base, please feel free to let us know.
 - Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
 - Much work remains on the User Interface side
 - We will require substantial testing before a stable release
+#### Left to do before Beta 1:
+- [ ] Onboarding walkthrough
+- [ ] Store relationship between Contact and ServiceAccount
+- [ ] ContactsEvaluator: Filter for Contacts only from updated ServiceAccounts
+#### Left to do before Release 1:
+- [ ] Design: Contact List View
+- [ ] Design: Contact Detail View
+- [ ] Design: Accounts configuration/add view
+- [ ] Build Axis/label support into BarGraph
 
 ### Milestone 1 Goals
 - [ ] **"Zero User Input" data analysis release**
