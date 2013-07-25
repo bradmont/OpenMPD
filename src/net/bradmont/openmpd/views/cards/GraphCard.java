@@ -13,90 +13,24 @@ import android.widget.TextView;
 
 import com.fima.cardsui.objects.Card;
 
+/**
+ * Bug (TODO): if a non-monthly regular donor gives an extra gift in a
+ * month they also make a regular donation, their regular donation will
+ * be included in the monthly base rather than the regular base
+ */
 public class GraphCard extends Card {
 
     // monthly giving, where a month's total gifts == donor's regular giving
     // eg, if they gave an extra gift, their entire giving will be excluded
-    private static final String BASE_GIVING_SQL =
-        "select month, sum(total_gifts) "+
-        "    from "+
-        "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
-        "        join "+
-        "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
-        "        on A.tnt_people_id = B.tnt_people_id "+
-        "    where total_gifts=giving_amount and partner_type=6"+
-        "    group by month "+
-        "    order by month; ";
-
-
-    // non-monthly regular
-    private static final String REGULAR_NONMONTHLY_GIVING =
-        "select * from  "+
-        "   (select distinct month from gift) months left outer join (select month, sum(total_gifts) "+
-        "    from "+
-        "        ( select contact_id, tnt_people_id, giving_amount, partner_type from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
-        "        join "+
-        "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
-        "        on A.tnt_people_id = B.tnt_people_id "+
-        "    where total_gifts=giving_amount and (partner_type=5 or partner_type=4) "+
-        "    group by month) gifts "+
-        "    on months.month=gifts.month "+
-        "    order by month;";
-
-    // Regular from monthly donors where month's gifts > regular giving
-    // (they gave extra in a given month)
-    // This is confusing but necessary
-    private static final String BASE_GIVING_SQL_EXTRA =
-        "select months.month, total from "+
-            "(select distinct month from gift) months left outer join  "+
-                "(select month, sum(giving_amount)  as total "+
-                "from  "+
-                    "( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
-                    "join  "+
-                    "(select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B  "+
-                    "on A.tnt_people_id = B.tnt_people_id  "+
-                "where total_gifts>giving_amount  "+
-                "group by month ) main_query "+
-            "on main_query.month=months.month "+
-                "order by months.month; ";
-     
-        /*"select month, sum(giving_amount) "+
-        "    from "+
-        "        ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
-        "        join "+
-        "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
-        "        on A.tnt_people_id = B.tnt_people_id "+
-        "    where total_gifts>giving_amount "+
-        "    group by month "+
-        "    order by month; ";*/
-
-
-    // gifts above monthly giving
-    // Eg, all special gifts (including for regular donors who gave extra)
-    private static final String SPECIAL_SQL =
-        "select months.month, giving from "+
-            "(select distinct month from gift) months "+
-            "left outer join "+
-            "(select month, sum(total_gifts) - sum(giving_amount)  as giving "+
-                "from  "+
-                    "(select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
-                    "join  "+
-                    "(select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B  "+
-                    "on A.tnt_people_id = B.tnt_people_id  "+
-                "where total_gifts>giving_amount)  "+
-                "group by month ) as dataset "+
-            "on months.month=dataset.month "+
-                "order by dataset.month; ";
-
-            /*"    select month, sum(total_gifts) - sum(giving_amount) "+
-            "    from "+
-            "        (select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A "+
-            "        join "+
-            "        (select tnt_people_id, month, sum(amount) as total_gifts from gift group by tnt_people_id,month) B "+
-            "        on A.tnt_people_id = B.tnt_people_id "+
-            "    where total_gifts>giving_amount) "+
-            "    group by month "+
-            "    order by month; ";*/
+    private static final String GIVING_SQL =
+        "select month.month, base_giving/100, regular_giving/100, special_gifts/100 from "+
+        "    month left outer join monthly_base_giving A "+
+        "        on month.month=A.month"+
+        "        left outer join regular_by_month B"+
+        "            on month.month=B.month"+
+        "        left outer join special_gifts_by_month C"+
+        "            on month.month=C.month"+
+        "    order by month.month;";
 
     private View content = null;
 	public GraphCard(){
@@ -126,42 +60,29 @@ public class GraphCard extends Card {
         Float [] [] vals = null;
 
         Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            BASE_GIVING_SQL, null);
-        Cursor cur2 = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            BASE_GIVING_SQL_EXTRA, null);
-        Cursor cur3 = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            REGULAR_NONMONTHLY_GIVING, null);
-        Cursor cur4 = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            SPECIAL_SQL, null);
+            GIVING_SQL, null);
 
         vals = new Float[cur1.getCount()][3];
         cur1.moveToFirst();
-        cur2.moveToFirst();
-        cur3.moveToFirst();
-        cur4.moveToFirst();
         for (int i = 0; i < cur1.getCount(); i++){
-            if (i < cur2.getCount()){
-                // sometimes this happens....
-                vals[i][0] = ((float) cur1.getInt(1) + cur2.getInt(1)) / 100f;
-            } else {
-                vals[i][0] = ((float) cur1.getInt(1) ) / 100f;
+            try {
+                vals[i][0] = cur1.getFloat(1);
+            } catch (Exception e){
+                vals[i][0]=0f;
             }
-            if (i < cur3.getCount()){
-                vals[i][1] = ((float) cur3.getInt(2)) / 100f;
-            } else {
-                vals[i][1] = 0f;
+            try {
+                vals[i][1] = cur1.getFloat(2);
+            } catch (Exception e){
+                vals[i][1]=0f;
             }
-            if (i < cur4.getCount()){
-                vals[i][2] = ((float) cur4.getInt(1)) / 100f;
-            } else {
-                vals[i][1] = 0f;
+            try {
+                vals[i][2] = cur1.getFloat(3);
+            } catch (Exception e){
+                vals[i][2]=0f;
             }
             cur1.moveToNext();
-            cur2.moveToNext();
-            cur3.moveToNext();
-            cur4.moveToNext();
         }
-        cur1.close(); cur2.close(); cur3.close(); cur4.close();
+        cur1.close(); 
         graph.setValues(vals);
 		
 		return view;
