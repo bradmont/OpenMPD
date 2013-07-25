@@ -34,56 +34,52 @@ import java.io.BufferedReader;
 
 public class ContactsEvaluator implements Runnable{
 
-    private ProgressBar progressbar=null;
     private NotificationCompat.Builder builder = null;
     private NotificationManager notifyManager = null;
     private Context context;
-    private boolean initialImport = false; // suppress notifications
+    private ArrayList<Boolean> initialImport = null; 
+    private ArrayList<Integer> newdata = null; 
 
     public final static int NOTIFICATION_ID = 1;
-
-
-    public ContactsEvaluator(Context context, ProgressBar progressbar){
-        this.progressbar = progressbar;
-        this.context = context;
-    }
-
-    public ContactsEvaluator(Context context, ProgressBar progressbar, boolean initialImport){
-        this(context, progressbar);
-        this.initialImport = initialImport;
-    }
 
     public ContactsEvaluator(Context context, NotificationCompat.Builder builder){
         this.builder = builder;
         this.context = context;
     }
 
-    public ContactsEvaluator(Context context, NotificationCompat.Builder builder, boolean initialImport){
+    public ContactsEvaluator(Context context, NotificationCompat.Builder builder, ArrayList<Integer> newdata, ArrayList<Boolean> initialImport){
         this(context, builder);
         this.initialImport = initialImport;
+        this.newdata = newdata;
     }
 
     public void run(){
-        ModelList contacts = new Contact().getAll(); // all!
-
-        if (progressbar != null){
-            progressbar.setIndeterminate(false);
-            progressbar.setMax(contacts.size());
-        }
-        if (builder != null){
-            builder.setProgress(contacts.size(), 0, false);
-            notifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notifyManager.notify(NOTIFICATION_ID, builder.build());
-        }
-
-        for (int i=0; i < contacts.size(); i++){
-            ((Contact) contacts.get(i)).updateStatus(initialImport);
-            if (progressbar != null){
-                progressbar.incrementProgressBy(1);
+        ModelList [] contact_lists = null;
+        int total_contacts = 0;
+        if (newdata == null){
+            contact_lists = new ModelList[1];
+            contact_lists[0] = new Contact().getAll(); // all!
+            total_contacts = contact_lists[0].size();
+        } else {
+            contact_lists = new ModelList[newdata.size()];
+            for (int i = 0; i < newdata.size(); i++){
+                contact_lists[i] = MPDDBHelper.get().filter("contact", "account", newdata.get(i).intValue());
+                total_contacts += contact_lists[i].size();
             }
-            if (builder != null){
-                builder.setProgress(contacts.size(), i, false);
-                notifyManager.notify(NOTIFICATION_ID, builder.build());
+        }
+
+        notifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int progress = 0;
+        for (int j = 0; j < contact_lists.length; j++){
+            ModelList contacts = contact_lists[j];
+            for (int i=0; i < contacts.size(); i++){
+                ((Contact) contacts.get(i)).updateStatus(initialImport.get(j).booleanValue());
+                if (builder != null){
+                    progress++;
+                    builder.setProgress(total_contacts, progress, false);
+                    notifyManager.notify(NOTIFICATION_ID, builder.build());
+                }
             }
         }
     }

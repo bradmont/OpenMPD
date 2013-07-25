@@ -14,6 +14,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -33,8 +34,8 @@ public class TntImportService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent){
         Bundle b = intent.getExtras();
-        boolean newdata = false;
-        boolean initialImport = false;
+        ArrayList<Integer> newdata = new ArrayList<Integer>();
+        ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
         if (MPDDBHelper.get() == null){
             MPDDBHelper dbh = new MPDDBHelper(this);
         }
@@ -54,10 +55,14 @@ public class TntImportService extends IntentService {
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account)){
-                if (account.getString("last_import") == null) {initialImport = true;}
+                if (account.getString("last_import") == null) {
+                    initialImport.add(new Boolean(true));
+                } else {
+                    initialImport.add(new Boolean(false));
+                }
                 TntImporter importer = new TntImporter(this, account, builder);
                 importer.run();
-                newdata = true;
+                newdata.add(new Integer(account.getID()));
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
             int [] ids = b.getIntArray("net.bradmont.openmpd.account_ids");
@@ -65,20 +70,20 @@ public class TntImportService extends IntentService {
                 ServiceAccount account = new ServiceAccount(ids[i]);
                 if (isOld(account)){
                     if (account.getString("last_import") == null) {
-                        initialImport = true;
-                    } else { 
-                        initialImport = false;
+                        initialImport.add(new Boolean(true));
+                    } else {
+                        initialImport.add(new Boolean(false));
                     }
                     TntImporter importer = new TntImporter(this, account, builder);
                     importer.run();
-                    newdata = true;
+                    newdata.add(new Integer(account.getID()));
                 }
             }
         }
 
         // Evaluate contacts if we have newly imported data
-        if (newdata == true){
-            ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, initialImport);
+        if (newdata.size() > 0){
+            ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
             evaluator.run();
