@@ -30,14 +30,13 @@ manage your donor base, please feel free to let us know.
 
 #### Left to do before Beta 1:
 - [ ] Onboarding walkthrough
-- [ ] Store relationship between Contact and ServiceAccount
-- [ ] ContactsEvaluator: Filter for Contacts only from updated ServiceAccounts
 
 #### Left to do before Release 1:
 - [ ] Design: Contact List View
 - [ ] Design: Contact Detail View
 - [ ] Design: Accounts configuration/add view
-- [ ] Build Axis/label support into BarGraph
+- [ ] Searching & filtering contacts (by name, partner type, giving amount, etc).
+- [ ] Build label and swipe support into BarGraph
 
 ### Milestone 1 Goals
 - [ ] **"Zero User Input" data analysis release**
