@@ -160,14 +160,17 @@ public class Contact extends DBModel{
         Notification note = new Notification();
         note.setValue("contact", this);
         if (oldStatus == null){
-            if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE){
+            if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE
+                && cs.getInt("partner_type") != ContactStatus.PARTNER_ONETIME){
                 note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
                 note.dirtySave();
             }
         } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
-            note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-            note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
-            note.dirtySave();
+            if (cs.getInt("partner_type") != ContactStatus.PARTNER_OCCASIONAL){
+                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
+                note.dirtySave();
+            }
         } else if (oldStatus.getInt("status") != cs.getInt("status")){
             note.setValue("type", Notification.CHANGE_STATUS);
             note.setValue("message", Integer.toString(oldStatus.getInt("status")));

@@ -24,6 +24,7 @@ public class NotificationCardFactory {
                 if (partnership == R.string.monthly || partnership == R.string.regular){
                     return new NewRegularPartnerCard(n, contact, status);
                 }
+                break;
 
             case Notification.CHANGE_STATUS:
 
@@ -50,7 +51,8 @@ public class NotificationCardFactory {
                         } catch (Exception e){
                                 return null;
                         }
-                    }
+                }
+                break;
             case Notification.CHANGE_AMOUNT:
                 return new AmountChangeCard(n, contact, status);
             case Notification.SPECIAL_GIFT:
