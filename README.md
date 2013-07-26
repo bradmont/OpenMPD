@@ -80,8 +80,7 @@ interested, please contact @Brad. Here's how you can help:
 
 License
 -------
-OpenMPD is licensed under the Gnu GPL v2.0 (or later, at your option). See
-LICENSE.txt for details. This may be changed to GPL3 in the near future.
+OpenMPD is licensed under the Gnu GPL version 3. See LICENSE.txt for details. 
 
 Depends
 -------
