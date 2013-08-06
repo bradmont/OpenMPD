@@ -22,9 +22,9 @@ public class RestartedPartnerCard extends NotificationCard {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_notification, null);
 		TextView title = ((TextView) view.findViewById(R.id.title));
 		TextView description = ((TextView) view.findViewById(R.id.description));
-        ((ImageView) view.findViewById(R.id.stripe)).setBackgroundResource(R.color.blue);
+        ((ImageView) view.findViewById(R.id.stripe)).setBackgroundResource(R.color.green);
         ((TextView) view.findViewById(R.id.title)).setTextColor(
-            context.getResources().getColor(R.color.blue)
+            context.getResources().getColor(R.color.green)
             );
 
         // set title

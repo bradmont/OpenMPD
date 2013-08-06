@@ -22,7 +22,12 @@ public class NotificationCardFactory {
             case Notification.CHANGE_PARTNER_TYPE:
                 int partnership = status.partnership(status.getInt("partner_type"));
                 if (partnership == R.string.monthly || partnership == R.string.regular){
-                    return new NewRegularPartnerCard(n, contact, status);
+                    if (status.getInt("status") == ContactStatus.STATUS_NEW){
+                        return new NewRegularPartnerCard(n, contact, status);
+                    } else if (status.getInt("status") == ContactStatus.STATUS_CURRENT){
+                        // not sure why these are getting marked as new partners
+                        return new RestartedPartnerCard(n, contact, status);
+                    }
                 }
                 break;
 

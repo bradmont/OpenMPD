@@ -207,7 +207,7 @@ public class Contact extends DBModel{
                     note.setValue("type", Notification.SPECIAL_GIFT);
                     note.setValue("message", Integer.toString(monthAmount));
                     note.dirtySave();
-                } else if (monthAmount != cs.getInt("giving_amount")){
+                } else if (monthAmount > cs.getInt("giving_amount")){
                     note.setValue("type", Notification.SPECIAL_GIFT);
                     note.setValue("message", Integer.toString(monthAmount));
                     note.dirtySave();
