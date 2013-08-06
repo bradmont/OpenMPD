@@ -43,9 +43,9 @@ public abstract class DBModel {
 
     boolean record_exists = false;
 
-    protected SQLiteOpenHelper dbh = null;
+    protected static SQLiteOpenHelper dbh = null;
     protected SQLiteDatabase dbr = null;
-    protected SQLiteDatabase dbw = null;
+    protected static SQLiteDatabase dbw = null;
     protected Context context = null;
 
     protected String TABLE_NAME = null;
@@ -500,7 +500,7 @@ public abstract class DBModel {
         setupDbw();
         return dbw;
     }
-    protected void setupDbw(){
+    protected static void setupDbw(){
         if (dbw == null){
             dbw = dbh.getWritableDatabase();
         }
@@ -534,5 +534,15 @@ public abstract class DBModel {
 
     public boolean recordExists(){
         return record_exists;
+    }
+
+    public static void beginTransaction(){
+        setupDbw();
+        dbw.beginTransaction();
+    }
+
+    public static void endTransaction(){
+        dbw.setTransactionSuccessful();
+        dbw.endTransaction();
     }
 }

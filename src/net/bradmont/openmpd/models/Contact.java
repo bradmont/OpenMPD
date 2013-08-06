@@ -280,8 +280,9 @@ public class Contact extends DBModel{
         if (result == 0){
             // check last two months, as end-of-month gifts can show up when there's already
             // gifts from the next month
-            cur.moveToNext();
-            result = cur.getInt(1);
+            if (cur.moveToNext()){
+                result = cur.getInt(1);
+            }
         }
         cur.close();
 

@@ -71,17 +71,24 @@ public class ContactsEvaluator implements Runnable{
         notifyManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         int progress = 0;
+        ContactStatus temp = new ContactStatus();
+        ContactStatus.beginTransaction();
         for (int j = 0; j < contact_lists.length; j++){
             ModelList contacts = contact_lists[j];
             for (int i=0; i < contacts.size(); i++){
                 ((Contact) contacts.get(i)).updateStatus(initialImport.get(j).booleanValue());
+                progress++;
+                if (progress % 1000 == 0){
+                    ContactStatus.endTransaction();
+                    ContactStatus.beginTransaction();
+                }
                 if (builder != null){
-                    progress++;
                     builder.setProgress(total_contacts, progress, false);
                     notifyManager.notify(NOTIFICATION_ID, builder.build());
                 }
             }
         }
+        ContactStatus.endTransaction();
     }
 
 }
