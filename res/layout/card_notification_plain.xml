@@ -42,8 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:ellipsize="end"
-            android:maxLines="4"
-            android:text="@string/welcome_string" />
+            android:maxLines="4" />
     </LinearLayout>
 
 </LinearLayout>

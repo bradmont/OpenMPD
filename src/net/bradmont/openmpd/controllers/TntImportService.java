@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.fragments.HomeFragment;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
@@ -87,6 +88,12 @@ public class TntImportService extends IntentService {
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
             evaluator.run();
+
+            getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
+                .edit()
+                .putInt("onboardState", HomeFragment.ONBOARD_FINISHED)
+                .apply();
+
 
 
             // notify of important changes

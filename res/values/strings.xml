@@ -42,7 +42,15 @@
     <string name="last_import">Last import: </string>
 
     <string name="add_account">Add Account</string>
-    <string name="welcome_string">Welcome to OpenMPD. We\'re here to help decode your financial partnership. Get started by adding your organisation accounts on the settings panel.</string>
+
+    <string name="getting_started">Getting Started</string>
+    <string name="getting_started_body">Welcome to OpenMPD. We\'re here to help decode your financial partnership. The first step is to add your organisation\'s account(s) to import data. Tap this card to add an account.</string>
+    <string name="add_another_account">Add Another Account</string>
+    <string name="add_another_account_body">Click this card to add another account. You can edit existing accounts by opening the navigation drawer on the left and accessing the settings page.</string>
+    <string name="done_adding_accounts">Done Adding Accounts?</string>
+    <string name="done_adding_accounts_body">When you\'re done adding accounts, click this card and we\'ll import your data.</string>
+    <string name="importing_data">Importing Data</string>
+    <string name="importing_data_body">We\'re importing your partner data now. This can take two or three minutes; pull down your device\'s notification drawer to see the progress. Once we\'re done, we\'ll notify you.</string>
 
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>

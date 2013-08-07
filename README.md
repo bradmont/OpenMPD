@@ -25,11 +25,11 @@ manage your donor base, please feel free to let us know.
 
 ### Current Status:
 - Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
-- Much work remains on the User Interface side
-- We will require substantial testing before a stable release
+- Some work remains on the User Interface side
+- **We are now in beta testing**
 
-#### Left to do before Beta 1:
-- [ ] Onboarding walkthrough
+#### Beta 1:
+If you are interested in helping test OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
 
 #### Left to do before Release 1:
 - [ ] Design: Contact List View
@@ -39,7 +39,7 @@ manage your donor base, please feel free to let us know.
 - [ ] Build label and swipe support into BarGraph
 
 ### Milestone 1 Goals
-- [ ] **"Zero User Input" data analysis release**
+- **"Zero User Input" data analysis release**
 - [x] Import donor data and donation histories from TntMPD.DataServer
 - [x] Support for multiple data sources (p2c & Cru working; adding others should be fairly easy)
 - [x] Classify partners into monthly, regular (quarterly, semiannual, etc), annual, occasional or one-time
@@ -48,6 +48,7 @@ manage your donor base, please feel free to let us know.
 - [x] Automatic background updating of gifts & donor statuses
 - [x] Notifications of changes in donor status (for new, late, delinquent, dropped)
 - [x] Notifications of special gifts
+- [x] Simple Onboarding walkthrough
 - [ ] Beautiful, Holo-themed user interface
 - [ ] Simple, discoverable UI
 

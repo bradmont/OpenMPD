@@ -25,7 +25,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 
 
 
-class EditServiceAccountDialog extends DialogFragment{
+public class EditServiceAccountDialog extends DialogFragment{
 
     ServiceAccount account = null;
     CursorAdapter adapter = null;
