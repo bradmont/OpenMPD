@@ -108,22 +108,26 @@ public class HomeFragment extends Fragment {
                 // if this is first run:
                 MyCard card = new MyCard(R.string.getting_started, R.string.getting_started_body);
                 card.setOnClickListener( new addAccountClickListener());
+                card.setIsSwipeable(false); 
                 cardsui.addCard(card);
                 cardsui.refresh();
                 break;
             case ONBOARD_ACCOUNT_ADDED:
                 MyCard another = new MyCard(R.string.add_another_account, R.string.add_another_account_body);
+                another.setIsSwipeable(false); 
                 cardsui.addCard(another);
                 another.setOnClickListener( new addAccountClickListener());
 
                 MyCard done = new MyCard(R.string.done_adding_accounts, R.string.done_adding_accounts_body);
                 done.setOnClickListener( new updateClickListener());
+                done.setIsSwipeable(false); 
                 cardsui.addCard(done);
                 cardsui.refresh();
                 break;
             case ONBOARD_IMPORTING:
                 // if we're in the middle of the initial import
                 MyCard importing = new MyCard(R.string.importing_data, R.string.importing_data_body);
+                importing.setIsSwipeable(false); 
                 cardsui.addCard(importing);
                 cardsui.refresh();
                 break;

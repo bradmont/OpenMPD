@@ -47,19 +47,19 @@ public class MenuFragment extends ListFragment {
             }
 			newContent = OpenMPD.contactList;
 			break;
-		case 2:
+		/*case 2:
             if (OpenMPD.giftList == null){
                 OpenMPD.giftList = new GiftList();
             }
 			newContent = OpenMPD.giftList;
-			break;
-		case 3:
+			break;*/
+		case 2:
             if (OpenMPD.serviceAccountList == null){
                 OpenMPD.serviceAccountList = new ServiceAccountList();
             }
 			newContent = OpenMPD.serviceAccountList;
 			break;
-		case 4:
+		case 3:
             if (OpenMPD.debugFragment == null){
                 OpenMPD.debugFragment = new DebugFragment();
             }
