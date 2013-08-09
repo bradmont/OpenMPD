@@ -63,8 +63,10 @@ public class GraphCard extends Card {
             GIVING_SQL, null);
 
         vals = new Float[cur1.getCount()][3];
+        String [] labels = new String[cur1.getCount()];
         cur1.moveToFirst();
         for (int i = 0; i < cur1.getCount(); i++){
+            labels[i] = cur1.getString(0);
             try {
                 vals[i][0] = cur1.getFloat(1);
             } catch (Exception e){
@@ -83,6 +85,7 @@ public class GraphCard extends Card {
             cur1.moveToNext();
         }
         cur1.close(); 
+        graph.setLabels(labels);
         graph.setValues(vals);
 		
 		return view;

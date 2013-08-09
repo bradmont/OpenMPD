@@ -8,5 +8,6 @@
        <attr name="minItems" format="integer" />
        <attr name="barWeight" format="float" />
        <attr name="spacingWeight" format="float" />
+       <attr name="maxTicks" format="integer" />
    </declare-styleable>
 </resources>
