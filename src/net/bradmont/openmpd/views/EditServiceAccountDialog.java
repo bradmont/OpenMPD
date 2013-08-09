@@ -2,12 +2,14 @@ package net.bradmont.openmpd.views;
 
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.supergreen.fields.*;
 import net.bradmont.supergreen.fields.constraints.ConstraintError;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
@@ -20,8 +22,13 @@ import android.widget.Toast;
 
 
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+
+import java.util.ArrayList;
+import org.apache.http.message.*;
+
 
 
 
@@ -32,6 +39,8 @@ public class EditServiceAccountDialog extends DialogFragment{
     int [] view_ids = {R.id.tnt_service_id, R.id.username, R.id.password };
     String [] field_names = {"tnt_service_id", "username", "password"};
     View content_view = null;
+    private FragmentManager manager=null;
+    private String fragment_tag = null;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -51,15 +60,25 @@ public class EditServiceAccountDialog extends DialogFragment{
             R.layout.service_spinner_item, c, spinner_columns, spinner_views);
         spinner.setAdapter(ca);
 
+        if (account != null){
+            populateView();
+        }
+
         builder.setView(content_view)
             .setMessage(R.string.add_account)
-            .setPositiveButton(R.string.add, new saveListner())
+            .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {}
+            })
             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {}
-
             });
 
         return builder.create();
+    }
+    public void onStart(){
+        super.onStart();
+        AlertDialog dialog = (AlertDialog) getDialog();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new saveListener());
     }
 
     /**
@@ -70,8 +89,21 @@ public class EditServiceAccountDialog extends DialogFragment{
         this.adapter = adapter;
     }
 
-    private class saveListner implements DialogInterface.OnClickListener{
-        public void onClick(DialogInterface dialog, int id) {
+    public void setAccount(ServiceAccount account){
+        this.account = account;
+    }
+
+    private void populateView(){
+        for (int i = 0; i < view_ids.length; i++){
+            View v = content_view.findViewById(view_ids[i]);
+            Log.i("net.bradmont.openmpd", "Getting " +field_names[i]);
+            DBField field = account.getField(field_names[i]);
+            field.putToView(v);
+        }
+    }
+
+    private class saveListener implements View.OnClickListener{
+        public void onClick(View v) {
             if (account == null) {
                 account = new ServiceAccount();
             }
@@ -79,12 +111,54 @@ public class EditServiceAccountDialog extends DialogFragment{
             try {
                 Log.i("net.bradmont.openmpd", "Getting views.");
                 for (int i = 0; i < view_ids.length; i++){
-                    View v = content_view.findViewById(view_ids[i]);
+                    View field_view = content_view.findViewById(view_ids[i]);
                     Log.i("net.bradmont.openmpd", "Getting " +field_names[i]);
                     DBField field = account.getField(field_names[i]);
-                    field.getFromView(v);
+                    field.getFromView(field_view);
                 }
-                account.save();
+
+                // check the account credentials
+                Toast.makeText(getActivity(), R.string.checking_login, Toast.LENGTH_SHORT)
+                     .show();
+
+
+                final Context context = getActivity();
+                OpenMPD.getInstance().queueTask(new Runnable(){
+
+                    @Override
+                    public void run(){
+                        TntImporter importer = new TntImporter(getActivity(), account);
+                        ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
+                        arguments.add(new BasicNameValuePair( "Action", "TntBalance"));
+                        arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
+                        arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
+
+                        TntService service = (TntService) account.getRelated("tnt_service_id");
+                        ArrayList<String> content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments);
+
+                        if (content == null || content.get(0).contains("ERROR") || content.size() > 5){
+                            // if result is > 5 lines on a balance query, it's probably because the
+                            // server sent an error. TODO: we need a better way of checking this;
+                            // a comprehensive list of errors would be helpful
+                                OpenMPD.getInstance().userMessage( R.string.login_error);
+                        } else {
+                            
+                            for (int i = 0; i < content.size(); i++){
+                                Log.i("net.bradmont.openmpd", content.get(i));
+                            }
+                            try {
+                                OpenMPD.getInstance().userMessage( R.string.account_verified);
+                                account.dirtySave();
+                                dismiss();
+                            } catch (Exception e){
+                                Log.i("net.bradmont.openmpd", e.getMessage());
+                                for (int i=0; i < e.getStackTrace().length; i++){
+                                    Log.i("net.bradmont.openmpd", e.getStackTrace()[i].toString());
+                                }
+                            }
+                        }
+                    }
+                });
             } catch (ConstraintError e){
                 // TODO: Don't dismiss dialog on bad input
                 // TODO: Croutons
