@@ -74,7 +74,8 @@
     <string name="special_gift_title">%s Made A Special Gift</string>
 
     <!-- Toast values -->
-    <string name="checking_login">Checking Login, please wait</string>
+    <string name="checking_login">Checking Login</string>
+    <string name="please_wait">Please Wait</string>
     <string name="login_error">Login error, please verify your credentials</string>
     <string name="account_verified">Account Verified</string>
 

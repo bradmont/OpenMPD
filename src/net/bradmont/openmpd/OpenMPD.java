@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 
 import android.content.Intent;
 import android.content.Context;
@@ -39,6 +40,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class OpenMPD extends BaseActivity {
 	
 	private Fragment mContent;
+    private ProgressDialog waitDialog = null;
     private static OpenMPD instance = null;
     private static DBHelper db;
     public static HomeFragment homeFragment = null;
@@ -152,6 +154,27 @@ public class OpenMPD extends BaseActivity {
         m.activity = this;
         m.message = message;
         runOnUiThread(m);
+    }
+
+    public void showWaitDialog(final int title_id, final int body_id){
+        final Context context = this;
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                waitDialog = new ProgressDialog(context);
+                waitDialog.setTitle(R.string.checking_login);
+                waitDialog.setMessage("Please Wait");
+                waitDialog.show();
+            }
+        });
+    }
+    public void dismissWaitDialog(){
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                waitDialog.dismiss();
+            }
+        });
     }
 
 

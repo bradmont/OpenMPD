@@ -118,15 +118,13 @@ public class EditServiceAccountDialog extends DialogFragment{
                 }
 
                 // check the account credentials
-                Toast.makeText(getActivity(), R.string.checking_login, Toast.LENGTH_SHORT)
-                     .show();
-
 
                 final Context context = getActivity();
                 OpenMPD.getInstance().queueTask(new Runnable(){
 
                     @Override
                     public void run(){
+                        OpenMPD.getInstance().showWaitDialog(R.string.checking_login, R.string.please_wait);
                         TntImporter importer = new TntImporter(getActivity(), account);
                         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
                         arguments.add(new BasicNameValuePair( "Action", "TntBalance"));
@@ -135,11 +133,15 @@ public class EditServiceAccountDialog extends DialogFragment{
 
                         TntService service = (TntService) account.getRelated("tnt_service_id");
                         ArrayList<String> content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments);
+                        OpenMPD.getInstance().dismissWaitDialog();
 
                         if (content == null || content.get(0).contains("ERROR") || content.size() > 5){
                             // if result is > 5 lines on a balance query, it's probably because the
                             // server sent an error. TODO: we need a better way of checking this;
-                            // a comprehensive list of errors would be helpful
+                            // a comprehensive list of errors would be helpful, but there doesn't
+                            // seem to be one on the TNT website... (CCCi's servers don't seem to
+                            // follow the expected behaviour)
+                            // http://www.tntware.com/tntmpd/faqs/en/how-can-i-make-my-organization-39-s-online-donation-system-compatible-with-tntmpd.aspx
                                 OpenMPD.getInstance().userMessage( R.string.login_error);
                         } else {
                             
