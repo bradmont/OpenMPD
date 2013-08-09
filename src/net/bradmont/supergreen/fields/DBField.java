@@ -50,7 +50,7 @@ public abstract class DBField {
         return true;
     }
 
-    public abstract void putToView(View parentView);
+    public abstract void putToView(View v);
     public abstract void getFromView(View v) throws ConstraintError;
 
     public void setColumnName(String column_name){
@@ -103,7 +103,7 @@ public abstract class DBField {
         } else if (v instanceof TextView){
             value = ((TextView) v).getText().toString();
         }
-        Log.i("net.bradmont.supergreen", "getFromView value " + value);
+        //Log.i("net.bradmont.supergreen", "getFromView value " + value);
         return value;
     }
 
