@@ -132,8 +132,6 @@ public class BarGraph extends View {
 
         setDrawingCacheEnabled(false);
 
-        Log.i("net.bradmont.holograph", String.format("canvas_bottom: %f", canvas_bottom));
-        Log.i("net.bradmont.holograph", String.format("data_bottom: %f", data_bottom));
     }
 
     @Override
@@ -156,7 +154,7 @@ public class BarGraph extends View {
                 float left = (barWidth + spacingWidth) * (i-start) + (spacingWidth/2 + data_left);
                 float right = left + barWidth;
                 float top = bottom - val*barHeightFactor;
-                Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
+                //Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
                 Rect r = new Rect((int)left, (int)top, (int)right, (int)bottom);
                 canvas.drawRect(r, barPaints[j]);
                 bottom = top; // stacked bars; bottom is top of previous
@@ -171,7 +169,7 @@ public class BarGraph extends View {
         // draw axes
         canvas.drawLine(data_left, data_bottom, data_left, canvas_top, linePaint);
         canvas.drawLine(data_left, data_bottom, canvas_right, data_bottom, linePaint);
-        Log.i("net.bradmont.holograph", String.format("ticks: %d; tickSpacing %f", maxTicks, tickSpacing));
+        //Log.i("net.bradmont.holograph", String.format("ticks: %d; tickSpacing %f", maxTicks, tickSpacing));
         Rect r = new Rect();
         for (int tick = 0; tick <= maxTicks; tick++){
             float y = data_bottom - (tick * tickSpacing*barHeightFactor);
