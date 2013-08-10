@@ -1,5 +1,6 @@
 package net.bradmont.openmpd.models;
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.controllers.TntImporter;
 
 import net.bradmont.supergreen.*;
 import net.bradmont.supergreen.fields.*;
@@ -153,7 +154,12 @@ public class Contact extends DBModel{
 
         int partner = evaluate(giftPattern, cs);
         cs.setValue("partner_type", partner);
-        cs.dirtySave();
+        if (cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
+            // if user has manually set ContactStatus, and it hasn't
+            // expired, we won't save our evaluated one. We'll still
+            // notify against it, though.
+            cs.dirtySave();
+        }
 
         // create notifications for changes in status (unless we're importing
         // data for a new account)
@@ -197,8 +203,14 @@ public class Contact extends DBModel{
         cur.close();
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-            cs.setValue("last_notify", lastGift);
-            cs.dirtySave();
+            if (oldStatus == null || cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
+                // make sure we're not overwriting manually set statuses
+                cs.setValue("last_notify", lastGift);
+                cs.dirtySave();
+            } else {
+                oldStatus.setValue("last_notify", lastGift);
+                oldStatus.dirtySave();
+            }
             note.setValue("contact", this);
             int monthAmount = getMonthAmount();
             if (monthAmount != 0){

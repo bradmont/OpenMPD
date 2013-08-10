@@ -15,6 +15,11 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+
 import com.fima.cardsui.objects.Card;
 
 public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMenuItemClickListener {
@@ -74,7 +79,20 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_make_monthly:
-                OpenMPD.getInstance().userMessage("clicked make monthly");
+                OpenMPD.getInstance().userMessage(R.string.assigned_monthly);
+                // do stuff to the ContactStatus
+                status.setValue("partner_type", ContactStatus.PARTNER_MONTHLY); 
+                status.setValue("status", ContactStatus.STATUS_CURRENT); 
+                status.setValue("giving_amount", Integer.parseInt(n.getString("message")));
+
+                // set up expiry date for manual status
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 3); // expire in 3 months
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String expires_date = dateFormat.format(cal.getTime());
+                status.setValue("manual_set_expires", expires_date);
+
+                status.dirtySave();
                 return true;
         }
         return false;

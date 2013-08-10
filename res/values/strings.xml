@@ -79,6 +79,7 @@
     <string name="please_wait">Please Wait</string>
     <string name="login_error">Login error, please verify your credentials</string>
     <string name="account_verified">Account Verified</string>
+    <string name="assigned_monthly">Assigned to monthly. Expires in 3 months.</string>
 
     <!-- menu strings -->
     <string name="make_monthly">This is monthly</string>

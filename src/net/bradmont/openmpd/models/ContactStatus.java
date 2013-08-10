@@ -219,6 +219,7 @@ public class ContactStatus extends DBModel{
         getField("status").setDefault(STATUS_NONE);
         addField(new StringField("notes"));
         addField(new DateField("last_notify"));
+        addField(new DateField("manual_set_expires"));
 
 
         TABLE_NAME=TABLE;
@@ -226,21 +227,29 @@ public class ContactStatus extends DBModel{
     }
     public String [] generateUpdateSQL(int oldversion){
         if (oldversion < 2){
-            String [] result = new String[3];
+            String [] result = new String[4];
             result[0] = generateCreateSQL();
             result[1] = "alter table contact_status add " + getField("notes").getSQLDefinition() + ";";
             result[2] = "alter table contact_status add " + getField("last_notify").getSQLDefinition() + ";";
+            result[3] = "alter table contact_status add " + getField("manual_set_expires").getSQLDefinition() + ";";
             return result;
         }
         if (oldversion < 3){
-            String [] result = new String[2];
+            String [] result = new String[3];
             result[0] = "alter table contact_status add " + getField("notes").getSQLDefinition() + ";";
             result[1] = "alter table contact_status add " + getField("last_notify").getSQLDefinition() + ";";
+            result[2] = "alter table contact_status add " + getField("manual_set_expires").getSQLDefinition() + ";";
             return result;
         }
         if (oldversion < 6){
-            String [] result = new String[1];
+            String [] result = new String[2];
             result[0] = "alter table contact_status add " + getField("last_notify").getSQLDefinition() + ";";
+            result[1] = "alter table contact_status add " + getField("manual_set_expires").getSQLDefinition() + ";";
+            return result;
+        }
+        if (oldversion < 9){
+            String [] result = new String[1];
+            result[0] = "alter table contact_status add " + getField("manual_set_expires").getSQLDefinition() + ";";
             return result;
         }
         return null;
