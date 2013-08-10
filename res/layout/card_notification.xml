@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/selectable_background_cardbank"
                 android:padding="2dip"
+                android:visibility="gone"
                 android:src="@drawable/abs__ic_menu_moreoverflow_holo_light" />
         </LinearLayout>
     </LinearLayout>

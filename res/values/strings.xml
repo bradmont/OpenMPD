@@ -37,13 +37,14 @@
     <string name="last_gift">Last Gift: </string>
     <string name="last_contact">Last Contact: </string>
 
+    <!-- login -->
     <string name="service_provider">Service Provider</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="last_import">Last import: </string>
 
+    <!-- Onboarding -->
     <string name="add_account">Add Account</string>
-
     <string name="getting_started">Getting Started</string>
     <string name="getting_started_body">Welcome to OpenMPD. We\'re here to help decode your financial partnership. The first step is to add your organisation\'s account(s) to import data. Tap this card to add an account.</string>
     <string name="add_another_account">Add Another Account</string>
@@ -78,5 +79,8 @@
     <string name="please_wait">Please Wait</string>
     <string name="login_error">Login error, please verify your credentials</string>
     <string name="account_verified">Account Verified</string>
+
+    <!-- menu strings -->
+    <string name="make_monthly">This is monthly</string>
 
 </resources>
