@@ -188,6 +188,8 @@ public class TntImportService extends IntentService {
                 notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
             }
         }
+        MPDDBHelper.get().close();
+
         stopForeground(true);
     }
 

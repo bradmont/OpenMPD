@@ -20,10 +20,12 @@ import net.bradmont.supergreen.models.ModelList;
  * Handles the device boot system broadcast, and schedules data updates
  */
 public class OnBootScheduler extends BroadcastReceiver {
+    private boolean instantiatedDB = false;
     public void onReceive(Context context, Intent intent) {
-        MPDDBHelper helper = MPDDBHelper.get();
+        MPDDBHelper helper = MPDDBHelper.rawGet();
         if (helper == null){
             helper = new MPDDBHelper(context);
+            instantiatedDB = true;
         }
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -43,7 +45,6 @@ public class OnBootScheduler extends BroadcastReceiver {
             PendingIntent.getService(context, 0, new Intent(context, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
             PendingIntent.FLAG_UPDATE_CURRENT)
             );
-
-
+        helper.close();
     }
 }

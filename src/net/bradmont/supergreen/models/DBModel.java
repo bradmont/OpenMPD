@@ -545,4 +545,9 @@ public abstract class DBModel {
         dbw.setTransactionSuccessful();
         dbw.endTransaction();
     }
+    public void close(){
+        dbh = null;
+        dbw = null;
+        dbr=null;
+    }
 }

@@ -200,4 +200,12 @@ public class OpenMPD extends BaseActivity {
         return instance;
     }
 
+    public void closeDB(){
+        if (db != null){
+            db.getWritableDatabase().close();
+            db.close();
+            db = null;
+        }
+    }
+
 }

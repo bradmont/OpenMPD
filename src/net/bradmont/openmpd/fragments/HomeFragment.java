@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import net.bradmont.openmpd.OpenMPD;
 import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.MPDDBHelper;
@@ -155,6 +156,9 @@ public class HomeFragment extends Fragment {
             for (int i = 0; i < accounts.size(); i++){
                 account_ids[i] = accounts.get(i).getID();
             }
+
+            // release write lock for background thread
+            OpenMPD.getInstance().closeDB();
 
             getActivity().startService(
                 new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids));

@@ -88,4 +88,12 @@ public abstract class DBHelper extends SQLiteOpenHelper {
         return models.get(model);
     }
     protected abstract void registerModels();
+
+    public synchronized void close(){
+        for (Map.Entry<String, DBModel> entry: models.entrySet()){
+            DBModel model = entry.getValue();
+            model.close();
+        }
+        models = new LinkedHashMap<String, DBModel>();
+    }
 }

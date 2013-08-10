@@ -41,7 +41,18 @@ public class MPDDBHelper extends DBHelper{
         }
     }
    
+    // get the instance without instantiating
+    public static MPDDBHelper rawGet(){
+        return instance;
+    }
+
     public static MPDDBHelper get(){
+        // Thread-safety is a pain; if we aren't instantiated, we'll use
+        // the main app activity as context. This means outside threads
+        // will have to be careful to take care of this themselves.
+        if (instance == null){
+            instance = new MPDDBHelper(OpenMPD.getInstance());
+        }
         return instance;
     }
     public static ModelList filter(String table_name, String field_name, int value){
@@ -166,7 +177,11 @@ public class MPDDBHelper extends DBHelper{
             in.close();
         }
     }
-
+    @Override
+    public synchronized void close(){
+        super.close();
+        instance = null;
+    }
 
 }
 
