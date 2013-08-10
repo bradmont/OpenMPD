@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 9;
+    private static int DATABASE_VERSION = 10;
 
     @Override
     protected void registerModels(){
@@ -181,6 +181,14 @@ public class MPDDBHelper extends DBHelper{
     public synchronized void close(){
         super.close();
         instance = null;
+    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
+        super.onUpgrade(db, oldVersion, newVersion);
+        if (oldVersion < 10){
+            db.execSQL("drop view monthly_base_giving;");
+            db.execSQL( "create view monthly_base_giving as select month, sum(base_total) base_giving from (select * from _monthly_base_giving union select * from _monthly_base_giving_in_special_month) group by month;");
+
+        }
     }
 
 }
