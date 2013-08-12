@@ -67,9 +67,10 @@ public class OpenMPD extends BaseActivity {
 		// set the Above View
 		if (savedInstanceState != null)
 			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-		if (mContent == null)
+		if (mContent == null){
             homeFragment = new HomeFragment();
 			mContent = homeFragment;
+        }
 
 		
 		// set the Above View
