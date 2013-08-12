@@ -154,7 +154,8 @@ public class Contact extends DBModel{
 
         int partner = evaluate(giftPattern, cs);
         cs.setValue("partner_type", partner);
-        if (cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
+        if (cs.getString("manual_set_expires") == null ||
+            cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
             // if user has manually set ContactStatus, and it hasn't
             // expired, we won't save our evaluated one. We'll still
             // notify against it, though.
@@ -203,7 +204,9 @@ public class Contact extends DBModel{
         cur.close();
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-            if (oldStatus == null || cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
+            if (oldStatus == null || 
+            (cs.getString("manual_set_expires") == null ||
+             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) ){
                 // make sure we're not overwriting manually set statuses
                 cs.setValue("last_notify", lastGift);
                 cs.dirtySave();

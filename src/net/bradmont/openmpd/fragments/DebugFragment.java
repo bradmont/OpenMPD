@@ -32,6 +32,10 @@ import com.actionbarsherlock.view.MenuInflater;
 
 public class DebugFragment extends SherlockFragment implements OnClickListener{
 
+    public static final String [] columns = {"msg1", "msg2", "msg3"};
+    public static final int [] fields = {R.id.msg1, R.id.msg2, R.id.msg3};
+
+
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +45,22 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
     public View onCreateView( LayoutInflater inflater, 
             ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.contact_list_header, null);
+        View view = inflater.inflate(R.layout.debug_page, null);
         setHasOptionsMenu(true);
+        Cursor cursor = MPDDBHelper.get()
+                   .getReadableDatabase()
+                   .rawQuery("select * from log order by _id desc;", null);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+                    R.layout.error_list_item, cursor, columns, fields);
+        ListView lv = (ListView) view.findViewById(R.id.list);
+        lv.setAdapter(adapter);
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
     }
 
     @Override
