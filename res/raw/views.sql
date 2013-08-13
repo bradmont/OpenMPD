@@ -40,7 +40,7 @@ create view if not exists _monthly_base_giving_in_special_month as
 
 -- monthly_base_giving
 create view monthly_base_giving as 
- select month, sum(base_total) from 
+ select month, sum(base_total) base_giving from 
     (select * from _monthly_base_giving union select * from _monthly_base_giving_in_special_month) 
     group by month;
 
@@ -48,7 +48,7 @@ create view monthly_base_giving as
 -- regular_by_month (non-monthly regular gifts)
 -- all regular gifts where a partner's giving equals their giving_amount
 create view if not exists regular_by_month as
-    select month, sum(total_gifts) base_giving as regular_giving
+    select month, sum(total_gifts) as regular_giving
             from 
             partner_giving_status A join partner_giving_by_month B 
             on A.tnt_people_id = B.tnt_people_id 
