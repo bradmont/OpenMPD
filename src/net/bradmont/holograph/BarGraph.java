@@ -156,7 +156,7 @@ public class BarGraph extends View {
                 float top = bottom - val*barHeightFactor;
                 //Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
                 Rect r = new Rect((int)left, (int)top, (int)right, (int)bottom);
-                canvas.drawRect(r, barPaints[j]);
+                canvas.drawRect(r, barPaints[j % barPaints.length]);
                 bottom = top; // stacked bars; bottom is top of previous
 
                 if (labels != null){
