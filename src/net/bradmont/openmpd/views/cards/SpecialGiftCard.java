@@ -84,12 +84,30 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
                 status.setValue("partner_type", ContactStatus.PARTNER_MONTHLY); 
                 status.setValue("status", ContactStatus.STATUS_CURRENT); 
                 status.setValue("giving_amount", Integer.parseInt(n.getString("message")));
+                status.setValue("gift_frequency", 1); 
 
                 // set up expiry date for manual status
                 Calendar cal = Calendar.getInstance();
                 cal.add(Calendar.MONTH, 3); // expire in 3 months
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String expires_date = dateFormat.format(cal.getTime());
+                status.setValue("manual_set_expires", expires_date);
+
+                status.dirtySave();
+                return true;
+            case R.id.menu_make_annual:
+                OpenMPD.getInstance().userMessage(R.string.assigned_annual);
+                // do stuff to the ContactStatus
+                status.setValue("partner_type", ContactStatus.PARTNER_ANNUAL); 
+                status.setValue("status", ContactStatus.STATUS_CURRENT); 
+                status.setValue("giving_amount", Integer.parseInt(n.getString("message")));
+                status.setValue("gift_frequency", 12); 
+
+                // set up expiry date for manual status
+                cal = Calendar.getInstance();
+                cal.add(Calendar.MONTH, 14); // expire in 14 months
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                expires_date = dateFormat.format(cal.getTime());
                 status.setValue("manual_set_expires", expires_date);
 
                 status.dirtySave();
