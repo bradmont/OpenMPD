@@ -80,8 +80,10 @@
     <string name="login_error">Login error, please verify your credentials</string>
     <string name="account_verified">Account Verified</string>
     <string name="assigned_monthly">Assigned to monthly. Expires in 3 months.</string>
+    <string name="assigned_annual">Assigned to annual. Expires in 14 months.</string>
 
     <!-- menu strings -->
     <string name="make_monthly">This is monthly</string>
+    <string name="make_annual">This is annual</string>
 
 </resources>
