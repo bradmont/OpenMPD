@@ -73,7 +73,10 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
         switch (item.getItemId() ){
             case R.id.menu_refresh:
                 Log.i("net.bradmont.openmpd", "menu_refresh");
-                ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
+                ModelList accounts = MPDDBHelper
+                    .get()
+                    .getReferenceModel("service_account")
+                    .getAll();
                 int [] account_ids = new int [accounts.size()];
                 for (int i = 0; i < accounts.size(); i++){
                     account_ids[i] = accounts.get(i).getID();

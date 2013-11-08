@@ -34,10 +34,14 @@ public class TntImportService extends IntentService {
     }
     @Override
     protected void onHandleIntent(Intent intent){
+        Log.i("net.bradmont.openmpd", "Starting updater thread");
         Bundle b = intent.getExtras();
         ArrayList<Integer> newdata = new ArrayList<Integer>();
         ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
-        if (MPDDBHelper.get() == null){
+        if (MPDDBHelper.rawGet() == null){
+            MPDDBHelper dbh = new MPDDBHelper(this);
+        } else if (MPDDBHelper.get().getContext() != this){
+            MPDDBHelper.get().close();
             MPDDBHelper dbh = new MPDDBHelper(this);
         }
         NotificationCompat.Builder builder =

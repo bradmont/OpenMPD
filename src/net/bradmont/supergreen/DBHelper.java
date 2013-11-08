@@ -90,6 +90,7 @@ public abstract class DBHelper extends SQLiteOpenHelper {
     protected abstract void registerModels();
 
     public synchronized void close(){
+        super.close();
         for (Map.Entry<String, DBModel> entry: models.entrySet()){
             DBModel model = entry.getValue();
             model.close();
