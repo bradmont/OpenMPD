@@ -76,7 +76,7 @@ public class HomeFragment extends Fragment {
                 // notifications
                 ModelList notifications = MPDDBHelper
                         .filter("notification", "status", Notification.STATUS_NOTIFIED)
-                        .orderBy("message");
+                        .orderBy("date");
                 for (int i = 0; i < notifications.size(); i++){
                     Notification n = (Notification) notifications.get(i);
                     NotificationCard card = NotificationCardFactory.newCard(n);
