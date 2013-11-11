@@ -3,9 +3,10 @@
     xmlns:custom="http://schemas.android.com/apk/res/net.bradmont.openmpd"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:padding="8dp"
     >
+    <!-- Name, giving summary -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -50,10 +51,12 @@
                 android:text="st" />
         </LinearLayout>
     </LinearLayout>
+    <!-- Address, email -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
+        <!-- address -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
@@ -125,6 +128,7 @@
                    />
             </LinearLayout>
         </LinearLayout>
+        <!-- email, phone -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
@@ -157,6 +161,12 @@
         custom:spacingWeight=".33"
         custom:maxItems="13"
     />
+
+    <com.fima.cardsui.views.CardUI
+        android:id="@+id/cardsui"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
 
     <LinearLayout
         android:orientation="horizontal"
