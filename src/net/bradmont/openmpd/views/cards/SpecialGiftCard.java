@@ -39,6 +39,10 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
         ((TextView) view.findViewById(R.id.title)).setTextColor(
             context.getResources().getColor(R.color.purple)
             );
+		TextView date = ((TextView) view.findViewById(R.id.date));
+
+        // set date
+        date.setText(n.getString("date"));
 
         // set title
         String title_string = String.format(

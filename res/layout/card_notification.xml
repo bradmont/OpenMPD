@@ -36,6 +36,13 @@
                 android:layout_marginLeft="8dip"
                 android:textColor="@color/blue"
                 android:textSize="24sp" />
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dip"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/description"

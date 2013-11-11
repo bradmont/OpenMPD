@@ -4,6 +4,7 @@ import net.bradmont.supergreen.models.*;
 import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.views.cards.*;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 
@@ -20,6 +21,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
+
+import com.fima.cardsui.views.CardUI;
+import com.fima.cardsui.objects.CardStack;
 
 import java.util.HashMap;
 import java.lang.Runnable;
@@ -146,6 +150,19 @@ public class ContactDetail extends Fragment implements OnClickListener{
             values.put("country_short", address.getString("country_short"));
         } catch (Exception e){ }
         populateView(layout, values);
+
+        // notification history
+        CardUI cardsui = (CardUI) layout.findViewById(R.id.cardsui);
+        cardsui.setSwipeable(true);
+        cardsui.clearCards();
+        ModelList notifications = MPDDBHelper
+            .filter("notification", "contact", contact.getID())
+            .orderBy("_id");
+        for (int i = 0; i < notifications.size(); i++){
+            Notification n = (Notification) notifications.get(i);
+            NotificationCard card = NotificationCardFactory.newCard(n);
+            cardsui.addCard(card);
+        }
 
         // set up gift list
         ListView gift_list = (ListView) layout.findViewById(R.id.gift_list);

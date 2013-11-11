@@ -66,14 +66,21 @@ public class Notification extends DBModel{
 
         addField(new StringField("message")); 
 
+        addField(new DateField("date"));
 
         TABLE_NAME=TABLE;
         super.init();
     }
     public String [] generateUpdateSQL(int oldversion){
-        if (oldversion < 5){
+        if (oldversion < 12){
             String [] result = new String[1];
+            result[0] = "alter table notification add " + getField("date").getSQLDefinition() +";";
+            return result;
+        }
+        if (oldversion < 5){
+            String [] result = new String[2];
             result[0] = generateCreateSQL();
+            result[1] = "alter table notification add " + getField("date").getSQLDefinition() +";";
             return result;
         }
         return null;

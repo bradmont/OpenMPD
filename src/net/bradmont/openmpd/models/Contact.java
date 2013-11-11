@@ -162,10 +162,38 @@ public class Contact extends DBModel{
             cs.dirtySave();
         }
 
+        // check if we've already made a notification for this partner's last gift
+        SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+        String lastGift = "";
+        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+        if (cur.getCount() > 0){
+            cur.moveToFirst();
+            lastGift = cur.getString(0);
+        }
+        cur.close();
+
+        buildNotification(oldStatus, cs, lastGift, TntImporter.getTodaysDate());
+
+        if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
+            if (oldStatus == null || 
+            (cs.getString("manual_set_expires") == null ||
+             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) ){
+                // make sure we're not overwriting manually set statuses
+                cs.setValue("last_notify", lastGift);
+                cs.dirtySave();
+            } else {
+                oldStatus.setValue("last_notify", lastGift);
+                oldStatus.dirtySave();
+            }
+        }
+    }
+
+    public void buildNotification(ContactStatus oldStatus, ContactStatus cs, String lastGift, String evalDate){
         // create notifications for changes in status (unless we're importing
         // data for a new account)
         Notification note = new Notification();
         note.setValue("contact", this);
+        note.setValue("date", evalDate);
         if (oldStatus == null){
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE
                 && cs.getInt("partner_type") != ContactStatus.PARTNER_ONETIME){
@@ -193,27 +221,7 @@ public class Contact extends DBModel{
             note.dirtySave();
         }
 
-        // check if we've already made a notification for this partner's last gift
-        SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
-        String lastGift = "";
-        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
-        if (cur.getCount() > 0){
-            cur.moveToFirst();
-            lastGift = cur.getString(0);
-        }
-        cur.close();
-
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-            if (oldStatus == null || 
-            (cs.getString("manual_set_expires") == null ||
-             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) ){
-                // make sure we're not overwriting manually set statuses
-                cs.setValue("last_notify", lastGift);
-                cs.dirtySave();
-            } else {
-                oldStatus.setValue("last_notify", lastGift);
-                oldStatus.dirtySave();
-            }
             note.setValue("contact", this);
             int monthAmount = getMonthAmount();
             if (monthAmount != 0){
@@ -229,6 +237,7 @@ public class Contact extends DBModel{
                 }
             }
         }
+
     }
 
     private int evaluate(String giftPattern, ContactStatus cs){

@@ -26,6 +26,10 @@ public class LatePartnerCard extends NotificationCard {
         ((TextView) view.findViewById(R.id.title)).setTextColor(
             context.getResources().getColor(R.color.yellow)
             );
+		TextView date = ((TextView) view.findViewById(R.id.date));
+
+        // set date
+        date.setText(n.getString("date"));
 
 
         // set title

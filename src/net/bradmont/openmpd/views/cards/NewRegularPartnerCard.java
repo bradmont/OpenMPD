@@ -21,6 +21,10 @@ public class NewRegularPartnerCard extends NotificationCard {
 		View view = LayoutInflater.from(context).inflate(R.layout.card_notification, null);
 		TextView title = ((TextView) view.findViewById(R.id.title));
 		TextView description = ((TextView) view.findViewById(R.id.description));
+		TextView date = ((TextView) view.findViewById(R.id.date));
+
+        // set date
+        date.setText(n.getString("date"));
 
         // set title
         String title_string = String.format(
