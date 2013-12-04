@@ -22,6 +22,7 @@
     <string name="Address">Address</string>
     <string name="Phone">Phone</string>
     <string name="Notes">Notes</string>
+    <string name="edit_notes">Edit Notes</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>

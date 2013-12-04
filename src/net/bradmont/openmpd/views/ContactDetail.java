@@ -13,6 +13,7 @@ import android.content.Context;
 import android.database.sqlite.*;
 import android.database.Cursor;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -72,6 +73,8 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
 
 
         layout = inflater.inflate(R.layout.contact_detail, null);
+        setHasOptionsMenu(true);
+
 
         values.put("fname", contact.getString("fname"));
         values.put("lname", contact.getString("lname"));
@@ -214,6 +217,56 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"));
         return layout;
     }
+    @Override
+        public void onCreateOptionsMenu (Menu menu, MenuInflater inflater){
+        inflater.inflate(R.menu.contact_detail, menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+        switch (item.getItemId() ){
+            case R.id.menu_gift_history:
+                Log.i("net.bradmont.openmpd", "menu_gift_history");
+                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+                ad.setTitle(R.string.gift_history);
+                ListView gift_list = (ListView) ((LayoutInflater) getActivity()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                    .inflate(R.layout.list, null);
+
+                String [] args = new String[1]; args[0] = contact.getString("tnt_people_id");
+                Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+                    "select _id, date, amount as amount from gift where tnt_people_id=? order by date desc; " , args);
+
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+                    R.layout.contact_gift_list_item,
+                    cur,
+                    new String [] {"date", "amount"},
+                    new int [] {R.id.date, R.id.amount});
+                
+                adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
+                    public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                        switch (columnIndex){
+                            case 2:
+                            TextView tv = (TextView) view;
+                            tv.setText( String.format("$%.2f", cursor.getFloat(2)/100f));
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                gift_list.setAdapter(adapter);
+                ad.setView(gift_list);
+                ad.show();
+                return true;
+            case R.id.menu_notes:
+                Log.i("net.bradmont.openmpd", "menu_notes");
+                OpenMPD.getInstance().userMessage("Not implemented yet.");
+                // TODO
+                return true;
+        }
+        return false;
+    }
+
+
 
     private void buildGraph(BarGraph graph, String tnt_people_id){
         String [] args = new String [1];

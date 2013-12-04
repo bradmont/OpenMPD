@@ -4,11 +4,10 @@
 - Intro cards: "Swipe me away" & "click title"
 
 - Contact page: 
-    - giving history pop-up dialog from context menu
     - Notes block (editable, not filled with giving pattern)
     - Set last_gift in partner_status
 
-- Verify presence network connection when downloading
+- Verify presence of network connection when downloading
 
 - option to notify only in business hours
 - changeable update frequency
