@@ -26,6 +26,7 @@ import net.bradmont.openmpd.views.EditServiceAccountDialog;
 import net.bradmont.supergreen.models.ModelList;
 import net.bradmont.holograph.BarGraph;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fima.cardsui.views.CardUI;
 import com.fima.cardsui.objects.CardStack;
 
@@ -135,6 +136,15 @@ public class HomeFragment extends Fragment {
 
         }
 	}
+    @Override
+    public void onResume(){
+        super.onResume();
+        // set title
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+            .setTitle(R.string.app_name);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+            .setSubtitle(null);
+    }
     private class addAccountClickListener implements OnClickListener{
         @Override
         public void onClick(View v){

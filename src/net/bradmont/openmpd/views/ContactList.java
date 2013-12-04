@@ -25,6 +25,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import java.lang.Runnable;
 
 public class ContactList extends ListFragment implements OnClickListener{
@@ -106,6 +108,15 @@ public class ContactList extends ListFragment implements OnClickListener{
 
         setListAdapter(adapter);
 
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        // set title
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+            .setTitle(R.string.app_name);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+            .setSubtitle(null);
     }
 
     @Override
