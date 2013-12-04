@@ -33,7 +33,7 @@ If you are interested in helping test OpenMPD, please contact me. Twitter is pro
 
 #### Left to do before Release 1:
 - [ ] Design: Contact List View
-- [ ] Design: Contact Detail View
+- [x] Design: Contact Detail View
 - [ ] Design/UI: Accounts configuration/add view
 - [ ] Searching & filtering contacts (by name, partner type, giving amount, etc).
 - [x] Verification of service accounts when you first add them
