@@ -201,40 +201,17 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             }
         } catch (Exception e){ }
 
-        // listview
-        ListView linkList = (ListView) layout.findViewById(R.id.contactinfo_list);
-        linkList.setAdapter(new ContactLinkAtapter(getActivity(), links.toArray( new Link[links.size()])));
-        linkList.setDivider(null);
-        linkList.setDividerHeight(0);
+        // Add links to the view
+        LinearLayout linkList = (LinearLayout) layout.findViewById(R.id.contactinfo_list);
+        for (int i = 0; i < links.size(); i++){
+            Log.i("net.bradmont.openmpd", "Adding view " + links.get(i).title);
+            View v = buildLinkView(links.get(i), linkList);
+            v.setLayoutParams(linkList.getLayoutParams());
+            linkList.addView(v);
+        }
 
         // barGraph
         buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"));
-
-        // set up gift list
-        ListView gift_list = (ListView) layout.findViewById(R.id.gift_list);
-        String [] args = new String [1];
-        args[0] = contact.getString("tnt_people_id");
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
-            "select _id, date, amount as amount from gift where tnt_people_id=? order by date desc; " , args);
-
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
-            R.layout.contact_gift_list_item,
-            cur,
-            new String [] {"date", "amount"},
-            new int [] {R.id.date, R.id.amount});
-
-        adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                switch (columnIndex){
-                    case 2:
-                    TextView tv = (TextView) view;
-                    tv.setText( String.format("$%.2f", cursor.getFloat(2)/100f));
-                    return true;
-                }
-                return false;
-            }
-        });
-        gift_list.setAdapter(adapter);
         return layout;
     }
 
@@ -295,34 +272,23 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         public String subtitle = null;
 
     }
-    public class ContactLinkAtapter extends ArrayAdapter<Link> {
-        private final Context context;
-        private final Link[] values;
 
-        public ContactLinkAtapter(Context context, Link[] values){
-            super(context, R.layout.contact_link_layout, values);
-            this.context = context;
-            this.values = values;
+    public View buildLinkView(Link link, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) getActivity()
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
+
+        TextView title = (TextView) rowView.findViewById(R.id.title);
+        TextView value = (TextView) rowView.findViewById(R.id.value);
+        TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
+
+        title.setText(link.title);
+        value.setText(link.value);
+        if (link.subtitle != null){
+            subtitle.setText(link.subtitle);
+        } else {
+            subtitle.setVisibility(View.GONE);
         }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
-
-            TextView title = (TextView) rowView.findViewById(R.id.title);
-            TextView value = (TextView) rowView.findViewById(R.id.value);
-            TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
-
-            title.setText(values[position].title);
-            value.setText(values[position].value);
-            if (values[position].subtitle != null){
-                subtitle.setText(values[position].subtitle);
-            } else {
-                subtitle.setVisibility(View.GONE);
-            }
-            return rowView;
-        }
+        return rowView;
     }
 }

@@ -1,8 +1,12 @@
 
+- Cache data for GraphCard into temp table to make rendering faster/UI more responsive
 
 - Intro cards: "Swipe me away" & "click title"
 
-- Contact page: card history
+- Contact page: 
+    - giving history pop-up dialog from context menu
+    - Notes block (editable, not filled with giving pattern)
+    - Set last_gift in partner_status
 
 - Verify presence network connection when downloading
 
