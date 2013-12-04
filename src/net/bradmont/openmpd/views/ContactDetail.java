@@ -214,7 +214,10 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         }
 
         // barGraph
-        buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"));
+        if (!buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"))){
+            // Hide bar graph if no gifts in last year
+            layout.findViewById(R.id.bar_graph_layout).setVisibility(View.GONE);
+        }
         return layout;
     }
     @Override
@@ -268,10 +271,19 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
 
 
 
-    private void buildGraph(BarGraph graph, String tnt_people_id){
+    private boolean buildGraph(BarGraph graph, String tnt_people_id){
         String [] args = new String [1];
         args[0] = contact.getString("tnt_people_id");
+
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+            "select sum(amount) from (select amount, a.month from (select distinct month from gift order by month desc limit 13) a join gift b on a.month=b.month where tnt_people_id=?);", args);
+        cur.moveToFirst();
+        if (cur.getInt(0) == 0){
+            // if no gifts in last 13 months, return false
+            return false;
+        }
+
+        cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
             "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
         Float [][] values = new Float[cur.getCount()][];
         String [] labels = new String[cur.getCount()];
@@ -292,8 +304,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         }
         graph.setValues(values);
         graph.setLabels(labels);
-
-
+        return true;
     }
     @Override
     public void onSaveInstanceState (Bundle outState){

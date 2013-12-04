@@ -13,6 +13,7 @@
         android:paddingRight="@dimen/list_padding" >
         <!-- giving graph -->
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/bar_graph_layout"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >

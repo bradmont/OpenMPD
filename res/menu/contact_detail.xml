@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/menu_gift_history" 
+        android:icon="@android:drawable/ic_menu_today" 
+        android:showAsAction="never" 
+        android:title="@string/gift_history" 
+        android:visible="true"></item>
+    <item android:id="@+id/menu_notes" 
+        android:icon="@android:drawable/ic_menu_edit" 
+        android:showAsAction="never" 
+        android:title="@string/edit_notes" 
+        android:visible="true"></item>
+
+</menu>
