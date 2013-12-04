@@ -12,6 +12,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import android.view.View;
+
+import java.lang.Math;
+
 import net.bradmont.openmpd.R;
 
 public class BarGraph extends View {
@@ -123,6 +126,8 @@ public class BarGraph extends View {
             Rect r = new Rect();
             linePaint.getTextBounds(sampleLabel, 0, sampleLabel.length() - 1, r);
             float label_height = Math.abs(r.height());
+            // Labels at angle, calculate height:
+            label_height = (label_width + label_height) /(float) Math.sqrt(2);
             data_bottom = canvas_bottom - (label_height + tickWidth);
             barHeightFactor = (height-label_height - tickWidth) / maxValue;
         } else {
@@ -142,8 +147,10 @@ public class BarGraph extends View {
 
         // draw bars
         for (int i = start; i < values.length; i++){
-            float bottom=data_bottom; // Bottom changes with each bar
 
+            float bottom=data_bottom; // Bottom changes with each bar
+            float left = (barWidth + spacingWidth) * (i-start) + (spacingWidth/2 + data_left);
+            float right = left + barWidth;
             for (int j=0; j < values[i].length; j++){
                 float val = 0f;
                 if (values[i][j] instanceof Float){
@@ -151,18 +158,19 @@ public class BarGraph extends View {
                 } else if (values[i][j] instanceof Integer){
                     val = ((Integer) values[i][j]).floatValue();
                 }
-                float left = (barWidth + spacingWidth) * (i-start) + (spacingWidth/2 + data_left);
-                float right = left + barWidth;
                 float top = bottom - val*barHeightFactor;
                 //Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
                 Rect r = new Rect((int)left, (int)top, (int)right, (int)bottom);
                 canvas.drawRect(r, barPaints[j % barPaints.length]);
                 bottom = top; // stacked bars; bottom is top of previous
 
-                if (labels != null){
-                    String label = labels[i];
-                    canvas.drawText(label , left, canvas_bottom, linePaint);
-                }
+            }
+            if (labels != null){
+                String label = labels[i];
+                canvas.save();
+                canvas.rotate(-45, left, canvas_bottom);
+                canvas.drawText(label , left, canvas_bottom, linePaint);
+                canvas.restore();
             }
         }
 
