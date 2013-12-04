@@ -17,6 +17,10 @@
     <string name="data_import">Importing Data</string>
     <string name="giving_summary">Giving Summary</string>
     <string name="clear_data">Clear Data</string>
+    <string name="Email">Email</string>
+    <string name="Address">Address</string>
+    <string name="Phone">Phone</string>
+    <string name="Notes">Notes</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>

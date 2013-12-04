@@ -22,15 +22,17 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import com.fima.cardsui.views.CardUI;
-import com.fima.cardsui.objects.CardStack;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Runnable;
 
-public class ContactDetail extends Fragment implements OnClickListener{
-    public static final String [] columns = { "partner_type", "giving_amount", "status", "notes", "last_gift", "email_address", "phone_number", "addr1", "addr2", "addr3", "addr4", "city", "region", "post_code", "country_short", "name"};
-    public static final int [] fields = { R.id.partner_type, R.id.giving_amount, R.id.status, R.id.notes, R.id.last_gift, R.id.email_address, R.id.phone_number, R.id.addr1, R.id.addr2, R.id.addr3, R.id.addr4, R.id.city, R.id.region, R.id.post_code, R.id.country_short, R.id.name};
+public class ContactDetail extends SherlockFragment implements OnClickListener{
     private HashMap<String, String> values = new HashMap();
 
     private Cursor cursor = null;
@@ -97,26 +99,21 @@ public class ContactDetail extends Fragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
+        ((OpenMPD)getActivity()).getSupportActionBar().setTitle(values.get("name"));
 
-        try {
-            status = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status").getByField("contact_id", contact.getInt("id"));
-            values.put("partner_type", getActivity().getResources()
-                            .getString(ContactStatus.partnership(status.getInt("partner_type"))));
-            values.put("giving_amount", "$" + Integer.toString(status.getInt("giving_amount")/100));
-            values.put("status", 
-                getActivity().getResources().getString(
-                    ContactStatus.getStatusStringRes(status.getInt("status"))
-                ));
-            
-            values.put("notes", status.getString("notes"));
-            values.put("last_gift", status.getString("last_gift"));
-        } catch (Exception e){ }
+        ArrayList<Link> links = new ArrayList<Link>(4);
 
         // email
         try {
             EmailAddress email = (EmailAddress) MPDDBHelper
                     .getModelByField("email_address", "contact_id", contact.getInt("id"));
             values.put("email_address", email.getString("address"));
+            Link link = new Link();
+            link.title = R.string.Email;
+            link.value = email.getString("address");
+            if (link.value != "" && link.value != null && link.value.length() > 1){
+                links.add(link);
+            }
         } catch (Exception e){ }
 
         // phone number
@@ -124,6 +121,12 @@ public class ContactDetail extends Fragment implements OnClickListener{
             PhoneNumber phone = (PhoneNumber) MPDDBHelper
                     .getModelByField("phone_number", "contact_id", contact.getInt("id"));
             values.put("phone_number", phone.getString("number"));
+            Link link = new Link();
+            link.title = R.string.Phone;
+            link.value = phone.getString("number");
+            if (link.value != "" && link.value != null){
+                links.add(link);
+            }
         } catch (Exception e){ }
 
         // address
@@ -132,37 +135,80 @@ public class ContactDetail extends Fragment implements OnClickListener{
                     .getModelByField("address", "contact_id", contact.getInt("id"));
 
             values.put("addr1", address.getString("addr1"));
+            String fullAddress = address.getString("addr1");
             if (address.getString("addr2") != null
                 && !address.getString("addr2").equals("")){
                 values.put("addr2", address.getString("addr2"));
+                fullAddress = fullAddress + ", " + values.get("addr2");
             }
             if (address.getString("addr3") != null
                 && !address.getString("addr3").equals("")){
                 values.put("addr3", address.getString("addr3"));
+                fullAddress = fullAddress + ", " + values.get("addr3");
             }
             if (address.getString("addr4") != null
                 && !address.getString("addr4").equals("")){
                 values.put("addr4", address.getString("addr4"));
+                fullAddress = fullAddress + ", " + values.get("addr4");
             }
             values.put("city", address.getString("city"));
+            fullAddress = fullAddress + ", " + values.get("city");
             values.put("region", address.getString("region"));
+            fullAddress = fullAddress + ", " + values.get("region");
             values.put("post_code", address.getString("post_code"));
+            fullAddress = fullAddress + ", " + values.get("post_code");
             values.put("country_short", address.getString("country_short"));
-        } catch (Exception e){ }
-        populateView(layout, values);
 
-        // notification history
-        CardUI cardsui = (CardUI) layout.findViewById(R.id.cardsui);
-        cardsui.setSwipeable(true);
-        cardsui.clearCards();
-        ModelList notifications = MPDDBHelper
-            .filter("notification", "contact", contact.getID())
-            .orderBy("_id");
-        for (int i = 0; i < notifications.size(); i++){
-            Notification n = (Notification) notifications.get(i);
-            NotificationCard card = NotificationCardFactory.newCard(n);
-            cardsui.addCard(card);
-        }
+            Link link = new Link();
+            link.title = R.string.Address;
+            link.value = fullAddress;
+            if (link.value != "" && link.value != null){
+                links.add(link);
+            }
+        } catch (Exception e){ }
+
+        // Partner status & notes
+        try {
+            status = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status").getByField("contact_id", contact.getInt("id"));
+
+            String partner_type = getActivity().getResources()
+                            .getString(ContactStatus.partnership(status.getInt("partner_type")));
+            String giving_amount = "$" + Integer.toString(status.getInt("giving_amount")/100);
+            String giving_status = 
+                getActivity().getResources().getString(
+                    ContactStatus.getStatusStringRes(status.getInt("status")));
+            
+            // header will be different depending on partner type
+            if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
+                String subTitle = giving_amount + partner_type + ", " + giving_status;
+                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+            } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
+                // TODO: set up last_gift in partner_status
+                /*String subTitle = partner_type + ". " + 
+                    getActivity().getResources().getString(R.string.last_gift) + 
+                    status.getString("last_gift");*/
+                String subTitle = partner_type;
+                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+            } else {
+                String subTitle = partner_type;
+                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+            }
+            Link link = new Link();
+            link.title = R.string.Notes;
+            link.value = status.getString("notes");
+            if (link.value != "" && link.value != null && link.value.length() > 1){
+                links.add(link);
+            }
+        } catch (Exception e){ }
+
+        // listview
+        ListView linkList = (ListView) layout.findViewById(R.id.contactinfo_list);
+        linkList.setAdapter(new ContactLinkAtapter(getActivity(), links.toArray( new Link[links.size()])));
+        linkList.setDivider(null);
+        linkList.setDividerHeight(0);
+
+        // barGraph
+        buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"));
 
         // set up gift list
         ListView gift_list = (ListView) layout.findViewById(R.id.gift_list);
@@ -192,33 +238,13 @@ public class ContactDetail extends Fragment implements OnClickListener{
         return layout;
     }
 
-    @Override
-    public void onSaveInstanceState (Bundle outState){
-        if (contact != null){
-            outState.putInt("contact_id", contact.getID());
-        }
-    }
-
-    private void populateView(View layout, HashMap<String, String> values){
-        for (int i = 0; i < fields.length; i++){
-            if (values.containsKey(columns[i])){
-                TextView v = (TextView) layout.findViewById(fields[i]);
-                if (v != null){
-                    v.setText(values.get(columns[i]));
-                    v.setVisibility(View.VISIBLE);
-                }
-            }
-        }
-    }
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        final OpenMPD app = (OpenMPD)getActivity();
+    private void buildGraph(BarGraph graph, String tnt_people_id){
         String [] args = new String [1];
         args[0] = contact.getString("tnt_people_id");
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
             "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
         Float [][] values = new Float[cur.getCount()][];
+        String [] labels = new String[cur.getCount()];
         cur.moveToFirst();
         for (int i = 0; i < cur.getCount(); i++){
             String [] gifts;
@@ -231,12 +257,25 @@ public class ContactDetail extends Fragment implements OnClickListener{
             for (int j = 0; j < gifts.length; j++){
                 values[i][j] = new Float( Float.parseFloat(gifts[j])/100f);
             }
+            labels[i] = cur.getString(0);
             cur.moveToNext();
         }
-        BarGraph graph = (BarGraph) getView().findViewById(R.id.gifts_graph);
         graph.setValues(values);
+        graph.setLabels(labels);
 
 
+    }
+    @Override
+    public void onSaveInstanceState (Bundle outState){
+        if (contact != null){
+            outState.putInt("contact_id", contact.getID());
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        final OpenMPD app = (OpenMPD)getActivity();
     }
 
     @Override
@@ -246,5 +285,44 @@ public class ContactDetail extends Fragment implements OnClickListener{
                 break;
         }
     }
+    /**
+      * Represents a single link with a contact, such as an email
+      * address or a phone number
+      */
+    private class Link {
+        public int title = 0;
+        public String value = null;
+        public String subtitle = null;
 
+    }
+    public class ContactLinkAtapter extends ArrayAdapter<Link> {
+        private final Context context;
+        private final Link[] values;
+
+        public ContactLinkAtapter(Context context, Link[] values){
+            super(context, R.layout.contact_link_layout, values);
+            this.context = context;
+            this.values = values;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
+
+            TextView title = (TextView) rowView.findViewById(R.id.title);
+            TextView value = (TextView) rowView.findViewById(R.id.value);
+            TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
+
+            title.setText(values[position].title);
+            value.setText(values[position].value);
+            if (values[position].subtitle != null){
+                subtitle.setText(values[position].subtitle);
+            } else {
+                subtitle.setVisibility(View.GONE);
+            }
+            return rowView;
+        }
+    }
 }

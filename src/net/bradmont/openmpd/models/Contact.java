@@ -85,9 +85,7 @@ public class Contact extends DBModel{
         super.init();
     }
 
-    /** This really should be in a controller, not the model...
-      */
-    public void updateStatus(boolean initialImport){
+    public String generateGiftPattern(){
         // build a string that matches \d+, where each character
         // is the number of gifts in a given month. eg: 
         // a monthly partner will be 111111111...
@@ -113,6 +111,13 @@ public class Contact extends DBModel{
         cur.moveToFirst();
         String giftPattern = cur.getString(1);
         cur.close();
+        return giftPattern;
+    }
+
+    /** This really should be in a controller, not the model...
+      */
+    public void updateStatus(boolean initialImport){
+        String giftPattern = generateGiftPattern();
 
         // check if this contact already has an associated ContactStatus
         ContactStatus cs = (ContactStatus)MPDDBHelper
@@ -163,16 +168,18 @@ public class Contact extends DBModel{
         }
 
         // check if we've already made a notification for this partner's last gift
-        SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+        String SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+        String [] args = new String [1];
+        args[0] = getString("tnt_people_id");
         String lastGift = "";
-        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
         if (cur.getCount() > 0){
             cur.moveToFirst();
             lastGift = cur.getString(0);
         }
         cur.close();
 
-        buildNotification(oldStatus, cs, lastGift, TntImporter.getTodaysDate());
+        generateNotification(oldStatus, cs, lastGift, TntImporter.getTodaysDate());
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
             if (oldStatus == null || 
@@ -188,12 +195,21 @@ public class Contact extends DBModel{
         }
     }
 
-    public void buildNotification(ContactStatus oldStatus, ContactStatus cs, String lastGift, String evalDate){
+    public void generateNotification(ContactStatus oldStatus, ContactStatus cs, String lastGift, String evalDate){
+        generateNotification(oldStatus, cs, lastGift, evalDate, true);
+    }
+
+    public void generateNotification(ContactStatus oldStatus, ContactStatus cs, String lastGift, String evalDate, boolean notify){
         // create notifications for changes in status (unless we're importing
         // data for a new account)
         Notification note = new Notification();
         note.setValue("contact", this);
         note.setValue("date", evalDate);
+        if (notify == false){
+            // for initial import, we won't notify of out of date notifications,
+            // but we still want to show them in the contact history
+            note.setValue("status", Notification.STATUS_NOTIFIED);
+        }
         if (oldStatus == null){
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE
                 && cs.getInt("partner_type") != ContactStatus.PARTNER_ONETIME){

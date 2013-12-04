@@ -4,156 +4,14 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
+    android:padding="0dp"
     >
-    <!-- Name, giving summary -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-        <TextView android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/big_text"
-            />
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-                <TextView
-                    android:id="@+id/giving_amount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/medium_text"
-                    android:text="amnt" />
-                <TextView
-                    android:id="@+id/partner_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/medium_text"
-                    android:text="typ" />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text=" " />
-            </LinearLayout>
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/small_text"
-                android:text="st" />
-        </LinearLayout>
-    </LinearLayout>
-    <!-- Address, email -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-        <!-- address -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content" >
-            <TextView android:id="@+id/addr1"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-               />
-            <TextView android:id="@+id/addr2"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-               />
-            <TextView android:id="@+id/addr3"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="0px"
-                android:visibility="gone"
-               />
-            <TextView android:id="@+id/addr4"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="0px"
-                android:visibility="gone"
-               />
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-                <TextView android:id="@+id/city"
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                   />
-                <TextView 
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=", " />
-                <TextView android:id="@+id/region"
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                   />
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-                <TextView android:id="@+id/post_code"
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                   />
-                <TextView 
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=", " />
-                <TextView android:id="@+id/country_short"
-                    android:textSize="@dimen/small_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                   />
-            </LinearLayout>
-        </LinearLayout>
-        <!-- email, phone -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="wrap_content" >
-            <TextView android:id="@+id/last_gift"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <TextView android:id="@+id/email_address"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-            <TextView android:id="@+id/phone_number"
-                android:textSize="@dimen/small_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-               />
-        </LinearLayout>
-    </LinearLayout>
+    <!-- giving graph -->
     <net.bradmont.holograph.BarGraph 
         android:id="@+id/gifts_graph"
+        android:background="@color/white"
         android:layout_width="fill_parent"
-        android:layout_height="165dp"
+        android:layout_height="240dp"
         android:padding="8dp"
         custom:colors="#33b5e5,#ffbb33,#ff4444"
         custom:lineColor="#707070"
@@ -161,12 +19,15 @@
         custom:spacingWeight=".33"
         custom:maxItems="13"
     />
-
-    <com.fima.cardsui.views.CardUI
-        android:id="@+id/cardsui"
+    <!-- Name, giving summary -->
+    <!-- Address, email -->
+    <ListView
+        android:id="@+id/contactinfo_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:paddingLeft="@dimen/list_padding"
+        android:paddingRight="@dimen/list_padding" />
+
 
     <LinearLayout
         android:orientation="horizontal"

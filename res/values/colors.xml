@@ -8,5 +8,6 @@
     <color name="black">#000</color>
     <color name="gray">#A0A0A0</color>
     <color name="purple">#AA66CC</color>
+    <color name="white">#FFFFFF</color>
     
 </resources>

@@ -17,12 +17,13 @@
 <resources>
 
     <dimen name="slidingmenu_offset">60dp</dimen>
-    <dimen name="list_padding">10dp</dimen>
+    <dimen name="list_padding">16dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
     <dimen name="menu_width">40mm</dimen>
     <dimen name="big_text">36dp</dimen>
     <dimen name="medium_text">26dp</dimen>
     <dimen name="small_text">16dp</dimen>
+    <dimen name="very_small_text">12dp</dimen>
 
     <integer name="num_cols">1</integer>
 
