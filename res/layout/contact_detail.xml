@@ -50,12 +50,5 @@
             <!-- contact info after here -->
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/gift_list"
-            android:layout_width="fill_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:paddingRight="4dp"
-            android:text="Unknown" />
     </LinearLayout>
 </ScrollView>
