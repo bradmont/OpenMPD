@@ -9,6 +9,7 @@ import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 
 import android.database.sqlite.*;
 import android.database.Cursor;
@@ -187,9 +188,9 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
-                /*String subTitle = partner_type + ". " + 
+                String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
-                    status.getString("last_gift");*/
+                    status.getString("last_gift");
                 String subTitle = partner_type;
                 ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else {
@@ -226,10 +227,10 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
     }
     @Override
     public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
         switch (item.getItemId() ){
             case R.id.menu_gift_history:
                 Log.i("net.bradmont.openmpd", "menu_gift_history");
-                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
                 ad.setTitle(R.string.gift_history);
                 ListView gift_list = (ListView) ((LayoutInflater) getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
@@ -262,8 +263,26 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 return true;
             case R.id.menu_notes:
                 Log.i("net.bradmont.openmpd", "menu_notes");
-                OpenMPD.getInstance().userMessage("Not implemented yet.");
-                // TODO
+                ad.setTitle(R.string.Notes);
+                final EditText notes_text = (EditText) ((LayoutInflater) getActivity()
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                    .inflate(R.layout.notes_text, null);
+
+                notes_text.setText(status.getString("notes"));
+                ad.setView(notes_text);
+                final ContactStatus local_status = status;
+                ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        local_status.setValue("notes", notes_text.getText().toString());
+                        local_status.dirtySave();
+                        OpenMPD.getInstance().switchContent(new ContactDetail(contact.getID()));
+                    }
+                });
+                ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+                ad.show();
                 return true;
         }
         return false;

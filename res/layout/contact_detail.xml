@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/giving_summary"
                 android:textColor="@color/blue"
-                android:textSize="@dimen/very_small_text"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold"
                 android:padding="8dp"
                 android:textAllCaps="true"
