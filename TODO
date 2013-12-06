@@ -4,8 +4,7 @@
 - Intro cards: "Swipe me away" & "click title"
 
 - Contact page: 
-    - Notes block (editable, not filled with giving pattern)
-    - Set last_gift in partner_status
+    - Set last_gift in partner_status -> coded but not tested; check after next update
 
 - Verify presence of network connection when downloading
 

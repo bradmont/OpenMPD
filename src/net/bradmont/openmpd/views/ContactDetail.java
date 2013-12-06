@@ -191,7 +191,6 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                String subTitle = partner_type;
                 ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;

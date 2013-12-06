@@ -154,9 +154,23 @@ public class Contact extends DBModel{
             oldStatus = (ContactStatus)MPDDBHelper
                     .getReferenceModel("contact_status")
                     .getByField("contact_id", getInt("id"));
+            cs.setValue("notes", oldStatus.getString("notes"));
         }
 
 
+        // find last gift date
+        String SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
+        String [] args = new String [1];
+        args[0] = getString("tnt_people_id");
+        String lastGift = "";
+        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+        if (cur.getCount() > 0){
+            cur.moveToFirst();
+            lastGift = cur.getString(0);
+            cs.setValue("last_gift", lastGift);
+        }
+
+        cur.close();
         int partner = evaluate(giftPattern, cs);
         cs.setValue("partner_type", partner);
         if (cs.getString("manual_set_expires") == null ||
@@ -168,17 +182,6 @@ public class Contact extends DBModel{
         }
 
         // check if we've already made a notification for this partner's last gift
-        String SQL = "select date from gift where tnt_people_id=? order by date desc limit 1;";
-        String [] args = new String [1];
-        args[0] = getString("tnt_people_id");
-        String lastGift = "";
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
-        if (cur.getCount() > 0){
-            cur.moveToFirst();
-            lastGift = cur.getString(0);
-        }
-        cur.close();
-
         generateNotification(oldStatus, cs, lastGift, TntImporter.getTodaysDate());
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
@@ -257,7 +260,7 @@ public class Contact extends DBModel{
     }
 
     private int evaluate(String giftPattern, ContactStatus cs){
-        cs.setValue("notes", giftPattern);
+        cs.setValue("debug_data", giftPattern);
         for (int i = 0; i < ContactStatus.REGEXES.length; i++){
             String regex = ContactStatus.REGEXES[i];
             if (!regex.startsWith("^")){

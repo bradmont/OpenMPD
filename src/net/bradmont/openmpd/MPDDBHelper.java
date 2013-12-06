@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 13;
+    private static int DATABASE_VERSION = 14;
 
     @Override
     protected void registerModels(){
@@ -189,6 +189,9 @@ public class MPDDBHelper extends DBHelper{
             db.execSQL("drop view monthly_base_giving;");
             db.execSQL( "create view monthly_base_giving as select month, sum(base_total) base_giving from (select * from _monthly_base_giving union select * from _monthly_base_giving_in_special_month) group by month;");
 
+        }
+        if (oldVersion < 14){
+            db.execSQL("update contact_status set notes=NULL;");
         }
     }
 
