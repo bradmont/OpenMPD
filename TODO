@@ -1,14 +1,18 @@
-
-- Cache data for GraphCard into temp table to make rendering faster/UI more responsive
-
-- Intro cards: "Swipe me away" & "click title"
+--- before beta 1 ---
+- in onboarding cards, use buttons for actions
+- Tutorial cards: "Swipe me away" & "click title"
 
 - Contact page: 
     - Set last_gift in partner_status -> coded but not tested; check after next update
+    - verify notes are maintained across updates
 
 - Verify presence of network connection when downloading
 
+--- post beta1 point releases ---
+Polish/tweaks:
+- quick actions on notifications (email, call)
+- Cache data for GraphCard into temp table to make rendering faster/UI more responsive
+
+Settings:
 - option to notify only in business hours
 - changeable update frequency
-
-- quick actions on notifications (email, call)

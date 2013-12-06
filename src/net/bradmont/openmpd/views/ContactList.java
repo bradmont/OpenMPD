@@ -26,10 +26,17 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.widget.SearchView;
+
 
 import java.lang.Runnable;
 
-public class ContactList extends ListFragment implements OnClickListener{
+public class ContactList extends SherlockListFragment implements OnClickListener{
     public static final String [] columns = {"fname", "partner_type", "giving_amount"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount};
 
@@ -38,12 +45,18 @@ public class ContactList extends ListFragment implements OnClickListener{
     private Cursor cursor = null;
 
     private SimpleCursorAdapter adapter = null;
+    private static final String BASE_QUERY = "select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency  from " + 
+                "contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "order by A.lname, A.fname";
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, 
             Bundle savedInstanceState) {
 
+        setHasOptionsMenu(true);
         ListView lv = (ListView)  inflater.inflate(R.layout.list, null);
         LayoutInflater layoutInflater = (LayoutInflater)getActivity()
                 .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
@@ -58,11 +71,7 @@ public class ContactList extends ListFragment implements OnClickListener{
 
 
         // set up adapter
-        cursor = db_read.rawQuery("select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "order by A.lname, A.fname", null);
+        cursor = db_read.rawQuery(BASE_QUERY, null);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
@@ -109,6 +118,54 @@ public class ContactList extends ListFragment implements OnClickListener{
         setListAdapter(adapter);
 
     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        SearchView searchView = new
+                SearchView( ((OpenMPD)getActivity()).getSupportActionBar().getThemedContext());
+        //searchView.setQueryHint(getString(R.string.hint_search_bar));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+            public boolean onQueryTextChange(String newText){
+                String [] args = new String[1];
+                args[0] = newText;
+                // filter on a concatenation of contacts's names, to avoid really complex SQL...
+                Cursor newCursor = db_read.rawQuery("select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
+                " A.fname || ' ' || A.lname || ' ' || B.fname || ' ' || B.lname as full_name  from " + 
+                "contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and full_name like '%' || ? ||'%' order by A.lname, A.fname", args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            }
+            public boolean  onQueryTextSubmit(String query){
+                return false;
+            }
+        });
+        menu.add(R.string.Search)
+                .setIcon(android.R.drawable.ic_menu_search)
+                .setActionView(searchView)
+                .setOnActionExpandListener(new MenuItem.OnActionExpandListener(){
+                    // so we can reset the search when the searchView is closed
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        return true;
+                    }
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        Cursor newCursor = db_read.rawQuery(BASE_QUERY, null);
+                        adapter.changeCursor(newCursor);
+                        cursor = newCursor;
+                        return true;
+                    }
+                })
+                .setShowAsAction(
+                        MenuItem.SHOW_AS_ACTION_IF_ROOM
+                                | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+    }
+
+
     @Override
     public void onResume(){
         super.onResume();

@@ -23,6 +23,7 @@
     <string name="Phone">Phone</string>
     <string name="Notes">Notes</string>
     <string name="edit_notes">Edit Notes</string>
+    <string name="Search">Search</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>
