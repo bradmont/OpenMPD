@@ -1,15 +1,17 @@
 --- before beta 1 ---
-- in onboarding cards, use buttons for actions
-- Tutorial cards: "Swipe me away" & "click title"
+- in onboarding cards, use buttons for actions instead of clicking the cards
 
-- Verify presence of network connection when downloading
-
-- Help screens
+- hide debug screen
 
 --- post beta1 point releases ---
 Polish/tweaks:
 - quick actions on notifications (email, call)
 - Cache data for GraphCard into temp table to make rendering faster/UI more responsive
+    - build this table after data download to keep UI snappy
+    - on data invalidation (eg, "this is monthly", "this is annual") drop temp table
+    - on add graph card, verify existence of table and rebuild it if necessary
+
+- bug: editing accounts doesn't set spinner properly
 
 Settings:
 - option to notify only in business hours

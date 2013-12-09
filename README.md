@@ -26,19 +26,20 @@ manage your donor base, please feel free to let us know.
 ### Current Status:
 - Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
 - Some work remains on the User Interface side
-- **We are now in beta testing**
+- **We are now in closed beta testing**
 
 #### Beta 1:
 If you are interested in helping test OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
 
 #### Left to do before Release 1:
-- [ ] Design: Contact List View
+- [/] Design: Contact List View (I'd like this to be prettier, but can't think of how)
 - [x] Design: Contact Detail View
-- [ ] Design/UI: Accounts configuration/add view
+- [/] Design/UI: Accounts configuration/add view (Ok for now, would like to improve)
 - [x] Searching & filtering contacts (by name, partner type, giving amount, etc).
 - [x] Verification of service accounts when you first add them
 - [x] Build label support into BarGraph
-- [ ] Build swipe support into BarGraph
+- [ ] Build swipe support into BarGraph to view past history
+- [ ] Help screens & cleaner onboarding
 
 ### Milestone 1 Goals
 - **"Zero User Input" data analysis release**
