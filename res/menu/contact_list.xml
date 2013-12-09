@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/menu_search" 
+        android:icon="@android:drawable/ic_menu_search" 
+        android:showAsAction="always" 
+        android:title="@string/Search" 
+        android:visible="true"></item>
+    <item android:id="@+id/menu_filter" 
+        android:icon="@drawable/ic_menu_allfriends" 
+        android:showAsAction="ifRoom" 
+        android:title="@string/Filter" 
+        android:visible="true">
+        <menu>
+            <item android:id="@+id/menu_filter_all"
+                android:title="@string/All" />
+            <item android:id="@+id/menu_filter_new"
+                android:title="@string/new_" />
+            <item android:id="@+id/menu_filter_current"
+                android:title="@string/current" />
+            <item android:id="@+id/menu_filter_late"
+                android:title="@string/late" />
+            <item android:id="@+id/menu_filter_lapsed"
+                android:title="@string/lapsed" />
+            <item android:id="@+id/menu_filter_dropped"
+                android:title="@string/dropped" />
+            <item android:id="@+id/menu_filter_occasional"
+                android:title="@string/occasional" />
+        </menu>
+        </item>
+    
+
+</menu>

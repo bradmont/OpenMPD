@@ -49,6 +49,16 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
                 "order by A.lname, A.fname";
+    private static final String STATUS_QUERY = "select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
+                "contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and C.status=? order by A.lname, A.fname";
+    private static final String OCCASIONAL_QUERY = "select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
+                "contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and (C.partner_type=3 or C.partner_type=2) order by A.lname, A.fname";
 
     @Override
     public View onCreateView(
@@ -127,6 +137,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.contact_list, menu);
         SearchView searchView = new
                 SearchView( ((OpenMPD)getActivity()).getSupportActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
@@ -150,8 +161,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 return false;
             }
         });
-        menu.add(R.string.Search)
-                .setIcon(android.R.drawable.ic_menu_search)
+        menu.findItem(R.id.menu_search)
                 .setActionView(searchView)
                 .setOnActionExpandListener(new MenuItem.OnActionExpandListener(){
                     // so we can reset the search when the searchView is closed
@@ -170,6 +180,54 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 .setShowAsAction(
                         MenuItem.SHOW_AS_ACTION_IF_ROOM
                                 | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+    }
+    @Override
+    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+        String [] args = new String[1];
+        Cursor newCursor = null;
+        switch (item.getItemId() ){
+            case R.id.menu_filter_all:
+                newCursor = db_read.rawQuery(BASE_QUERY, null);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_new:
+                args[0] = Integer.toString(ContactStatus.STATUS_NEW);
+                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_current:
+                args[0] = Integer.toString(ContactStatus.STATUS_CURRENT);
+                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_late:
+                args[0] = Integer.toString(ContactStatus.STATUS_LATE);
+                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_lapsed:
+                args[0] = Integer.toString(ContactStatus.STATUS_LAPSED);
+                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_dropped:
+                args[0] = Integer.toString(ContactStatus.STATUS_DROPPED);
+                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+            case R.id.menu_filter_occasional:
+                newCursor = db_read.rawQuery(OCCASIONAL_QUERY, null);
+                adapter.changeCursor(newCursor);
+                cursor = newCursor;
+                return true;
+        }
+        return false;
     }
 
 

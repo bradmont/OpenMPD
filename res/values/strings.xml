@@ -24,6 +24,8 @@
     <string name="Notes">Notes</string>
     <string name="edit_notes">Edit Notes</string>
     <string name="Search">Search</string>
+    <string name="Filter">Filter</string>
+    <string name="All">All</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>
