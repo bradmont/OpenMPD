@@ -6,7 +6,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+
 
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -35,6 +38,11 @@ public class TntImportService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent){
         Log.i("net.bradmont.openmpd", "Starting updater thread");
+
+        // check if we have a network connection
+        if (!isNetworkAvailable()){
+            return;
+        }
         Bundle b = intent.getExtras();
         ArrayList<Integer> newdata = new ArrayList<Integer>();
         ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
@@ -195,6 +203,13 @@ public class TntImportService extends IntentService {
         MPDDBHelper.get().close();
 
         stopForeground(true);
+    }
+
+    protected boolean isNetworkAvailable(){
+        ConnectivityManager connectivityManager 
+            = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private boolean isOld(ServiceAccount account){
