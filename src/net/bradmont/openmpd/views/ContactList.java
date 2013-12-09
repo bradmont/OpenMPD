@@ -226,6 +226,9 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
+            case R.id.menu_help:
+                HelpDialog.showHelp(getActivity(), R.string.help_contact_list_title, R.string.help_contact_list);
+            return true;
         }
         return false;
     }

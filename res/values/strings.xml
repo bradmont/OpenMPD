@@ -100,5 +100,13 @@
     <string name="click_tutorial">Click on the header of any card in a stack to bring it forward.</string>
     <string name="swipe_me">Swipe Me Away</string>
     <string name="swipe_tutorial">You can swipe away notification cards when you\'re done with them, or leave them as a reminder to follow-up with a partner.</string>
+    <string name="help_main_title">Home Screen</string>
+    <string name="help_main"> This screen shows a summary of your recent donation activity.\n\nThe bar graph gives a month-by-month summary, where blue is monthly gifts, red is special (one-time or occasional) gifts, and orange is regular non-monthly gifts (quarterly, anual, etc.)\n\nThe Monthly Averages are calculated over the last year, and \"stable monthly\" and \"stable regular\" giving count only current partners (they exclude late and lapsed partners).\n\nYou can click notifications to show details about the donor they\'re related to, and swipe them away when you don\'t need them anymore.</string>
+    <string name="help_contact_list_title">The Contact List</string>
+    <string name="help_contact_list">This list contains all contacts who have ever given to your staff account(s). Givings for regular donors are coloured as follows:\n\nBlue: Current\nGreen: New partner\nYellow: Late (1-6 months)\nRed: Lapsed (more than 6 months late)\nGrey: Dropped (more than 12 months late)\n\nYou can search for contacts by name with the search icon, or filter by giving status with the group icon.</string>
+    <string name="help_contact_title">Contact Detail View</string>
+    <string name="help_contact">This page gives detailed information on an individual contact. If a contact has made a gift in the last year, a summary graph of recent gifts is shown.\n\nYou can add comments to a contact\'s record, or view their total giving history, by pressing the menu button.</string>
+    <string name="help_settings_title">Settings</string>
+    <string name="help_settings">This page allows you to manage (add, delete, or edit) accounts to download your donor data online.\n\nYour organisation should be able to provide you with the login details you need (this is the same username and password you use to download donor data in TntMPD).</string>
 
 </resources>

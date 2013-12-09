@@ -104,6 +104,9 @@ public class ServiceAccountList extends SherlockListFragment {
                 dialog.setAdapter((CursorAdapter) getListAdapter());
                 dialog.show(getFragmentManager(), "edit_account_dialog");
                 return true;
+            case R.id.menu_help:
+                HelpDialog.showHelp(getActivity(), R.string.help_settings_title, R.string.help_settings);
+            return true;
         }
         return false;
     }

@@ -283,6 +283,9 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 });
                 ad.show();
                 return true;
+            case R.id.menu_help:
+                HelpDialog.showHelp(getActivity(), R.string.help_contact_title, R.string.help_contact);
+            return true;
         }
         return false;
     }

@@ -21,24 +21,31 @@ import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.MPDDBHelper;
 import net.bradmont.openmpd.models.Notification;
+import net.bradmont.openmpd.views.HelpDialog;
 import net.bradmont.openmpd.views.cards.*;
 import net.bradmont.openmpd.views.EditServiceAccountDialog;
 import net.bradmont.supergreen.models.ModelList;
 import net.bradmont.holograph.BarGraph;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.fima.cardsui.views.CardUI;
 import com.fima.cardsui.objects.CardStack;
 import com.fima.cardsui.objects.Card;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends SherlockFragment {
 
     public static final int ONBOARD_FIRST_RUN=0;
     public static final int ONBOARD_ACCOUNT_ADDED=1;
     public static final int ONBOARD_IMPORTING=2;
     public static final int ONBOARD_FINISHED=3;
 
+
+    public void onCreate (Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.home, null);
@@ -177,6 +184,16 @@ public class HomeFragment extends Fragment {
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
             .setSubtitle(null);
     }
+    @Override
+    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+        switch (item.getItemId() ){
+            case R.id.menu_help:
+                HelpDialog.showHelp(getActivity(), R.string.help_main_title, R.string.help_main);
+            return true;
+        }
+        return false;
+    }
+
     private class addAccountClickListener implements OnClickListener{
         @Override
         public void onClick(View v){
