@@ -46,8 +46,8 @@ public class ContactStatus extends DBModel{
         0xFFA0A0A0,  // dropped
         0xFFFF4444,  // lapsed
         0xFFFFBB33,  // late
-        0xFF33B5E5,  // new
-        0xFF99CC00  // current
+        0xFF99CC00,  // new
+        0xFF33B5E5  // current
     };
 
     // parallel arrays for regex & the values it'll result in

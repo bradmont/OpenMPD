@@ -40,8 +40,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift};
 
-    private SQLiteDatabase db_read = MPDDBHelper.get()
-            .getReadableDatabase();
+    private SQLiteDatabase db_read = MPDDBHelper.get().getReadableDatabase();
     private Cursor cursor = null;
 
     private SimpleCursorAdapter adapter = null;
@@ -78,7 +77,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 TextView tv = (TextView) view;
                 switch(columnIndex){
-                    // 0: fname, 1:lname, 2:s_name, 3:_id, 4:partner_type, 5:giving_amount, 6: status, 7: gift_frequency
+                    // 0: fname, 1:lname, 2:s_name, 3:_id, 4:partner_type, 5:giving_amount, 6: status, 7: gift_frequency, 8: last_gift
                     case 0: 
                         String temp = cursor.getString(1);
                         if (cursor.getString(0) != null && !cursor.getString(0).equals("")){
@@ -109,6 +108,14 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                             tv.setText(" $" + Integer.toString(cursor.getInt(5)/100));
                         }
                         tv.setTextColor(ContactStatus.STATUS_COLORS[cursor.getInt(6)]);
+                        return true;
+                    case 8:
+                        String date = cursor.getString(8);
+                        if (date != null){
+                            tv.setText(date.substring(0,7));
+                        } else {
+                            tv.setText(R.string.never);
+                        }
                         return true;
                 }
                 return false;
