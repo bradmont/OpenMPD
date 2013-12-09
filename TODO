@@ -1,17 +1,10 @@
 --- before beta 1 ---
 - in onboarding cards, use buttons for actions
 - Tutorial cards: "Swipe me away" & "click title"
-- Summary graph, consistent colours:
-    - blue for current monthly, green? for regular, purple for one-time
-    - yellow for lapsed, red for dropped, etc.
-
-- Contact page: 
-    - Set last_gift in partner_status -> coded but not tested; check after next update
-
-- Contact list:
-    - Filter by contact status
 
 - Verify presence of network connection when downloading
+
+- Help screens
 
 --- post beta1 point releases ---
 Polish/tweaks:

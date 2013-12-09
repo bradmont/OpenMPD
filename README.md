@@ -35,7 +35,7 @@ If you are interested in helping test OpenMPD, please contact me. Twitter is pro
 - [ ] Design: Contact List View
 - [x] Design: Contact Detail View
 - [ ] Design/UI: Accounts configuration/add view
-- [ ] Searching & filtering contacts (by name, partner type, giving amount, etc).
+- [x] Searching & filtering contacts (by name, partner type, giving amount, etc).
 - [x] Verification of service accounts when you first add them
 - [x] Build label support into BarGraph
 - [ ] Build swipe support into BarGraph
