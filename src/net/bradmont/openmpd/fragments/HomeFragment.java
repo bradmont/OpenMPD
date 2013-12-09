@@ -29,6 +29,7 @@ import net.bradmont.holograph.BarGraph;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fima.cardsui.views.CardUI;
 import com.fima.cardsui.objects.CardStack;
+import com.fima.cardsui.objects.Card;
 
 
 public class HomeFragment extends Fragment {
@@ -54,8 +55,10 @@ public class HomeFragment extends Fragment {
         cardsui.clearCards();
 
         // Are we in the onboarding process?
-        SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+        final SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
         int onboardState = prefs.getInt("onboardState", ONBOARD_FIRST_RUN);
+        int tutorialSwipe = prefs.getInt("tutorialSwipe", 0);
+        int tutorialClickTitle = prefs.getInt("tutorialClickTitle", 0);
 
 
         switch (onboardState){
@@ -64,7 +67,22 @@ public class HomeFragment extends Fragment {
                 SummaryCard summaryCard = new SummaryCard();
                 summaryCard.setIsSwipeable(false); // uses minor mod to cardsui for dev purposes
                                                    // can be savely removed 
-                cardsui.addCard(summaryCard);
+                // click title tutorial card
+                if (tutorialClickTitle == 0){
+                    Card tutClickCard = new MyCard(R.string.click_me, R.string.click_tutorial);
+                    tutClickCard.setOnCardSwipedListener(new Card.OnCardSwiped(){
+                        public void onCardSwiped(Card card, View layout){
+                            prefs.edit()
+                                .putInt("tutorialClickTitle", 1)
+                                  .apply();
+                        }
+                    });
+                    cardsui.addCard(tutClickCard);
+                    cardsui.addCardToLastStack(summaryCard);
+                }
+                else {
+                    cardsui.addCard(summaryCard);
+                }
 
                 GraphCard graphCard = new GraphCard();
                 graphCard.setIsSwipeable(false);
@@ -74,6 +92,8 @@ public class HomeFragment extends Fragment {
                 CardStack happyStack = new CardStack();
                 CardStack sadStack = new CardStack();
                 CardStack specialStack = new CardStack();
+
+
                 // notifications
                 ModelList notifications = MPDDBHelper
                         .filter("notification", "status", Notification.STATUS_NOTIFIED)
@@ -95,6 +115,18 @@ public class HomeFragment extends Fragment {
                     } else if (card != null) {
                         cardsui.addCard(card);
                     }
+                }
+                // swipe tutorial card
+                if (tutorialSwipe == 0){
+                    Card tutSwipeCard = new MyCard(R.string.swipe_me, R.string.swipe_tutorial);
+                    tutSwipeCard.setOnCardSwipedListener(new Card.OnCardSwiped(){
+                        public void onCardSwiped(Card card, View layout){
+                            prefs.edit()
+                                .putInt("tutorialSwipe", 1)
+                                  .apply();
+                        }
+                    });
+                    happyStack.add(tutSwipeCard);
                 }
                 if (happyStack.getCards().size() > 0){
                     cardsui.addStack(happyStack);

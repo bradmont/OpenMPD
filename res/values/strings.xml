@@ -95,4 +95,10 @@
     <string name="make_monthly">This is monthly</string>
     <string name="make_annual">This is annual</string>
 
+    <!-- help/tutorial strings -->
+    <string name="click_me">Click Card Titles</string>
+    <string name="click_tutorial">Click on the header of any card in a stack to bring it forward.</string>
+    <string name="swipe_me">Swipe Me Away</string>
+    <string name="swipe_tutorial">You can swipe away notification cards when you\'re done with them, or leave them as a reminder to follow-up with a partner.</string>
+
 </resources>
