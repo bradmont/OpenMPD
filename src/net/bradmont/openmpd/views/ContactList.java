@@ -37,8 +37,8 @@ import com.actionbarsherlock.widget.SearchView;
 import java.lang.Runnable;
 
 public class ContactList extends SherlockListFragment implements OnClickListener{
-    public static final String [] columns = {"fname", "partner_type", "giving_amount"};
-    public static final int [] fields = {R.id.name, R.id.status, R.id.amount};
+    public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift"};
+    public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift};
 
     private SQLiteDatabase db_read = MPDDBHelper.get()
             .getReadableDatabase();
@@ -46,7 +46,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
 
     private SimpleCursorAdapter adapter = null;
     private static final String BASE_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency  from " + 
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
                 "order by A.lname, A.fname";
@@ -131,10 +131,10 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
                 Cursor newCursor = db_read.rawQuery("select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
-                " A.fname || ' ' || A.lname || ' ' || B.fname || ' ' || B.lname as full_name  from " + 
+                "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and full_name like '%' || ? ||'%' order by A.lname, A.fname", args);
+                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by A.lname, A.fname", args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
