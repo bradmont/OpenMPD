@@ -119,7 +119,9 @@ public class TntService extends DBModel{
                         serv.setValue(field, obj.getString(field));   
                     }
                 }
-                serv.dirtySave();
+                if (serv.getString("name_short") != "EXAMPLE"){
+                    serv.dirtySave();
+                }
             }
         } catch (JSONException e){ 
             Log.i("net.bradmont.openmpd", "JSONException caught.");

@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.TextView;
 
 
 import android.support.v4.app.DialogFragment;
@@ -27,6 +28,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
+import java.net.URL;
 import org.apache.http.message.*;
 
 
@@ -51,13 +53,28 @@ public class EditServiceAccountDialog extends DialogFragment{
         // set up spinner
         Spinner spinner = (Spinner) content_view.findViewById(R.id.tnt_service_id);
         Cursor c = MPDDBHelper.get().getReadableDatabase()
-            .rawQuery("select _id, name from tnt_service", null);
-        String [] spinner_columns = {"_id", "name"};
-        int [] spinner_views = {R.id._id, R.id.name};
+            .rawQuery("select _id, name, base_url from tnt_service", null);
+        String [] spinner_columns = {"_id", "name", "base_url"};
+        int [] spinner_views = {R.id._id, R.id.name, R.id.server};
         //String [] spinner_columns = { "name"};
         //int [] spinner_views = { R.id.name};
         SimpleCursorAdapter ca = new SimpleCursorAdapter(getActivity(),
             R.layout.service_spinner_item, c, spinner_columns, spinner_views);
+        ca.setViewBinder(new SimpleCursorAdapter.ViewBinder(){
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                switch(columnIndex){
+                    case(2):
+                        // server name
+                        TextView tv = (TextView) view;
+                        try {
+                            URL url = new URL(cursor.getString(2));
+                            tv.setText(url.getHost());
+                            return true;
+                        } catch (Exception e){}
+                }
+                return false;
+            }
+        });
         spinner.setAdapter(ca);
 
         if (account != null){
