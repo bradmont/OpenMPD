@@ -154,7 +154,9 @@ public class Contact extends DBModel{
             oldStatus = (ContactStatus)MPDDBHelper
                     .getReferenceModel("contact_status")
                     .getByField("contact_id", getInt("id"));
-            cs.setValue("notes", oldStatus.getString("notes"));
+            if (oldStatus != null){
+                cs.setValue("notes", oldStatus.getString("notes"));
+            }
         }
 
 
