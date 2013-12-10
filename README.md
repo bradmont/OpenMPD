@@ -39,7 +39,7 @@ If you are interested in helping test OpenMPD, please contact me. Twitter is pro
 - [x] Verification of service accounts when you first add them
 - [x] Build label support into BarGraph
 - [ ] Build swipe support into BarGraph to view past history
-- [ ] Help screens & cleaner onboarding
+- [x] Help screens & cleaner onboarding
 
 ### Milestone 1 Goals
 - **"Zero User Input" data analysis release**
