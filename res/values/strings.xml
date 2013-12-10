@@ -26,6 +26,7 @@
     <string name="Search">Search</string>
     <string name="Filter">Filter</string>
     <string name="All">All</string>
+    <string name="Done">Done</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>
@@ -54,12 +55,10 @@
 
     <!-- Onboarding -->
     <string name="add_account">Add Account</string>
-    <string name="getting_started">Getting Started</string>
-    <string name="getting_started_body">Welcome to OpenMPD. We\'re here to help decode your financial partnership. The first step is to add your organisation\'s account(s) to import data. Tap this card to add an account.</string>
     <string name="add_another_account">Add Another Account</string>
-    <string name="add_another_account_body">Click this card to add another account. You can edit existing accounts by opening the navigation drawer on the left and accessing the settings page.</string>
-    <string name="done_adding_accounts">Done Adding Accounts?</string>
-    <string name="done_adding_accounts_body">When you\'re done adding accounts, click this card and we\'ll import your data.</string>
+    <string name="getting_started">Getting Started</string>
+    <string name="getting_started_body">Welcome to OpenMPD. We\'re here to help decode your financial partnership. The first step is to add your organisation\'s account(s) to import your donor and donation data. Tap \"Add\" to add an account.</string>
+    <string name="getting_started_body_2">You can set up multiple accounts. Press \"Add\" to add another, or \"Done\" when you\'re done. You can add more accounts later from the \"Settings\" panel on the left menu.</string>
     <string name="importing_data">Importing Data</string>
     <string name="importing_data_body">We\'re importing your partner data now. This can take two or three minutes; pull down your device\'s notification drawer to see the progress. Once we\'re done, we\'ll notify you.</string>
 
@@ -97,7 +96,7 @@
 
     <!-- help/tutorial strings -->
     <string name="click_me">Click Card Titles</string>
-    <string name="click_tutorial">Click on the header of any card in a stack to bring it forward.</string>
+    <string name="click_tutorial">Click on the header of any card in a stack to bring it forward. Hit the ? icon in the top right for more info about any screen.</string>
     <string name="swipe_me">Swipe Me Away</string>
     <string name="swipe_tutorial">You can swipe away notification cards when you\'re done with them, or leave them as a reminder to follow-up with a partner.</string>
     <string name="help_main_title">Home Screen</string>

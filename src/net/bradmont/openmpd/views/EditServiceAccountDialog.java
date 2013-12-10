@@ -44,6 +44,8 @@ public class EditServiceAccountDialog extends DialogFragment{
     private FragmentManager manager=null;
     private String fragment_tag = null;
 
+    private Runnable saveCallback = null;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -91,6 +93,13 @@ public class EditServiceAccountDialog extends DialogFragment{
             });
 
         return builder.create();
+    }
+
+    /**
+      * Callback that's executed on a successful save
+      */
+    public void setSaveCallback(Runnable r){
+        saveCallback = r;
     }
     public void onStart(){
         super.onStart();
@@ -169,6 +178,9 @@ public class EditServiceAccountDialog extends DialogFragment{
                                 OpenMPD.getInstance().userMessage( R.string.account_verified);
                                 account.dirtySave();
                                 dismiss();
+                                if (saveCallback != null){
+                                    getActivity().runOnUiThread(saveCallback);
+                                }
                             } catch (Exception e){
                                 Log.i("net.bradmont.openmpd", e.getMessage());
                                 for (int i=0; i < e.getStackTrace().length; i++){

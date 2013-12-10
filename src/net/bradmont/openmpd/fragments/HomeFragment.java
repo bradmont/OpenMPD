@@ -146,27 +146,17 @@ public class HomeFragment extends SherlockFragment {
                 }
                 break;
             case ONBOARD_FIRST_RUN:
-                // if this is first run:
-                MyCard card = new MyCard(R.string.getting_started, R.string.getting_started_body);
-                card.setOnClickListener( new addAccountClickListener());
+            case ONBOARD_ACCOUNT_ADDED:
+                // if we're still adding accounts
+                OnboardCard card = new OnboardCard(onboardState);
+                card.setAddClickListener( new addAccountClickListener(this));
+                card.setDoneClickListener( new updateClickListener());
                 card.setIsSwipeable(false); 
                 cardsui.addCard(card);
                 cardsui.refresh();
                 break;
-            case ONBOARD_ACCOUNT_ADDED:
-                MyCard another = new MyCard(R.string.add_another_account, R.string.add_another_account_body);
-                another.setIsSwipeable(false); 
-                cardsui.addCard(another);
-                another.setOnClickListener( new addAccountClickListener());
-
-                MyCard done = new MyCard(R.string.done_adding_accounts, R.string.done_adding_accounts_body);
-                done.setOnClickListener( new updateClickListener());
-                done.setIsSwipeable(false); 
-                cardsui.addCard(done);
-                cardsui.refresh();
-                break;
             case ONBOARD_IMPORTING:
-                // if we're in the middle of the initial import
+                // if we're currently doing the initial import
                 MyCard importing = new MyCard(R.string.importing_data, R.string.importing_data_body);
                 importing.setIsSwipeable(false); 
                 cardsui.addCard(importing);
@@ -195,15 +185,25 @@ public class HomeFragment extends SherlockFragment {
     }
 
     private class addAccountClickListener implements OnClickListener{
+        HomeFragment fragment = null;
+        public addAccountClickListener(HomeFragment fragment){
+            this.fragment = fragment;
+        }
         @Override
         public void onClick(View v){
             EditServiceAccountDialog dialog = new EditServiceAccountDialog();
+            final Context context = getActivity();
+            dialog.setSaveCallback(new Runnable(){
+                @Override
+                public void run(){
+                    SharedPreferences prefs = context.getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+                    prefs.edit()
+                        .putInt("onboardState", ONBOARD_ACCOUNT_ADDED)
+                          .apply();
+                    fragment.addCards();
+                }
+            });
             dialog.show(getFragmentManager(), "edit_account_dialog");
-            SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
-            prefs.edit()
-                .putInt("onboardState", ONBOARD_ACCOUNT_ADDED)
-                  .apply();
-            addCards();
         }
     }
     private class updateClickListener implements OnClickListener{
