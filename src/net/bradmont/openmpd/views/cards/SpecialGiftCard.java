@@ -3,6 +3,7 @@ package net.bradmont.openmpd.views.cards;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.views.ContactDetail;
+import net.bradmont.openmpd.views.cards.GraphCard;
 
 import android.content.Context;
 import android.util.Log;
@@ -98,6 +99,7 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
                 status.setValue("manual_set_expires", expires_date);
 
                 status.dirtySave();
+                GraphCard.clearCache();
                 return true;
             case R.id.menu_make_annual:
                 OpenMPD.getInstance().userMessage(R.string.assigned_annual);
@@ -115,6 +117,7 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
                 status.setValue("manual_set_expires", expires_date);
 
                 status.dirtySave();
+                GraphCard.clearCache();
                 return true;
         }
         return false;

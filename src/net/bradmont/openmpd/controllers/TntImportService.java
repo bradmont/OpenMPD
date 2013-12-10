@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.fragments.HomeFragment;
 import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.views.cards.GraphCard;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.supergreen.models.*;
@@ -199,6 +200,8 @@ public class TntImportService extends IntentService {
 
                 notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
             }
+            // clear the cache on our summary graph
+            GraphCard.clearCache();
         }
         MPDDBHelper.get().close();
 

@@ -6,6 +6,7 @@ import net.bradmont.holograph.BarGraph;
 import android.content.Context;
 import android.database.Cursor;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,14 @@ public class GraphCard extends Card {
 
     // monthly giving, where a month's total gifts == donor's regular giving
     // eg, if they gave an extra gift, their entire giving will be excluded
-    private static final String GIVING_SQL =
-        "select month.month, base_giving/100, regular_giving/100, special_gifts/100 from "+
+    private static final String CLEAR_CACHE_SQL =
+        "drop table giving_summary_cache;";
+    private static final String VERIFY_CACHE_SQL =
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='giving_summary_cache';";
+    private static final String CACHE_SQL =
+        "create table giving_summary_cache as " +
+        "select month.month as month, base_giving/100 as base, " +
+        "regular_giving/100 as regular, special_gifts/100 as special from "+
         "    month left outer join monthly_base_giving A "+
         "        on month.month=A.month"+
         "        left outer join regular_by_month B"+
@@ -31,6 +38,8 @@ public class GraphCard extends Card {
         "        left outer join special_gifts_by_month C"+
         "            on month.month=C.month"+
         "    order by month.month;";
+    private static final String GIVING_SQL =
+        "select * from giving_summary_cache;";
 
     private View content = null;
 	public GraphCard(){
@@ -59,6 +68,9 @@ public class GraphCard extends Card {
         // magic graph
         Float [] [] vals = null;
 
+        if (!verifyCache()){
+            createCache();
+        }
         Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(
             GIVING_SQL, null);
 
@@ -91,7 +103,18 @@ public class GraphCard extends Card {
 		return view;
 	}
 
-	
-	
-	
+    public boolean verifyCache(){
+        Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(VERIFY_CACHE_SQL, null);
+        boolean result = (cur1.getCount() == 1);
+        cur1.close();
+        return result;
+    }
+    public void createCache(){
+        MPDDBHelper.get().getWritableDatabase().execSQL(CACHE_SQL);
+        verifyCache();
+    }
+    public static void clearCache(){
+        Log.i("net.bradmont.openmpd", "Clearing cache.");
+        MPDDBHelper.get().getWritableDatabase().execSQL(CLEAR_CACHE_SQL);
+    }
 }
