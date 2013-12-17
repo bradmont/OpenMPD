@@ -77,6 +77,10 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
                 popup.show();
             }
         });
+
+        // add click handlers to buttons
+        view.findViewById(R.id.button_quick_call).setOnClickListener(this);
+        view.findViewById(R.id.button_quick_email).setOnClickListener(this);
 		return view;
 	}
 
@@ -122,8 +126,9 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
         }
         return false;
     }
-
 	
-	
-	
+    @Override
+    public String getQuickMessageFilter(){
+        return "notification_type = 'special_gift'";
+    }
 }

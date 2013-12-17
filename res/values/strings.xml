@@ -27,6 +27,9 @@
     <string name="Filter">Filter</string>
     <string name="All">All</string>
     <string name="Done">Done</string>
+    <string name="choose_a_template">Choose A Message Template</string>
+    <string name="subject">Subject:</string>
+    <string name="send">Send</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>
@@ -75,12 +78,12 @@
     <string name="new_partner">New Partner: %s</string>
     <string name="new_monthly_partner">New Monthly Partner</string>
     <string name="new_regular_partner">New Regular Partner</string>
-    <string name="late_partner_title">%s Is Late</string>
-    <string name="restarted_partner_title">%s Restarted!</string>
-    <string name="lapsed_partner_title">%s Has Lapsed</string>
-    <string name="dropped_partner_title">%s Dropped Off</string>
-    <string name="amount_change_title">%s Changed Giving Amount</string>
-    <string name="special_gift_title">%s Made A Special Gift</string>
+    <string name="late_partner_title">%s is late</string>
+    <string name="restarted_partner_title">%s restarted!</string>
+    <string name="lapsed_partner_title">%s has lapsed</string>
+    <string name="dropped_partner_title">%s dropped off</string>
+    <string name="amount_change_title">%s changed giving amount</string>
+    <string name="special_gift_title">%s made a special gift</string>
 
     <!-- Toast values -->
     <string name="checking_login">Checking Login</string>
@@ -89,6 +92,7 @@
     <string name="account_verified">Account Verified</string>
     <string name="assigned_monthly">Assigned to monthly. Expires in 3 months.</string>
     <string name="assigned_annual">Assigned to annual. Expires in 14 months.</string>
+    <string name="no_phone_number">No phone number available for this contact.</string>
 
     <!-- menu strings -->
     <string name="make_monthly">This is monthly</string>

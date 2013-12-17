@@ -1,0 +1,67 @@
+{
+    "Blank Message" : {
+        "subject" : "Start with a blank message",
+        "body" : "",
+        "notification_type" : "blank"
+    },
+    "Special Gift Thanks" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just saw that you sent in a special gift, and I wanted to say thank you. Your partnership is having a real impact in the lives of students!\n\nThank you!",
+        "notification_type" : "special_gift"
+    },
+    "New Partner Thank" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that your partnership with our ministry with Power to Change has started; thank you! Together we are having a real impact in the lives of students, and I look forward to serving alongside you!\n\nThank you!",
+        "notification_type" : "special_gift"
+    },
+
+
+    "Late - Update Credit Card" : {
+        "subject"   : "Late gift",
+        "body"      : "$name,\n\nI just noticed that your regular giving didn't come through last month. This usually happens when a credit card expires and P2C doesn't have your new card info; all you need to do to fix it is call in at 1.855.722.4483, ask for the donations department, and update your info.\n\nI hope all is well with you, and thank you for your ongoing partnership!",
+        "notification_type" : "late"
+
+    },
+    "Lapsed - Update Credit Card" : {
+        "subject"   : "Late giving",
+        "body"      : "$name,\n\nI just noticed that your regular giving hasn't come through for a couple of months. This usually happens when a credit card expires and P2C doesn't have your new card info; all you need to do to fix it is call in at 1.855.722.4483, ask for the donations department, and update your info.\n\nI hope all is well with you, and thank you for your ongoing partnership!",
+        "notification_type" : "lapsed"
+    },
+
+    "Thank dropped partner" : {
+        "subject"   : "Thank you!",
+        "body"      : "Hello $name,\n\nIt has been about a year since your last gift to us through Power to Change, and I just wanted to write to say thank you for all that you have invested in our ministry. We understand that financial situations, and personal callings, change with time, but we are thankful for the time that we were able to serve the Lord together.\n\nWe hope all is well with you, and pray God's blessings on all you do as you follow Him forward.",
+        "notification_type" : "dropped"
+    },
+    "Restart Ask" : {
+        "subject"   : "Thank you!",
+        "body"      : "Hello $name,\n\nIt has been about a year since your last gift to us through Power to Change, and I just wanted to write to say thank you for all that you have invested in our ministry. We understand that financial situations, and personal callings, change with time, but we are thankful for the time that we were able to serve together.\n\nIf you feel the Lord is calling you on to other things, we definitely understand, but we would also like to ask you to consider renewing your partnership with us as we work to reach students. There is much left to do, and we would love for you to be a part of it!\n\nThank you for taking the time to consider,",
+        "notification_type" : "dropped"
+    },
+
+    "Increase Thank" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that you increased your support for our ministry! Your partnership is having a real impact in the lives of students,\n\nThank you!",
+        "notification_type" : "amount_change"
+    },
+    "Decrease Prayer" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that you decreased your regular support, and I wanted to check in to make see how you're doing.  We understand that situations change and are less worried about the money than about how you're doing; can we be praying for you in any special way in the next little while?\n\nHope you are well,",
+        "notification_type" : "amount_change"
+    },
+    "New Partner Thank" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that your partnership with our ministry with Power to Change has started; thank you! Together we are having a real impact in the lives of students, and I look forward to serving alongside you!\n\nThank you!",
+        "notification_type" : "new_partner"
+    },
+    "Unexpected New Partner Thank" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that you joined our team of regular ministry partners; thank you so much! Together we are having a real impact in the lives of students, and I look forward to serving alongside you!\n\nThank you!",
+        "notification_type" : "new_partner"
+    },
+    "Restart Thank" : {
+        "subject"   : "Thank you!",
+        "body"      : "$name,\n\nI just noticed that you restarted your regular givings; thank you! Together we are having a real impact in the lives of students, and I'm glad we can continue serving together!!\n\nThank you!",
+        "notification_type" : "restart"
+    }
+}

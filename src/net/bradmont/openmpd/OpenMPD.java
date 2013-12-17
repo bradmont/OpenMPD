@@ -99,6 +99,12 @@ public class OpenMPD extends BaseActivity {
         if (services.size() == 0){
             t.createDefaults();
         }
+        // ditto for QuickMessage
+        QuickMessage q = new QuickMessage();
+        ModelList messages = q.getAll(); 
+        if (messages.size() == 0){
+            q.createDefaults();
+        }
 
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

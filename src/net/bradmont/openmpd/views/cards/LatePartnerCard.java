@@ -54,10 +54,14 @@ public class LatePartnerCard extends NotificationCard {
         }
         description.setText(text);
 
+        // add click handlers to buttons
+        view.findViewById(R.id.button_quick_call).setOnClickListener(this);
+        view.findViewById(R.id.button_quick_email).setOnClickListener(this);
+
 		return view;
 	}
 
-	
-	
-	
+    public String getQuickMessageFilter(){
+        return "notification_type = 'late'";
+    }
 }

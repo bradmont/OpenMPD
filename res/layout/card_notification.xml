@@ -54,6 +54,53 @@
                 android:ellipsize="end"
                 android:maxLines="3"
                 android:textSize="16sp" />
+            <!-- quick action bar -->
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
+                <!-- spacer -->
+                <View android:layout_width="fill_parent" 
+                    android:layout_height="8dp" 
+                    android:layout_centerVertical ="true" />
+                <!-- dividing line -->
+                <View android:background="#e3e3e3" 
+                    android:layout_width = "fill_parent" 
+                    android:layout_height="1dip" 
+                    android:layout_centerVertical ="true" />
+                <!-- spacer -->
+                <View android:layout_width="fill_parent" 
+                    android:layout_height="8dp" 
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" >
+                    <ImageButton android:id="@+id/button_quick_call"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:src="@android:drawable/ic_menu_call"
+                        />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                    />
+                    <ImageButton android:id="@+id/button_quick_email"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_menu_compose"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
+
         </LinearLayout>
 
         <LinearLayout
