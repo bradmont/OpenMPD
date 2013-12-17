@@ -128,7 +128,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             Link link = new Link();
             link.title = R.string.Phone;
             link.value = phone.getString("number");
-            if (link.value != "" && link.value != null){
+            if (link.value != "" && link.value != null && link.value.length() > 1){
                 links.add(link);
             }
         } catch (Exception e){ }
