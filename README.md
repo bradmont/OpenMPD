@@ -25,8 +25,8 @@ manage your donor base, please feel free to let us know.
 
 ### Current Status:
 - Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
-- Some work remains on the User Interface side
-- **We are now in closed beta testing**
+- **We are in closed beta. If you want to test, please contact me.**
+- All that remains before open beta testing is to enable editing of Quick Messages
 
 #### Beta 1:
 If you are interested in helping test OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
@@ -52,8 +52,8 @@ If you are interested in helping test OpenMPD, please contact me. Twitter is pro
 - [x] Notifications of changes in donor status (for new, late, delinquent, dropped)
 - [x] Notifications of special gifts
 - [x] Simple Onboarding walkthrough
-- [ ] Beautiful, Holo-themed user interface
-- [ ] Simple, discoverable UI
+- [x] Beautiful, Holo-themed user interface
+- [x] Simple, discoverable UI
 
 
 ### Milestone 2 Goals
