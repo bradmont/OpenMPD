@@ -1,15 +1,21 @@
 package net.bradmont.openmpd.fragments;
 
+import android.app.AlertDialog;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -66,6 +72,7 @@ public class HomeFragment extends SherlockFragment {
         int onboardState = prefs.getInt("onboardState", ONBOARD_FIRST_RUN);
         int tutorialSwipe = prefs.getInt("tutorialSwipe", 0);
         int tutorialClickTitle = prefs.getInt("tutorialClickTitle", 0);
+        int updateNews = prefs.getInt("updateNews", 0);
 
 
         switch (onboardState){
@@ -144,6 +151,11 @@ public class HomeFragment extends SherlockFragment {
                 if (specialStack.getCards().size() > 0){
                     cardsui.addStack(specialStack);
                 }
+
+                // update news
+                if (updateNews < OpenMPD.getVersion()){
+                    showUpdateNews( OpenMPD.getVersion());
+                }
                 break;
             case ONBOARD_FIRST_RUN:
             case ONBOARD_ACCOUNT_ADDED:
@@ -182,6 +194,23 @@ public class HomeFragment extends SherlockFragment {
             return true;
         }
         return false;
+    }
+
+    public void showUpdateNews(final int version){
+        final SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+        AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+        builder.setMessage(R.string.update_news)
+            .setTitle(R.string.whats_new);
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                prefs.edit()
+                    .putInt("updateNews", version)
+                      .apply();
+            }
+        });
+        builder.show();
+
     }
 
     private class addAccountClickListener implements OnClickListener{

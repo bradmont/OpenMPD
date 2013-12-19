@@ -16,6 +16,7 @@ import android.app.ProgressDialog;
 
 import android.content.Intent;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 
 import android.database.sqlite.*;
 import android.os.Bundle;
@@ -215,4 +216,13 @@ public class OpenMPD extends BaseActivity {
         }
     }
 
+    public static int getVersion() {
+        int v = 0;
+        try {
+            v = getInstance().getPackageManager().getPackageInfo(getInstance().getPackageName(), 0).versionCode;
+        } catch (NameNotFoundException e) {
+            // Huh? Really?
+        }
+        return v;
+    }
 }
