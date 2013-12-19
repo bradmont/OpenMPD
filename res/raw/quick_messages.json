@@ -1,9 +1,4 @@
 {
-    "Blank Message" : {
-        "subject" : "Start with a blank message",
-        "body" : "",
-        "notification_type" : "blank"
-    },
     "Special Gift Thanks" : {
         "subject"   : "Thank you!",
         "body"      : "$name,\n\nI just saw that you sent in a special gift, and I wanted to say thank you. Your partnership is having a real impact in the lives of students!\n\nThank you!",

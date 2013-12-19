@@ -128,7 +128,7 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
     }
 	
     @Override
-    public String getQuickMessageFilter(){
-        return "notification_type = 'special_gift'";
+    public String getNotificationType(){
+        return "special_gift";
     }
 }

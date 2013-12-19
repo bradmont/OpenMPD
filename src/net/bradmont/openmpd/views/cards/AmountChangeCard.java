@@ -60,7 +60,7 @@ public class AmountChangeCard extends NotificationCard {
 		return view;
 	}
 
-    public String getQuickMessageFilter(){
-        return "notification_type = 'amount_change'";
+    public String getNotificationType(){
+        return "amount_change";
     }
 }

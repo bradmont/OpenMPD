@@ -61,8 +61,8 @@ public class DroppedPartnerCard extends NotificationCard {
 	}
 	
     @Override
-    public String getQuickMessageFilter(){
-        return "notification_type = 'dropped'";
+    public String getNotificationType(){
+        return "dropped";
     }
 	
 }

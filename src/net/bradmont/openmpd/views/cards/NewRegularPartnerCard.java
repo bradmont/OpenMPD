@@ -56,7 +56,7 @@ public class NewRegularPartnerCard extends NotificationCard {
 	}
 	
     @Override
-    public String getQuickMessageFilter(){
-        return "notification_type = 'new_partner'";
+    public String getNotificationType(){
+        return "new_partner";
     }
 }

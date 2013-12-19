@@ -61,7 +61,7 @@ public class RestartedPartnerCard extends NotificationCard {
 	}
 	
     @Override
-    public String getQuickMessageFilter(){
-        return "notification_type = 'restart'";
+    public String getNotificationType(){
+        return "restart";
     }
 }

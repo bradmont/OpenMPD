@@ -61,7 +61,7 @@ public class LapsedPartnerCard extends NotificationCard {
 	}
 	
     @Override
-    public String getQuickMessageFilter(){
-        return "notification_type = 'lapsed'";
+    public String getNotificationType(){
+        return "lapsed";
     }
 }

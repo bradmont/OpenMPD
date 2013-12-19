@@ -61,7 +61,7 @@ public class LatePartnerCard extends NotificationCard {
 		return view;
 	}
 
-    public String getQuickMessageFilter(){
-        return "notification_type = 'late'";
+    public String getNotificationType(){
+        return "late";
     }
 }

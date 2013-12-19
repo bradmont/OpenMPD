@@ -1,15 +1,12 @@
 --- before beta 1 ---
 - hide debug screen
-- UI to Edit and add quick messages
 - Libraries of quick messages for different users
     - eg, p2c-s single, p2c-s couple, aia single, aia couple, cru campus single, etc.
 
 --- post beta1 point releases ---
 Polish/tweaks:
-- Cache data for GraphCard into temp table to make rendering faster/UI more responsive
-    - Coded, not verified working after data download
-        - could force generate on data download to make app start faster
-    - "Set as monthly" invalidates the cache, but the graph doesn't redraw until the activity is rebuilt
+- regenerate BarGraph cache (instead of just invalidating it) on data download
+ to improve startup performance
 
 - bug: editing accounts doesn't set spinner properly
 

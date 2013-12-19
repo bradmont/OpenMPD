@@ -19,7 +19,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -91,16 +93,26 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
 
                 break;
             case R.id.button_quick_email:
-                OpenMPD.getInstance().userMessage("Quick email");
                 showQuickMessageDialog();
                 break;
         }
     }
     public void showQuickMessageDialog(){
 
-        String sql = "select _id, name, subject, body from quick_message where " + getQuickMessageFilter() + " or notification_type='blank' order by name;";
+        String sql = "select _id, name, subject, body from quick_message where notification_type = '" + getNotificationType() + "' order by name;";
         AlertDialog.Builder ad = new AlertDialog.Builder(OpenMPD.getInstance());
         ad.setTitle(R.string.choose_a_template);
+
+        ad.setPositiveButton(R.string.send_blank, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                sendMessage(null, "", "");
+            }
+        });
+        ad.setNegativeButton(R.string.new_template, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                showEditTemplateDialog(null);
+            }
+        });
 
         // set up listview
         ListView message_list = (ListView) ((LayoutInflater) OpenMPD.getInstance()
@@ -119,18 +131,14 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
             public void onItemClick(AdapterView<?> parent, final View view,
                 int position, long id) {
                 QuickMessage message = new QuickMessage((int)id);
-                if (message.getString("notification_type").equals("blank")){
-                    sendMessage(message, "", "");
-                    dialog.dismiss();
-                } else {
-                    showPreview(message, dialog);
-                }
+                showPreview(message, dialog);
             }
         });
 
         dialog.setView(message_list);
         dialog.show();
     }
+
     public void showPreview(final QuickMessage message, final Dialog parentDialog){
         // show a preview of the message, and the option to show it
         AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
@@ -147,6 +155,12 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
                 parentDialog.dismiss();
             }
         });
+        builder.setNeutralButton(R.string.edit_template, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) { 
+                showEditTemplateDialog(message);
+                parentDialog.dismiss();
+            }
+        });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) { }
         });
@@ -154,6 +168,55 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
         builder.show();
 
     }
+    private void showEditTemplateDialog(final QuickMessage message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+        builder.setTitle(R.string.edit_email_template);
+        final LinearLayout layout = (LinearLayout) ((LayoutInflater) OpenMPD.getInstance()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.quick_message_edit, null);
+        builder.setView(layout);
+        if (message != null){
+            ((EditText) layout.findViewById(R.id.name))
+                .setText(message.getString("name"));
+            ((EditText) layout.findViewById(R.id.email_subject))
+                .setText(message.getString("subject"));
+            ((EditText) layout.findViewById(R.id.email_body))
+                .setText(message.getString("body"));
+        }
+        builder.setPositiveButton(R.string.save_and_send, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                saveMessage(message, layout);
+                String body = message.getString("body").replace("$name", contact.getString("fname"));
+                String subject = message.getString("subject").replace("$name", contact.getString("fname"));
+                sendMessage(message, subject, body);
+            }
+        });
+        builder.setNeutralButton(R.string.save, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                saveMessage(message, layout);
+                OpenMPD.getInstance().userMessage(R.string.saved);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) { }
+        });
+        builder.show();
+    }
+    private void saveMessage(QuickMessage message, LinearLayout layout){
+        if (message == null){
+            message = new QuickMessage();
+            message.setValue("notification_type", getNotificationType());
+        }
+        message.setValue("name", 
+            ((EditText) layout.findViewById(R.id.name)).getText().toString());
+        message.setValue("subject", 
+            ((EditText) layout.findViewById(R.id.email_subject)).getText().toString());
+        message.setValue("body", 
+            ((EditText) layout.findViewById(R.id.email_body)).getText().toString());
+        message.setValue("customized", true);
+        message.dirtySave();
+    }
+
     private void sendMessage(QuickMessage message, String subject, String body){
         String recipient_address = "";
         try {
@@ -167,7 +230,7 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_EMAIL, new String [] {recipient_address});
-        if (!message.getString("notification_type").equals("blank")){
+        if (message != null){
             intent.putExtra(Intent.EXTRA_SUBJECT, subject);
             intent.putExtra(Intent.EXTRA_TEXT, body);
         }
@@ -177,7 +240,7 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
                 Intent.createChooser(intent, "Send Email"));
     }
 
-    public abstract String getQuickMessageFilter();
+    public abstract String getNotificationType();
     public abstract View buildCardContent(Context context);
 	
 }
