@@ -24,7 +24,7 @@ public class GraphCard extends Card {
     // monthly giving, where a month's total gifts == donor's regular giving
     // eg, if they gave an extra gift, their entire giving will be excluded
     private static final String CLEAR_CACHE_SQL =
-        "drop table giving_summary_cache;";
+        "drop table if exists giving_summary_cache;";
     private static final String VERIFY_CACHE_SQL =
         "SELECT name FROM sqlite_master WHERE type='table' AND name='giving_summary_cache';";
     private static final String CACHE_SQL =
@@ -41,7 +41,9 @@ public class GraphCard extends Card {
     private static final String GIVING_SQL =
         "select * from giving_summary_cache;";
 
-    private View content = null;
+    private static View content = null; // so we can invalidate the view from
+                                        // clearCache. We should only ever
+                                        // have one instance anyway.
 	public GraphCard(){
 		super();
 	}
@@ -116,5 +118,6 @@ public class GraphCard extends Card {
     public static void clearCache(){
         Log.i("net.bradmont.openmpd", "Clearing cache.");
         MPDDBHelper.get().getWritableDatabase().execSQL(CLEAR_CACHE_SQL);
+        content = null;
     }
 }
