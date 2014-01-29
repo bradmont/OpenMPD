@@ -223,9 +223,13 @@ public class Contact extends DBModel{
             }
         } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_OCCASIONAL){
-                note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
-                note.dirtySave();
+                if (cs.getString("manual_set_expires") == null ||
+                 cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
+                    // don't give notifications for manually set statuses
+                    note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
+                    note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
+                    note.dirtySave();
+                }
             }
         } else if (oldStatus.getInt("status") != cs.getInt("status")){
             note.setValue("type", Notification.CHANGE_STATUS);
@@ -235,11 +239,14 @@ public class Contact extends DBModel{
                 (cs.getInt("partner_type") == ContactStatus.PARTNER_MONTHLY ||
                  cs.getInt("partner_type") == ContactStatus.PARTNER_REGULAR ||
                  cs.getInt("partner_type") == ContactStatus.PARTNER_ANNUAL)
-                && cs.getInt("giving_amount") != 0
-                ){
-            note.setValue("type", Notification.CHANGE_AMOUNT);
-            note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
-            note.dirtySave();
+                && cs.getInt("giving_amount") != 0){
+            if (cs.getString("manual_set_expires") == null ||
+             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
+                    // don't give notifications for manually set statuses
+                note.setValue("type", Notification.CHANGE_AMOUNT);
+                note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
+                note.dirtySave();
+            }
         }
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
