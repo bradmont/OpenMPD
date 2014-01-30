@@ -4,6 +4,7 @@ import net.bradmont.supergreen.models.*;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.controllers.TntImportService;
+import net.bradmont.openmpd.controllers.TntImporter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,16 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+
+
 
 public class DebugFragment extends SherlockFragment implements OnClickListener{
 
@@ -100,7 +111,63 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
                 }
                 MPDDBHelper.get().getWritableDatabase()
                     .execSQL(String.format("update service_account set last_import = null;"));
-            break;
+                break;
+            case R.id.randomise_data_button:
+                // Replace all contact info with fake data, for public
+                // screenshots and such.
+
+                // read sample data
+                InputStream inputStream = getActivity().getResources().openRawResource(R.raw.example_names);
+                InputStreamReader inputreader = new InputStreamReader(inputStream);
+                BufferedReader buffreader = new BufferedReader(inputreader);
+                String line;
+                ArrayList<String> fake_data = new ArrayList<String>(500);
+                try {
+                    line = buffreader.readLine(); // drop first row
+                    while (( line = buffreader.readLine()) != null) {
+                        fake_data.add(line);
+                    }
+                } catch (IOException e){
+                    return;
+                }
+
+
+                // get all contacts
+                ModelList contacts = MPDDBHelper.getReferenceModel("contact").getAll();
+                for (int i = 0; i < contacts.size(); i++){
+                    int index = i % fake_data.size();
+                    String [] info = TntImporter.csvLineSplit(fake_data.get(index));
+                    Contact c = (Contact) contacts.get(index);
+                    c.setValue("fname", info[0]);
+                    c.setValue("lname", info[1]);
+                    c.dirtySave();
+                    try {
+                    EmailAddress email = (EmailAddress) MPDDBHelper
+                        .getModelByField("email_address", "contact_id", c.getInt("id"));
+                        email.setValue("address", info[9]);
+                        email.dirtySave();
+                    } catch (Exception e){}
+                    try {
+                    PhoneNumber phone = (PhoneNumber) MPDDBHelper
+                        .getModelByField("phone_number", "contact_id", c.getInt("id"));
+                        phone.setValue("number", info[7]);
+                        phone.dirtySave();
+                    } catch (Exception e){}
+                    try {
+                    Address address = (Address) MPDDBHelper
+                        .getModelByField("address", "contact_id", c.getInt("id"));
+                        address.setValue("addr1", info[3]);
+                        address.setValue("addr2", "");
+                        address.setValue("addr3", "");
+
+                        address.setValue("city", info[4]);
+                        address.setValue("region", info[5]);
+                        address.setValue("post_code", info[6]);
+
+                        address.dirtySave();
+                    } catch (Exception e){}
+                }
+                break;
         }
     }
 
