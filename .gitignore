@@ -16,5 +16,8 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
+# kate
+*.kateproject
+
 # dolphin directory metadata
 .directory
