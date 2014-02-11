@@ -23,29 +23,34 @@ public class ModelList {
     protected SQLiteDatabase db = null;
 
     private String orderBy = null;
-    private String lookupField = null;
-    private String lookupValue = null;
-    private boolean is_numeric = false;
+    private String [] lookupFields = null;
+    private String [] lookupValues = null;
     private boolean initialised = false;
 
     public ModelList(DBModel referenceInstance, String lookupFieldName, int value){
         this(referenceInstance, lookupFieldName, Integer.toString(value));
-        is_numeric = true;
     }
 
     public ModelList(DBModel referenceInstance, String lookupFieldName, float value){
         this(referenceInstance, lookupFieldName, Float.toString(value));
-        is_numeric = true;
     }
 
     public ModelList(DBModel referenceInstance, String lookupFieldName, boolean value){
         this(referenceInstance, lookupFieldName, value?1:0);
     }
 
+    public ModelList(DBModel referenceInstance){
+        this(referenceInstance, null, null);
+    }
+
     public ModelList(DBModel referenceInstance, String lookupField, String value){
         this.referenceInstance = referenceInstance;
-        this.lookupField = lookupField;
-        this.lookupValue = value;
+        if (lookupField != null && value != null){
+            this.lookupFields = new String[1];
+            this.lookupFields[0] = lookupField ;
+            this.lookupValues = new String[1];
+            this.lookupValues[0] = value ;
+        }
         db = referenceInstance.getDbh().getReadableDatabase();
     }
     
@@ -61,31 +66,55 @@ public class ModelList {
         cur = null;
     }
 
+    public ModelList filter(String field, int value){
+        return filter(field, Integer.toString(value));
+    }
+
+    public ModelList filter(String field, float value){
+        return filter(field, Float.toString(value));
+    }
+
+    public ModelList filter(String field, String value){
+        String [] fields = new String [lookupFields.length+1];
+        String [] values = new String [lookupFields.length+1];
+        fields [fields.length-1] = field;
+        values [fields.length-1] = value;
+        for (int i = 0; i < lookupFields.length; i++){
+            fields[i] = lookupFields[i];
+            values[i] = lookupValues[i];
+        }
+        lookupFields = fields;
+        lookupValues = values;
+        setUnInitialised();
+        return this;
+    }
+
     private void init(){
         initialised = true;
         String [] args = new String[1];
-        args[0] = lookupValue;
+
+        args = lookupValues;
+
         String table = referenceInstance.getTableName();
-        if (lookupField != null){
-            String lookup_column = referenceInstance.getField(lookupField).getColumnName();
-            // do select & get Cursor
-            if (is_numeric == true){
-                // second argument is null, signifying select *
-                cur = db.query(table, null, String.format("%s = ?", lookup_column),
-                    args, null, null, orderBy);
-            } else {
-                if (lookupValue.contains("%")){
-                    cur = db.query(table, null, String.format("%s like ?", lookup_column),
-                        args, null, null, orderBy);
+        String conditions = null;
+        if (lookupFields != null){
+            conditions = "";
+            for (int i = 0; i < lookupValues.length; i++){
+                if (conditions != ""){
+                    conditions = conditions + " and ";
+                }
+
+                String lookup_column = referenceInstance.getField(lookupFields[i]).getColumnName();
+                // we can't look up a literal %...
+                if (lookupValues[i].contains("%")){
+                    conditions = conditions + lookup_column+" like ?";
                 } else {
-                    cur = db.query(table, null, String.format("%s = ?", lookup_column),
-                        args, null, null, orderBy);
+                    conditions = conditions + lookup_column+"=?";
                 }
             }
-        } else {
-            cur = db.query(table, null, null,
-                null, null, null, orderBy);
         }
+        cur = db.query(table, null, conditions, args, null, null, orderBy);
+
         // Instantiate models, null its elements
         models = new DBModel[cur.getCount()];
         for (int i = 0; i < models.length; i++){

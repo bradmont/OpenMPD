@@ -36,7 +36,7 @@ import java.io.StringWriter;
 
 public abstract class DBModel {
     /** id is kept as a convenience. Table primary keys must be integers. */
-    int id = 0;
+    protected int id = 0;
     LinkedHashMap<String, DBField> fields = new LinkedHashMap<String, DBField>(); // preserves insertion order
     HashMap<String, String> fields_by_column_name = new HashMap<String, String>(); // stores columname:fieldname pairs for Fields that have a custom columname
     DBField primaryKey;
