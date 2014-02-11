@@ -109,103 +109,106 @@ public class TntImportService extends IntentService {
 
 
 
-            // notify of important changes
-            ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
-            
-            int new_partners, late_partners, lapsed_partners, restarted_partners, amount_changes, special_gifts;
-            new_partners = late_partners = lapsed_partners = restarted_partners = amount_changes = special_gifts = 0;
-
-            for (int i = 0; i < notifications.size(); i++){
-
-                Notification n = (Notification) notifications.get(i);
-                Contact contact = (Contact) n.getRelated("contact");
-                ContactStatus status = (ContactStatus)MPDDBHelper
-                        .getReferenceModel("contact_status")
-                        .getByField("contact_id", contact.getInt("id"));
-
-                switch (n.getInt("type")){
-                    case Notification.CHANGE_PARTNER_TYPE:
-                        int partnership = status.partnership(status.getInt("partner_type"));
-                        if (partnership == R.string.monthly || partnership == R.string.regular){
-                            new_partners++;
-                        }
-                        break;
-
-                    case Notification.CHANGE_STATUS:
-                        switch(status.getInt("status")){
-                            case ContactStatus.STATUS_LATE:
-                                late_partners++;
-                                break;
-                            case ContactStatus.STATUS_LAPSED:
-                                lapsed_partners++;
-                                break;
-                            case ContactStatus.STATUS_CURRENT:
-                                try{
-                                    int temp = Integer.parseInt(status.getString("message"));
-                                    if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
-                                        restarted_partners++;
-                                    }
-                                } catch (Exception e){ }
-                                break;
-
-                        }
-                        break;
-
-                    case Notification.CHANGE_AMOUNT:
-                        amount_changes++;
-                        break;
-                    case Notification.SPECIAL_GIFT:
-                        special_gifts++;
-                }
-                n.setValue("status", Notification.STATUS_NOTIFIED);
-                n.dirtySave();
-            }
-
-            int total = new_partners + late_partners + lapsed_partners + restarted_partners + amount_changes + special_gifts;
-
-            if (total > 0){
-                builder.setContentTitle(String.format("%d MPD notifications", total));
-                String content = "";
-
-                if (new_partners >  0){
-                    content += String.format("%d new partner(s). ", new_partners);
-                }
-                if ( restarted_partners  > 0){
-                    content += String.format("%d restarted partner(s). ", restarted_partners);
-                } 
-                if ( special_gifts > 0) { 
-                    content += String.format("%d special gift(s). ", special_gifts);
-                }
-                if ( late_partners  > 0){
-                    content += String.format("%d late partner(s). ", late_partners);
-                } 
-                if ( lapsed_partners  > 0){
-                    content += String.format("%d lapsed partner(s). ", lapsed_partners);
-                } 
-                if ( amount_changes  > 0){
-                    content += String.format("%d amount change(s). ", amount_changes);
-                } 
-
-                builder.setContentText(content);
-                builder.setProgress(0, 0, false); // remove progress bar
-
-                Intent homeIntent = new Intent(this, OpenMPD.class);
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-                stackBuilder.addParentStack(OpenMPD.class);
-                stackBuilder.addNextIntent(homeIntent);
-                PendingIntent homePendingIntent =
-                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.setContentIntent(homePendingIntent);
-
-
-                notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
-            }
+            notifyUser(builder, notificationManager);
             // clear the cache on our summary graph
             GraphCard.clearCache();
         }
         MPDDBHelper.get().close();
 
         stopForeground(true);
+    }
+    protected void notifyUser(NotificationCompat.Builder builder, NotificationManager notificationManager){
+        // notify of important changes
+        ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
+        
+        int new_partners, late_partners, lapsed_partners, restarted_partners, amount_changes, special_gifts;
+        new_partners = late_partners = lapsed_partners = restarted_partners = amount_changes = special_gifts = 0;
+
+        for (int i = 0; i < notifications.size(); i++){
+
+            Notification n = (Notification) notifications.get(i);
+            Contact contact = (Contact) n.getRelated("contact");
+            ContactStatus status = (ContactStatus)MPDDBHelper
+                    .getReferenceModel("contact_status")
+                    .getByField("contact_id", contact.getInt("id"));
+
+            switch (n.getInt("type")){
+                case Notification.CHANGE_PARTNER_TYPE:
+                    int partnership = status.partnership(status.getInt("partner_type"));
+                    if (partnership == R.string.monthly || partnership == R.string.regular){
+                        new_partners++;
+                    }
+                    break;
+
+                case Notification.CHANGE_STATUS:
+                    switch(status.getInt("status")){
+                        case ContactStatus.STATUS_LATE:
+                            late_partners++;
+                            break;
+                        case ContactStatus.STATUS_LAPSED:
+                            lapsed_partners++;
+                            break;
+                        case ContactStatus.STATUS_CURRENT:
+                            try{
+                                int temp = Integer.parseInt(status.getString("message"));
+                                if (temp == ContactStatus.STATUS_LATE || temp == ContactStatus.STATUS_LAPSED){
+                                    restarted_partners++;
+                                }
+                            } catch (Exception e){ }
+                            break;
+
+                    }
+                    break;
+
+                case Notification.CHANGE_AMOUNT:
+                    amount_changes++;
+                    break;
+                case Notification.SPECIAL_GIFT:
+                    special_gifts++;
+            }
+            n.setValue("status", Notification.STATUS_NOTIFIED);
+            n.dirtySave();
+        }
+
+        int total = new_partners + late_partners + lapsed_partners + restarted_partners + amount_changes + special_gifts;
+
+        if (total > 0){
+            builder.setContentTitle(String.format("%d MPD notifications", total));
+            String content = "";
+
+            if (new_partners >  0){
+                content += String.format("%d new partner(s). ", new_partners);
+            }
+            if ( restarted_partners  > 0){
+                content += String.format("%d restarted partner(s). ", restarted_partners);
+            } 
+            if ( special_gifts > 0) { 
+                content += String.format("%d special gift(s). ", special_gifts);
+            }
+            if ( late_partners  > 0){
+                content += String.format("%d late partner(s). ", late_partners);
+            } 
+            if ( lapsed_partners  > 0){
+                content += String.format("%d lapsed partner(s). ", lapsed_partners);
+            } 
+            if ( amount_changes  > 0){
+                content += String.format("%d amount change(s). ", amount_changes);
+            } 
+
+            builder.setContentText(content);
+            builder.setProgress(0, 0, false); // remove progress bar
+
+            Intent homeIntent = new Intent(this, OpenMPD.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            stackBuilder.addParentStack(OpenMPD.class);
+            stackBuilder.addNextIntent(homeIntent);
+            PendingIntent homePendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setContentIntent(homePendingIntent);
+
+
+            notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
+        }
     }
 
     protected boolean isNetworkAvailable(){

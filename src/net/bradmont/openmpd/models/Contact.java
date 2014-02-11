@@ -208,62 +208,83 @@ public class Contact extends DBModel{
         // create notifications for changes in status (unless we're importing
         // data for a new account)
         Notification note = new Notification();
+        boolean save = false; // should we keep this notification?
         note.setValue("contact", this);
         note.setValue("date", evalDate);
+        note.setValue("last_gift", lastGift);
+        note.setValue("giving_amount", cs.getInt("giving_amount"));
+        note.setValue("partner_type", cs.getInt("partner_type"));
+        note.setValue("partner_status", cs.getInt("status"));
+        // ### check if we have already made a notification with this contact, last_gift, partner_type and partner_status
+        ModelList prev_notes = getRelatedList(note, "contact")
+            .filter("last_gift", lastGift)
+            .filter("giving_amount", cs.getInt("giving_amount"))
+            .filter("partner_type", cs.getInt("partner_type"))
+            .filter("partner_status", cs.getInt("status"));
+        if (prev_notes.size() > 0){
+            return;
+        }
+
         if (notify == false){
             // for initial import, we won't notify of out of date notifications,
             // but we still want to show them in the contact history
             note.setValue("status", Notification.STATUS_NOTIFIED);
         }
-        if (oldStatus == null){
+        if (oldStatus == null){ // a new contact
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_NONE
                 && cs.getInt("partner_type") != ContactStatus.PARTNER_ONETIME){
+                // notify as new partner
                 note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
-                note.dirtySave();
+                save = true;
             }
         } else if (oldStatus.getInt("partner_type") != cs.getInt("partner_type")){
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_OCCASIONAL){
+                // if they changed to a different type (except one-time to occasional)
                 if (cs.getString("manual_set_expires") == null ||
                  cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
                     // don't give notifications for manually set statuses
                     note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
                     note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
-                    note.dirtySave();
+                    save = true;
                 }
             }
         } else if (oldStatus.getInt("status") != cs.getInt("status")){
+            // change of status (eg, current to late)
             note.setValue("type", Notification.CHANGE_STATUS);
             note.setValue("message", Integer.toString(oldStatus.getInt("status")));
-            note.dirtySave();
+            save = true;
         } else if (oldStatus.getInt("giving_amount") != cs.getInt("giving_amount") && 
                 (cs.getInt("partner_type") == ContactStatus.PARTNER_MONTHLY ||
                  cs.getInt("partner_type") == ContactStatus.PARTNER_REGULAR ||
                  cs.getInt("partner_type") == ContactStatus.PARTNER_ANNUAL)
                 && cs.getInt("giving_amount") != 0){
+                // change giving amount for monthly, regular or annual partner
             if (cs.getString("manual_set_expires") == null ||
              cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
                     // don't give notifications for manually set statuses
                 note.setValue("type", Notification.CHANGE_AMOUNT);
                 note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));
-                note.dirtySave();
+                save = true;
             }
         }
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
-            note.setValue("contact", this);
             int monthAmount = getMonthAmount();
             if (monthAmount != 0){
                 if (cs.getInt("partner_type") == ContactStatus.PARTNER_OCCASIONAL 
                     || cs.getInt("partner_type") == ContactStatus.PARTNER_ONETIME ){
                     note.setValue("type", Notification.SPECIAL_GIFT);
                     note.setValue("message", Integer.toString(monthAmount));
-                    note.dirtySave();
+                    save = true;
                 } else if (monthAmount > cs.getInt("giving_amount")){
                     note.setValue("type", Notification.SPECIAL_GIFT);
                     note.setValue("message", Integer.toString(monthAmount));
-                    note.dirtySave();
+                    save = true;
                 }
             }
+        }
+        if (save == true){
+            note.dirtySave();
         }
 
     }

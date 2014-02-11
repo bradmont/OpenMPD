@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 15;
+    private static int DATABASE_VERSION = 16;
 
     @Override
     protected void registerModels(){

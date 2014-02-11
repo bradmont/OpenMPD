@@ -68,19 +68,30 @@ public class Notification extends DBModel{
 
         addField(new DateField("date"));
 
+        addField(new StringField("last_gift")); 
+        addField(new IntField("giving_amount")); 
+        addField(new IntField("partner_type")); 
+        addField(new IntField("partner_status")); 
+
         TABLE_NAME=TABLE;
         super.init();
     }
     public String [] generateUpdateSQL(int oldversion){
         if (oldversion < 12){
-            String [] result = new String[1];
+            String [] result = new String[5];
             result[0] = "alter table notification add " + getField("date").getSQLDefinition() +";";
+            result[1] = "alter table notification add " + getField("last_gift").getSQLDefinition() +";";
+            result[2] = "alter table notification add " + getField("giving_amount").getSQLDefinition() +";";
+            result[3] = "alter table notification add " + getField("partner_type").getSQLDefinition() +";";
+            result[4] = "alter table notification add " + getField("partner_status").getSQLDefinition() +";";
             return result;
         }
-        if (oldversion < 5){
-            String [] result = new String[2];
-            result[0] = generateCreateSQL();
-            result[1] = "alter table notification add " + getField("date").getSQLDefinition() +";";
+        if (oldversion < 16){
+            String [] result = new String[4];
+            result[0] = "alter table notification add " + getField("last_gift").getSQLDefinition() +";";
+            result[1] = "alter table notification add " + getField("giving_amount").getSQLDefinition() +";";
+            result[2] = "alter table notification add " + getField("partner_type").getSQLDefinition() +";";
+            result[3] = "alter table notification add " + getField("partner_status").getSQLDefinition() +";";
             return result;
         }
         return null;
