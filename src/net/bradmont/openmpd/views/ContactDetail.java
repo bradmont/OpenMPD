@@ -4,17 +4,20 @@ import net.bradmont.supergreen.models.*;
 import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.controllers.QuickMessenger;
 import net.bradmont.openmpd.views.cards.*;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 
 import android.database.sqlite.*;
 import android.database.Cursor;
 
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,6 +47,11 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
     private Contact contact = null;
     private Contact spouse = null;
     private ContactStatus status  = null;
+
+    public static final int EMAIL = 1;
+    public static final int PHONE = 2;
+    public static final int ADDRESS = 3;
+    public static final int NOTES = 4;
 
     public ContactDetail(int id){
         contact = new Contact(id);
@@ -80,6 +88,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         values.put("fname", contact.getString("fname"));
         values.put("lname", contact.getString("lname"));
 
+        // spouse
         try {
             spouse = (Contact) contact.getRelated("spouse");
             values.put("spouse_fname", spouse.getString("fname"));
@@ -115,6 +124,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             Link link = new Link();
             link.title = R.string.Email;
             link.value = email.getString("address");
+            link.type = EMAIL;
             if (link.value != "" && link.value != null && link.value.length() > 1){
                 links.add(link);
             }
@@ -128,6 +138,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             Link link = new Link();
             link.title = R.string.Phone;
             link.value = phone.getString("number");
+            link.type = PHONE;
             if (link.value != "" && link.value != null && link.value.length() > 1){
                 links.add(link);
             }
@@ -166,6 +177,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             Link link = new Link();
             link.title = R.string.Address;
             link.value = fullAddress;
+            link.type = ADDRESS;
             if (link.value != "" && link.value != null){
                 links.add(link);
             }
@@ -199,6 +211,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             Link link = new Link();
             link.title = R.string.Notes;
             link.value = status.getString("notes");
+            link.type = NOTES;
             if (link.value != "" && link.value != null && link.value.length() > 1){
                 links.add(link);
             }
@@ -224,6 +237,31 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         public void onCreateOptionsMenu (Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.contact_detail, menu);
     }
+    private void editNotes(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        Log.i("net.bradmont.openmpd", "menu_notes");
+        ad.setTitle(R.string.Notes);
+        final EditText notes_text = (EditText) ((LayoutInflater) getActivity()
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+            .inflate(R.layout.notes_text, null);
+
+        notes_text.setText(status.getString("notes"));
+        ad.setView(notes_text);
+        final ContactStatus local_status = status;
+        ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                local_status.setValue("notes", notes_text.getText().toString());
+                local_status.dirtySave();
+                OpenMPD.getInstance().switchContent(new ContactDetail(contact.getID()));
+            }
+        });
+        ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        ad.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
         AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
@@ -261,27 +299,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 ad.show();
                 return true;
             case R.id.menu_notes:
-                Log.i("net.bradmont.openmpd", "menu_notes");
-                ad.setTitle(R.string.Notes);
-                final EditText notes_text = (EditText) ((LayoutInflater) getActivity()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                    .inflate(R.layout.notes_text, null);
-
-                notes_text.setText(status.getString("notes"));
-                ad.setView(notes_text);
-                final ContactStatus local_status = status;
-                ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        local_status.setValue("notes", notes_text.getText().toString());
-                        local_status.dirtySave();
-                        OpenMPD.getInstance().switchContent(new ContactDetail(contact.getID()));
-                    }
-                });
-                ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-                ad.show();
+                editNotes();
                 return true;
             case R.id.menu_help:
                 HelpDialog.showHelp(getActivity(), R.string.help_contact_title, R.string.help_contact);
@@ -355,10 +373,10 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         public int title = 0;
         public String value = null;
         public String subtitle = null;
-
+        public int type = 0;
     }
 
-    public View buildLinkView(Link link, ViewGroup parent) {
+    public View buildLinkView(final Link link, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getActivity()
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
@@ -374,6 +392,35 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
         } else {
             subtitle.setVisibility(View.GONE);
         }
+        value.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = null;
+                switch (link.type){
+                    case EMAIL:
+                        // TODO: Log contact
+                        QuickMessenger q = new QuickMessenger(contact);
+                        q.showQuickMessageDialog();
+                        break;
+                    case PHONE:
+                        // TODO: Log contact
+                        String number = link.value.replaceAll("[^\\d]", "");
+                        number = "tel:" + number;
+                        intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse(number));
+                        OpenMPD.getInstance().startActivity(intent);
+                        break;
+                    case ADDRESS:
+                        String uri = "geo:0,0?q=" + Uri.encode(link.value);
+                        intent = new Intent(android.content.Intent.ACTION_VIEW, 
+                            Uri.parse(uri));
+                        OpenMPD.getInstance().startActivity(intent);
+                        break;
+                    case NOTES:
+                        editNotes();
+                        break;
+                }
+            }
+        });
         return rowView;
     }
 }

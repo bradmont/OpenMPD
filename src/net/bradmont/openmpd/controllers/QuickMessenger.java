@@ -34,15 +34,23 @@ import com.fima.cardsui.objects.Card;
 public class QuickMessenger {
 
     protected Contact contact;
-    protected String messageFilter = "";
+    protected String messageFilter = null;
 
 	public QuickMessenger(Contact contact, String messageFilter){
         this.contact=contact;
         this.messageFilter = messageFilter;
     }
+	public QuickMessenger(Contact contact){
+        this.contact=contact;
+    }
     public void showQuickMessageDialog(){
 
-        String sql = "select _id, name, subject, body from quick_message where notification_type = '" + messageFilter+ "' order by name;";
+        String sql;
+        if (messageFilter != null){
+            sql = "select _id, name, subject, body from quick_message where notification_type = '" + messageFilter+ "' order by name;";
+        } else {
+            sql = "select _id, name, subject, body from quick_message order by name;";
+        }
         AlertDialog.Builder ad = new AlertDialog.Builder(OpenMPD.getInstance());
         ad.setTitle(R.string.choose_a_template);
 
