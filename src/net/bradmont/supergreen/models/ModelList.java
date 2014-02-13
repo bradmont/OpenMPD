@@ -54,6 +54,8 @@ public class ModelList {
         db = referenceInstance.getDbh().getReadableDatabase();
     }
     
+    /* Set a field to order the ModelList.
+     */
     public ModelList orderBy(String orderBy){
         this.orderBy = orderBy;
         setUnInitialised();
@@ -74,6 +76,12 @@ public class ModelList {
         return filter(field, Float.toString(value));
     }
 
+    /*
+     * Filter the list by key, value. Filters can be chained, like so:
+        myList.filter('fname', 'george')
+            .filter('lname', 'costanza')
+            .filter('hair', 'none');
+     */
     public ModelList filter(String field, String value){
         String [] fields = new String [lookupFields.length+1];
         String [] values = new String [lookupFields.length+1];
@@ -97,6 +105,8 @@ public class ModelList {
 
         String table = referenceInstance.getTableName();
         String conditions = null;
+
+        // build the where conditions
         if (lookupFields != null){
             conditions = "";
             for (int i = 0; i < lookupValues.length; i++){
@@ -144,6 +154,8 @@ public class ModelList {
         return models[position];
     }
 
+    /** Returns the number of elements currently in the ModelList
+     */
     public int size(){
         if (initialised == false){
             init();
