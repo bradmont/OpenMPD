@@ -76,6 +76,10 @@
     <string name="getting_started_body_2">You can set up multiple accounts. Press \"Add\" to add another, or \"Done\" when you\'re done. You can add more accounts later from the \"Settings\" panel on the left menu.</string>
     <string name="importing_data">Importing Data</string>
     <string name="importing_data_body">We\'re importing your partner data now. This can take two or three minutes; pull down your device\'s notification drawer to see the progress. Once we\'re done, we\'ll notify you.</string>
+    <string name="ssl_cert_error">Bad SSL certicate.</string>
+    <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. This may be a configuration error on the server, or it could mean someone is doing something malicious. If you believe it is just an error, you can choose to ignore the bad certificate, but this is not recommended. If in doubt, please contact the server administrator.</string>
+    <string name="ignore_certificate">Ignore error</string>
+    <string name="ignoring_ssl">SSL errors on this server will be ignored in the future.</string>
 
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>

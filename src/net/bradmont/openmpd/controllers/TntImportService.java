@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -75,8 +77,11 @@ public class TntImportService extends IntentService {
                     initialImport.add(new Boolean(false));
                 }
                 TntImporter importer = new TntImporter(this, account, builder);
-                importer.run();
-                newdata.add(new Integer(account.getID()));
+                if (importer.run() == true){
+                    newdata.add(new Integer(account.getID()));
+                } else {
+                    return;
+                }
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
             int [] ids = b.getIntArray("net.bradmont.openmpd.account_ids");
@@ -89,8 +94,11 @@ public class TntImportService extends IntentService {
                         initialImport.add(new Boolean(false));
                     }
                     TntImporter importer = new TntImporter(this, account, builder);
-                    importer.run();
-                    newdata.add(new Integer(account.getID()));
+                    if (importer.run() == true){
+                        newdata.add(new Integer(account.getID()));
+                    } else {
+                        return;
+                    }
                 }
             }
         }

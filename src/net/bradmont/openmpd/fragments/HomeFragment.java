@@ -47,10 +47,16 @@ public class HomeFragment extends SherlockFragment {
     public static final int ONBOARD_IMPORTING=2;
     public static final int ONBOARD_FINISHED=3;
 
+    private String askSSLIgnore = null;
+
 
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    public void setAskSSLIgnore(String host){
+        askSSLIgnore = host;
     }
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,6 +81,11 @@ public class HomeFragment extends SherlockFragment {
         int updateNews = prefs.getInt("updateNews", 0);
 
 
+        if (askSSLIgnore != null){
+            SSLErrorCard eCard = new SSLErrorCard(askSSLIgnore);
+            cardsui.addCard(eCard);
+            cardsui.refresh();
+        }
         switch (onboardState){
             case ONBOARD_FINISHED:
                 // ### if initial import is finished

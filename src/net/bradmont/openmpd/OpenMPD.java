@@ -10,13 +10,17 @@ import net.bradmont.supergreen.models.ModelList;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 
-import android.content.Intent;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.SharedPreferences;
+
 
 import android.database.sqlite.*;
 import android.os.Bundle;
@@ -63,6 +67,7 @@ public class OpenMPD extends BaseActivity {
         instance = this;
         db = new MPDDBHelper(this);
 		super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
         
 
 		// set the Above View
@@ -70,6 +75,11 @@ public class OpenMPD extends BaseActivity {
 			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
 		if (mContent == null){
             homeFragment = new HomeFragment();
+            if (intent.hasExtra("net.bradmont.openmpd.SSLErrorServer")){
+                Log.i("net.bradmont.openmpd", "processing SSLError");
+                String host = intent.getStringExtra("net.bradmont.openmpd.SSLErrorServer");
+                homeFragment.setAskSSLIgnore(host);
+            }
 			mContent = homeFragment;
         }
 
@@ -125,7 +135,30 @@ public class OpenMPD extends BaseActivity {
                 new Intent(this, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
             PendingIntent.FLAG_UPDATE_CURRENT)
             );
+
 	}
+
+    private void verifySSLIgnore(final String host){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(host)
+            .setMessage(R.string.ask_add_ssl_exception);
+        builder.setPositiveButton(R.string.ignore_certificate, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                SharedPreferences.Editor prefs = getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
+                prefs.putBoolean("ignore_ssl_" + host, true);
+                prefs.commit();
+                userMessage(R.string.ignoring_ssl);
+
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        Log.i("net.bradmont.openmpd", "Showing dialog");
+        builder.show();
+
+    }
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
