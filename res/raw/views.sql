@@ -62,9 +62,20 @@ create view if not exists regular_by_month as
             on A.tnt_people_id = B.tnt_people_id 
         where total_gifts=giving_amount and (partner_type=50 or partner_type=40)  group by month;
 
+-- frequent_by_month (Frequent but irregular gifts)
+-- all gifts from PARTNER_FREQUENT partners
+drop view if exists frequent_by_month;
+create view if not exists frequent_by_month as
+    select month, sum(total_gifts) as frequent_giving
+            from 
+            partner_giving_status A join partner_giving_by_month B 
+            on A.tnt_people_id = B.tnt_people_id 
+        where partner_type=35 group by month;
 
 
 -- special_gifts_by_month
+-- giving above GIVING_AMOUNT for all partners, except FREQUENT,
+-- where giving_amount is an average
 drop view if exists special_gifts_by_month;
 create view if not exists special_gifts_by_month as 
     select month, sum(total_gifts) - sum(giving_amount) as special_gifts 
@@ -72,5 +83,5 @@ create view if not exists special_gifts_by_month as
             (select * from  partner_giving_status A  
             join   partner_giving_by_month B
             on A.tnt_people_id = B.tnt_people_id  
-        where total_gifts>giving_amount)  
+        where total_gifts>giving_amount and partner_type != 35)  
         group by month ;

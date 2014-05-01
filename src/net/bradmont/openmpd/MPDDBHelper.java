@@ -196,6 +196,7 @@ public class MPDDBHelper extends DBHelper{
         }
         if (oldVersion < 17){
             db.execSQL("update contact_status set partner_type=partner_type*10;");
+            db.execSQL("drop table if exists giving_summary_cache;");
             String file = "";
             try {
                 file = context.getResources().getResourceName(R.raw.views);

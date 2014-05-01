@@ -42,7 +42,7 @@
             android:layout_height="200dp"
             android:padding="8dp"
             android:paddingBottom="0dp"
-            custom:colors="#33b5e5,#ffbb33,#ff4444"
+            custom:colors="#33b5e5,#ffbb33,#ffd980,#ff4444"
             custom:lineColor="#707070"
             custom:barWeight="1"
             custom:spacingWeight=".33"
