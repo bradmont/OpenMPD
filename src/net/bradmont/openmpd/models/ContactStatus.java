@@ -24,12 +24,13 @@ import java.util.Date;
 
 public class ContactStatus extends DBModel{
     public static final String TABLE = "contact_status";
-    public static final int PARTNER_MONTHLY = 6;
-    public static final int PARTNER_REGULAR = 5;
-    public static final int PARTNER_ANNUAL = 4;
-    public static final int PARTNER_OCCASIONAL = 3;
-    public static final int PARTNER_ONETIME = 2;
-    public static final int PARTNER_NONE = 1;
+    public static final int PARTNER_MONTHLY = 60;
+    public static final int PARTNER_REGULAR = 50;
+    public static final int PARTNER_ANNUAL = 40;
+    public static final int PARTNER_FREQUENT = 35;
+    public static final int PARTNER_OCCASIONAL = 30;
+    public static final int PARTNER_ONETIME = 20;
+    public static final int PARTNER_NONE = 10;
     public static final int PARTNER_UNKNOWN = 0;
 
             
@@ -145,17 +146,19 @@ public class ContactStatus extends DBModel{
         switch (p){
             case 0:
                 return R.string.unknown;
-            case 1:
+            case 10:
                 return R.string.none;
-            case 2:
+            case 20:
                 return R.string.onetime;
-            case 3:
+            case 30:
                 return R.string.occasional;
-            case 4:
+            case 35:
+                return R.string.frequent;
+            case 40:
                 return R.string.annual;
-            case 5:
+            case 50:
                 return R.string.regular;
-            case 6:
+            case 60:
                 return R.string.monthly ;
         }
         return 0;

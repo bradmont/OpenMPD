@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 16;
+    private static int DATABASE_VERSION = 17;
 
     @Override
     protected void registerModels(){
@@ -193,6 +193,17 @@ public class MPDDBHelper extends DBHelper{
         }
         if (oldVersion < 14){
             db.execSQL("update contact_status set notes=NULL;");
+        }
+        if (oldVersion < 17){
+            db.execSQL("update contact_status set partner_type=partner_type*10;");
+            String file = "";
+            try {
+                file = context.getResources().getResourceName(R.raw.views);
+                executeSqlScript(context, db, R.raw.views);
+            } catch (IOException e){
+                // TODO we should die gracefully here...
+                Log.i("net.bradmont.openmpd", "FAILURE: could not open " + file );
+            }
         }
     }
 

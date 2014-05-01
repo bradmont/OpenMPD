@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.*;
 import android.widget.SimpleCursorAdapter;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Set;
@@ -307,8 +308,40 @@ public class Contact extends DBModel{
                         }
                     cs.setValue("giving_amount", getGivingAmount(current));
                 }
-                cs.setValue("status", ContactStatus.STATUSES[i][3]);
-                return ContactStatus.STATUSES[i][0];
+                if (ContactStatus.STATUSES[i][0] == ContactStatus.PARTNER_OCCASIONAL){
+                    // if >= 3 gifts in year
+                    String [] args = new String[2];
+                    args[0] = getString("tnt_people_id");
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.YEAR, -1);
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+                    args[1] = dateFormat.format(cal.getTime());
+
+                    String SQL = "select count(*) from gift where tnt_people_id = ? and month > ?;";
+
+                    Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+                    cur.moveToFirst();
+                    if (cur.getInt(0) > 2){
+                        cur.close();
+                        // set partner_type to 35 (PARTNER_FREQUENT)
+                        cs.setValue("partner_type", ContactStatus.PARTNER_FREQUENT);
+                        cs.setValue("gift_frequency", 1);
+                        cs.setValue("status", ContactStatus.STATUS_CURRENT);
+                        // set giving_amount to 12 month average
+                        SQL = "select sum(amount)/12 as average from gift where tnt_people_id = ? and month > ?;";
+                        cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+                        cur.moveToFirst();
+                        cs.setValue("giving_amount", cur.getInt(0));
+                        cur.close();
+                        return ContactStatus.PARTNER_FREQUENT;
+                    }
+                    cur.close();
+                    cs.setValue("status", ContactStatus.STATUSES[i][3]);
+                    return ContactStatus.STATUSES[i][0];
+                } else {
+                    cs.setValue("status", ContactStatus.STATUSES[i][3]);
+                    return ContactStatus.STATUSES[i][0];
+                }
             }
         }
         return ContactStatus.PARTNER_NONE;

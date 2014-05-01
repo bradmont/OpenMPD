@@ -20,7 +20,7 @@ public class SummaryCard extends Card {
     public static final String STABLE_MONTHLY_SQL = 
         "select sum(giving_amount) "+
             "from contact_status " +
-            "where partner_type=6 " +
+            "where partner_type=60 " +
             "and (status=4 or status=5);";
             // magic numbers! 
 
@@ -28,21 +28,28 @@ public class SummaryCard extends Card {
     public static final String STABLE_REGULAR_SQL = 
         "select sum(giving_amount/gift_frequency) " +
             "from contact_status "+
-            "where (partner_type=4 or partner_type=5) "+
+            "where (partner_type=40 or partner_type=50) "+
+                "and (status=4 or status=5);";
+
+    // Frequent, but irregular, partners
+    public static final String FREQUENT_SQL = 
+        "select sum(giving_amount) " +
+            "from contact_status "+
+            "where (partner_type=35) "+
                 "and (status=4 or status=5);";
 
     // late partners
     public static final String LATE_SQL = 
         "select sum(giving_amount/gift_frequency) "+
             "from contact_status "+
-            "where (partner_type=6 or partner_type=5 or partner_type=4) "+
+            "where (partner_type=60 or partner_type=50 or partner_type=40) "+
             "and status=3;";
 
     // lapsed partners
     public static final String LAPSED_SQL = 
         "select sum(giving_amount/gift_frequency) "+
             "from contact_status "+
-            "where (partner_type=6 or partner_type=5 or partner_type=4) "+
+            "where (partner_type=60 or partner_type=50 or partner_type=40) "+
             "and status=2;";
 
     // Average of special gifts
@@ -91,6 +98,7 @@ public class SummaryCard extends Card {
 
         int stable_monthly = getSqlInt(STABLE_MONTHLY_SQL);
         int stable_regular = getSqlInt(STABLE_REGULAR_SQL);
+        int frequent_average = getSqlInt(FREQUENT_SQL);
         int late_average = getSqlInt(LATE_SQL);
         int lapsed_average = getSqlInt(LAPSED_SQL);
 
@@ -99,6 +107,9 @@ public class SummaryCard extends Card {
 
 		((TextView) view.findViewById(R.id.stable_regular))
             .setText(formatMoney(stable_monthly + stable_regular));
+
+		((TextView) view.findViewById(R.id.frequent_giving))
+            .setText(formatMoney(frequent_average));
         
 		((TextView) view.findViewById(R.id.late_giving))
             .setText(formatMoney(late_average));

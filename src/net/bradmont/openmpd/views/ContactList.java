@@ -58,7 +58,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (C.partner_type=3 or C.partner_type=2) order by A.lname, A.fname";
+                "and (C.partner_type=30 or C.partner_type=20) order by A.lname, A.fname";
 
     @Override
     public View onCreateView(

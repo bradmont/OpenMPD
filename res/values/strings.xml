@@ -48,6 +48,7 @@
     <string name="none">None</string>
     <string name="onetime">One Time</string>
     <string name="occasional"> Occasional</string>
+    <string name="frequent"> Frequent</string>
     <string name="annual">/yr</string>
     <string name="regular">/?mo</string>
     <string name="monthly">/mo</string>
@@ -84,6 +85,7 @@
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>
     <string name="stable_monthly_giving">Stable Monthly Giving:</string>
+    <string name="frequent_giving_average">Frequent Giving (avg):</string>
     <string name="late_giving">Late Giving (avg):</string>
     <string name="lapsed_giving">Lapsed Giving (avg):</string>
     <string name="stable_regular_giving">Stable Regular Giving (avg):</string>
