@@ -408,10 +408,43 @@ public class Contact extends DBModel{
             return 0;
         }
         cur.moveToFirst();
-        int mode = cur.getInt(0);
-        cur.close();
+        if (cur.getInt(1) > 1){
+            // only use the most common giving amount as the regular
+            // amount if it is non-unique
+            int mode = cur.getInt(0);
+            cur.close();
 
-        return mode;
+            return mode;
+        }
+        else {
+            // for donors that give unstable amounts, return their average
+            // over the last 12 months
+            cur.close();
+            SQL = 
+                "select sum(amount)/count(month) as average from "+
+                       "(select months.month, amount from  "+
+                       "(select distinct month from gift) months "+
+                       "left outer join "+
+                       "(select month, sum(amount) as amount  "+
+                        "from gift "+
+                        "where tnt_people_id=? "+
+                        "group by month) B "+
+                        "on months.month=B.month "+
+                        "order by months.month desc "+
+                        "limit 12) where amount not null;";
+            args = new String [1];
+            args[0] = getString("tnt_people_id");
+            cur = MPDDBHelper.get().getReadableDatabase().rawQuery( SQL, args);
+            if (cur.getCount() == 0){
+                return 0;
+            }
+            cur.moveToFirst();
+            int average = cur.getInt(0);
+            cur.close();
+
+            return average;
+
+        }
     }
     @Override
     public String [] generateUpdateSQL(int oldVersion){
