@@ -94,7 +94,11 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
                 }
 
                 getActivity().startService(
-                    new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids));
+                    new Intent(getActivity(), TntImportService.class)
+                        .putExtra("net.bradmont.openmpd.account_ids", account_ids)
+                        .putExtra("net.bradmont.openmpd.force_update", true)
+
+                    );
 
                 return true;
         }

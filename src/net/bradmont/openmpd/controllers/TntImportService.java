@@ -70,7 +70,7 @@ public class TntImportService extends IntentService {
         startForeground(ContactsEvaluator.NOTIFICATION_ID, builder.build());
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
-            if (isOld(account)){
+            if (isOld(account) || b.containsKey("net.bradmont.openmpd.force_update")){
                 if (account.getString("last_import") == null) {
                     initialImport.add(new Boolean(true));
                 } else {
@@ -87,7 +87,7 @@ public class TntImportService extends IntentService {
             int [] ids = b.getIntArray("net.bradmont.openmpd.account_ids");
             for (int i = 0; i < ids.length; i++){
                 ServiceAccount account = new ServiceAccount(ids[i]);
-                if (isOld(account)){
+                if (isOld(account) || b.containsKey("net.bradmont.openmpd.force_update")){
                     if (account.getString("last_import") == null) {
                         initialImport.add(new Boolean(true));
                     } else {
