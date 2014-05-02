@@ -58,7 +58,7 @@ public class EditServiceAccountDialog extends DialogFragment{
         // set up spinner
         Spinner spinner = (Spinner) content_view.findViewById(R.id.tnt_service_id);
         Cursor c = MPDDBHelper.get().getReadableDatabase()
-            .rawQuery("select _id, name, base_url from tnt_service", null);
+            .rawQuery("select _id, name, base_url from tnt_service where name_short != 'EXAMPLE';", null);
         String [] spinner_columns = {"_id", "name", "base_url"};
         int [] spinner_views = {R.id._id, R.id.name, R.id.server};
         //String [] spinner_columns = { "name"};
