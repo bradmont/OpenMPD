@@ -26,12 +26,10 @@ If you have suggestions or requests that would help you raise support or
 manage your donor base, please feel free to let us know.
 
 ### Current Status:
-- Most of the Milestone 1 features and heavy lifting are done. App is fully functional (minus a few bugs).
-- We are in closed beta. If you want to test, please contact me.
-- **We are feature complete for beta 1**. I'm going to ask a few friends to test the app before moving ot open beta. Should be soon now.
+- **We are now in open Beta**. There are still a few bugs I know of, but none are showstoppers. You can [download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd).
 
 #### Beta 1:
-If you are interested in helping test OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
+If you are interested in helping with OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
 
 #### Left to do before Release 1:
 - [/] Design: Contact List View (I'd like this to be prettier, but can't think of how)
