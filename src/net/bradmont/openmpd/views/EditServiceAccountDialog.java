@@ -12,6 +12,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,8 +28,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 
+import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.net.URL;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.http.message.*;
 
 
@@ -158,7 +161,15 @@ public class EditServiceAccountDialog extends DialogFragment{
                         arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
 
                         TntService service = (TntService) account.getRelated("tnt_service_id");
-                        ArrayList<String> content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments);
+                        ArrayList<String> content = null;
+                        try {
+                            content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments, false);
+                        } catch (RuntimeException e){
+                            OpenMPD.getInstance().dismissWaitDialog();
+                            Log.i("net.bradmont.openmpd", "SSL error caught");
+                            showSSLError(service.getString("base_url"));
+                            return;
+                        }
                         OpenMPD.getInstance().dismissWaitDialog();
 
                         if (content == null || content.get(0).contains("ERROR") || content.size() > 5){
@@ -188,6 +199,36 @@ public class EditServiceAccountDialog extends DialogFragment{
                                 }
                             }
                         }
+                    }
+                    public void showSSLError(final String url){
+                        OpenMPD.getInstance().runOnUiThread(new Runnable(){
+                            @Override
+                            public void run(){
+                                Log.i("net.bradmont.openmpd", "building dialog");
+                                AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+                                builder.setMessage(R.string.ask_add_ssl_exception)
+                                       .setTitle(R.string.ssl_cert_error);
+                                builder.setPositiveButton(R.string.ignore_certificate, new DialogInterface.OnClickListener() {
+                                           public void onClick(DialogInterface dialog, int id) {
+                                               // User clicked OK button
+                                               URL u = null;
+                                               try { u = new URL(url); } catch (Exception e){}
+                                               String host = u.getHost();
+                                               SharedPreferences.Editor prefs = OpenMPD.getInstance().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
+                                               prefs.putBoolean("ignore_ssl_" + host, true);
+                                               prefs.commit();
+                                               OpenMPD.getInstance().userMessage(R.string.ignoring_ssl);
+                                           }
+                                       });
+                                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                           public void onClick(DialogInterface dialog, int id) { }
+                                       });
+
+
+                                Log.i("net.bradmont.openmpd", "showing dialog");
+                                builder.show();
+                            }
+                        });    
                     }
                 });
             } catch (ConstraintError e){

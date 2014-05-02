@@ -59,6 +59,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import java.lang.StringBuffer;
 import java.lang.Runnable;
+import java.lang.RuntimeException;
 import java.lang.Thread;
 
 import java.net.URL;
@@ -478,9 +479,13 @@ public class TntImporter {
     }
 
     public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments){
+        return getStringsFromUrl(url, arguments, true);
+    }
+
+    public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments, boolean handleCertError){
         Log.i("net.bradmont.openmpd", "getStringsFromUrl: " + url);
 
-        InputStream stream = getStreamFromUrl(url, arguments);
+        InputStream stream = getStreamFromUrl(url, arguments, handleCertError);
         if (stream == null){
             return null;
         }
@@ -506,7 +511,7 @@ public class TntImporter {
         return lines;
     }
 
-    public InputStream getStreamFromUrl(String url_raw, ArrayList arguments){
+    public InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
         InputStream content = null;
         
         URL url = null;
@@ -559,6 +564,9 @@ public class TntImporter {
             }
         } catch (javax.net.ssl.SSLPeerUnverifiedException e){
             // SSL certs on the server are not accepted
+            if (handleCertError == false){
+                throw new RuntimeException("SSLError Certificate not accepted");
+            }
             NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
