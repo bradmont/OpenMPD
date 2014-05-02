@@ -3,7 +3,7 @@ OpenMPD
 
 OpenMPD is a [Free Software](https://en.wikipedia.org/wiki/Free_software) Ministry Partner Development tool for Android.
 
-![The Home Screen](http://i.imgur.com/aOxP1We.png)
+![The Home Screen](https://lh3.ggpht.com/2dLOo8IgWtc4VrOYCldjVn0crxTP9cMn-RLv3p-x7qCnsoTIV1hkp3kGxDAwFYsqtA=h900)
 
 The goal of OpenMPD is to automate as much of the data management involved in
 MPD and MPM (Ministry Partner Maintenance) as possible, and to mine your donor

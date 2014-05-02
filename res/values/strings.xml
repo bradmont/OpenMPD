@@ -78,7 +78,7 @@
     <string name="importing_data">Importing Data</string>
     <string name="importing_data_body">We\'re importing your partner data now. This can take two or three minutes; pull down your device\'s notification drawer to see the progress. Once we\'re done, we\'ll notify you.</string>
     <string name="ssl_cert_error">Bad SSL certicate.</string>
-    <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. You may ignore it, but this could be dangerous. Note that the P2C server has a known error, so you should be safe to ignore the error in this case.</string>
+    <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. You may ignore it, but this could be dangerous.\n\nNote that the P2C server currently has a known error, so you should be safe to ignore it for focus.powertochange.org.</string>
     <string name="ignore_certificate">Ignore error</string>
     <string name="ignoring_ssl">SSL errors on this server will be ignored in the future.</string>
     <string name="debug_enabled">Debug enabled. Please close and reopen the app to access debug.</string>
