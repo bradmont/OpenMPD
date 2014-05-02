@@ -81,6 +81,7 @@
     <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. You may ignore it, but this could be dangerous. Note that the P2C server has a known error, so you should be safe to ignore the error in this case.</string>
     <string name="ignore_certificate">Ignore error</string>
     <string name="ignoring_ssl">SSL errors on this server will be ignored in the future.</string>
+    <string name="debug_enabled">Debug enabled. Please close and reopen the app to access debug.</string>
 
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>

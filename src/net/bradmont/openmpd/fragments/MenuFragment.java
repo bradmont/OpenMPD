@@ -1,6 +1,8 @@
 package net.bradmont.openmpd.fragments;
 
 import android.os.Bundle;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -24,9 +26,19 @@ public class MenuFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		String[] menu_items = getResources().getStringArray(R.array.menu_items);
-		ArrayAdapter<String> menuAdapter = new ArrayAdapter<String>(getActivity(), 
-				R.layout.simple_list_item_1, android.R.id.text1, menu_items);
+		String[] menu_items = null;
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+
+
+        if (prefs.getBoolean("debugEnabled", false) == true){
+            menu_items = getResources().getStringArray(R.array.menu_items_debug);
+        } else {
+            menu_items = getResources().getStringArray(R.array.menu_items);
+        }
+		ArrayAdapter<String> menuAdapter = menuAdapter = new ArrayAdapter<String>(getActivity(), 
+                    R.layout.simple_list_item_1, android.R.id.text1, menu_items);
+
 		setListAdapter(menuAdapter);
 	}
 

@@ -11,6 +11,17 @@
         <item>Next Steps</item>
         <item>MPD</item> -->
         <item>Settings</item>
+    </string-array>
+    <string-array name="menu_items_debug">
+        <item>Main</item>
+        <item>Contacts</item>
+        <!-- <item>Gifts</item>
+        <item>Analysis</item>
+        <item>Prayer</item>
+        <item>Interactions</item>
+        <item>Next Steps</item>
+        <item>MPD</item> -->
+        <item>Settings</item>
         <item>Debug</item>
     </string-array>
     

@@ -48,6 +48,7 @@ public class HomeFragment extends SherlockFragment {
     public static final int ONBOARD_FINISHED=3;
 
     private String askSSLIgnore = null;
+    private int debug_count = 0;
 
 
     public void onCreate (Bundle savedInstanceState) {
@@ -201,6 +202,14 @@ public class HomeFragment extends SherlockFragment {
     public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
         switch (item.getItemId() ){
             case R.id.menu_help:
+                debug_count++;
+                if (debug_count > 7){
+                    SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+                    prefs.edit()
+                        .putBoolean("debugEnabled", true)
+                          .apply();
+                    OpenMPD.getInstance().userMessage(R.string.debug_enabled);
+                }
                 HelpDialog.showHelp(getActivity(), R.string.help_main_title, R.string.help_main);
             return true;
         }
