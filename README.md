@@ -38,7 +38,7 @@ If you are interested in helping with OpenMPD, please contact me. Twitter is pro
 - [x] Searching & filtering contacts (by name, partner type, giving amount, etc).
 - [x] Verification of service accounts when you first add them
 - [x] Build label support into BarGraph
-- [ ] Build swipe support into BarGraph to view past history
+- [x] Build swipe support into BarGraph to view past history
 - [x] Help screens & cleaner onboarding
 
 ### Milestone 1 Goals
