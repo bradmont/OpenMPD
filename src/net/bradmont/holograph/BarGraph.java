@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.lang.Math;
@@ -49,6 +50,10 @@ public class BarGraph extends View {
     protected float maxValue = 0;
     protected float tickSpacing = 0;
     protected float tickWidth = 0;
+
+    // swipe related:
+    protected float mTranslationX = 0;
+    protected float mDownX = 0;
 
 
     protected Object [][] values = new Integer [0][0];
@@ -142,35 +147,45 @@ public class BarGraph extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        int start = (values.length - maxItems) >0?values.length- maxItems:0;
-        //Log.i("BarGraph", String.format("from %d to %d", start, values.length));
 
         // draw bars
-        for (int i = start; i < values.length; i++){
+        for (int i = 0; i < values.length ; i++){
 
+            int index = values.length - i -1;
             float bottom=data_bottom; // Bottom changes with each bar
-            float left = (barWidth + spacingWidth) * (i-start) + (spacingWidth/2 + data_left);
-            float right = left + barWidth;
-            for (int j=0; j < values[i].length; j++){
-                float val = 0f;
-                if (values[i][j] instanceof Float){
-                    val = ((Float) values[i][j]).floatValue();
-                } else if (values[i][j] instanceof Integer){
-                    val = ((Integer) values[i][j]).floatValue();
-                }
-                float top = bottom - val*barHeightFactor;
-                //Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
-                Rect r = new Rect((int)left, (int)top, (int)right, (int)bottom);
-                canvas.drawRect(r, barPaints[j % barPaints.length]);
-                bottom = top; // stacked bars; bottom is top of previous
+            float right = canvas_right - spacingWidth/2 - i * (barWidth + spacingWidth) - mTranslationX;
+            float left = right - barWidth;
+            float label_left = left;
 
+            if (left < data_left){
+                left = data_left;
             }
-            if (labels != null){
-                String label = labels[i];
-                canvas.save();
-                canvas.rotate(-45, left, canvas_bottom);
-                canvas.drawText(label , left, canvas_bottom, linePaint);
-                canvas.restore();
+            if (right > canvas_right){
+                right = canvas_right;
+            }
+            // don't draw if bar is outside data area
+            if (left < canvas_right && right > data_left){
+                // draw the bar in segments
+                for (int j=0; j < values[index].length; j++){
+                    float val = 0f;
+                    if (values[index][j] instanceof Float){
+                        val = ((Float) values[index][j]).floatValue();
+                    } else if (values[index][j] instanceof Integer){
+                        val = ((Integer) values[index][j]).floatValue();
+                    }
+                    float top = bottom - val*barHeightFactor;
+                    //Log.i("net.bradmont.holograph", String.format("value %f: %f %f %f %f", val, bottom, top, right, left));
+                    Rect r = new Rect((int)left, (int)top, (int)right, (int)bottom);
+                    canvas.drawRect(r, barPaints[j % barPaints.length]);
+                    bottom = top; // stacked bars; bottom is top of previous
+                }
+                if (labels != null){
+                    String label = labels[index];
+                    canvas.save();
+                    canvas.rotate(-45, label_left, canvas_bottom);
+                    canvas.drawText(label , label_left, canvas_bottom, linePaint);
+                    canvas.restore();
+                }
             }
         }
 
@@ -199,6 +214,34 @@ public class BarGraph extends View {
 
         // cache it
         setDrawingCacheEnabled(true);
+    }
+    @Override 
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        switch (motionEvent.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN: {
+                mDownX = mTranslationX + motionEvent.getX();
+                return true;
+            }
+            case MotionEvent.ACTION_CANCEL: 
+            case MotionEvent.ACTION_UP: 
+                mTranslationX = (mDownX - motionEvent.getX()) ;
+                invalidate();
+                if (mTranslationX > 0){ mTranslationX = 0;} // if we scrolled past right edge, snap back
+                if (mTranslationX < -1 * (values.length - getBarCount() )*(barWidth+spacingWidth) ){ 
+                    // if we scrolled past left edge, snap back
+                    mTranslationX = -1 * (values.length - getBarCount() )*(barWidth+spacingWidth);
+                }
+                return true;
+           
+            case MotionEvent.ACTION_MOVE: {
+                mTranslationX = (mDownX - motionEvent.getX()) ;
+
+                Log.i("net.bradmont.holograph.BarGraph", "mTranslationX:" + mTranslationX);
+                invalidate();
+                return true;
+            }
+        }
+        return false;
     }
 
     private float sumValues(Object [] list){
