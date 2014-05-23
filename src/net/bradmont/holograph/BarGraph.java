@@ -218,11 +218,10 @@ public class BarGraph extends View {
     @Override 
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch (motionEvent.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN: {
+            case MotionEvent.ACTION_DOWN:
                 mDownX = mTranslationX + motionEvent.getX();
                 return true;
-            }
-            case MotionEvent.ACTION_CANCEL: 
+            //case MotionEvent.ACTION_CANCEL: 
             case MotionEvent.ACTION_UP: 
                 mTranslationX = (mDownX - motionEvent.getX()) ;
                 invalidate();
@@ -231,15 +230,19 @@ public class BarGraph extends View {
                     // if we scrolled past left edge, snap back
                     mTranslationX = -1 * (values.length - getBarCount() )*(barWidth+spacingWidth);
                 }
-                return true;
-           
-            case MotionEvent.ACTION_MOVE: {
-                mTranslationX = (mDownX - motionEvent.getX()) ;
-
-                Log.i("net.bradmont.holograph.BarGraph", "mTranslationX:" + mTranslationX);
                 invalidate();
                 return true;
-            }
+           
+            case MotionEvent.ACTION_MOVE: 
+                mTranslationX = (mDownX - motionEvent.getX()) ;
+                if (mTranslationX > 0){ mTranslationX = 0;} // don't scroll past right edge
+                if (mTranslationX < -1 * (values.length - getBarCount() )*(barWidth+spacingWidth) ){ 
+                    // don't scroll past left edge
+                    mTranslationX = -1 * (values.length - getBarCount() )*(barWidth+spacingWidth);
+                }
+
+                invalidate();
+                return true;
         }
         return false;
     }
