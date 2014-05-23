@@ -65,6 +65,7 @@ public class LogItem extends DBModel{
         for (int i = 0; i < e.getStackTrace().length; i++){
             stackTrace = stackTrace + "\n" + e.getStackTrace()[i].toString();
         }
+        stackTrace = e.toString() + "\n" + stackTrace;
         logError(a, b, stackTrace);
     }
     public static void logError(String a, String b, String c){

@@ -76,7 +76,17 @@ public class ContactsEvaluator implements Runnable{
         for (int j = 0; j < contact_lists.length; j++){
             ModelList contacts = contact_lists[j];
             for (int i=0; i < contacts.size(); i++){
-                ((Contact) contacts.get(i)).updateStatus(initialImport.get(j).booleanValue());
+                try {
+                    ((Contact) contacts.get(i)).updateStatus(initialImport.get(j).booleanValue());
+                } catch (Exception e){
+                    String contact_id = "Contact index " + i + " of " + contacts.size() + ", Contact_id: ";
+                    try {
+                        contact_id += ((Contact) contacts.get(i)).getInt("id");
+                        contact_id += "\nName: " + ((Contact) contacts.get(i)).getInt("fname") 
+                            + " " + ((Contact) contacts.get(i)).getInt("lname");
+                    } catch (Exception drop ){}
+                    LogItem.logError("Error evaluating contact", contact_id, e);
+                }
                 progress++;
                 if (progress % 1000 == 0){
                     ContactStatus.endTransaction();

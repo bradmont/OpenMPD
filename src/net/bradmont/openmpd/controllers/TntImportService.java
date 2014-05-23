@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.util.Log;
 
 
@@ -77,10 +78,15 @@ public class TntImportService extends IntentService {
                     initialImport.add(new Boolean(false));
                 }
                 TntImporter importer = new TntImporter(this, account, builder);
-                if (importer.run() == true){
-                    newdata.add(new Integer(account.getID()));
-                } else {
-                    return;
+                try {
+                    if (importer.run() == true){
+                        newdata.add(new Integer(account.getID()));
+                    } else {
+                        return;
+                    }
+                } catch (Exception e){
+                    LogItem.logError("TntImporter crashed", "", e);
+                    notifyError(notificationManager, "TntImporter Exception", e);
                 }
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
@@ -94,10 +100,15 @@ public class TntImportService extends IntentService {
                         initialImport.add(new Boolean(false));
                     }
                     TntImporter importer = new TntImporter(this, account, builder);
-                    if (importer.run() == true){
-                        newdata.add(new Integer(account.getID()));
-                    } else {
-                        return;
+                    try {
+                        if (importer.run() == true){
+                            newdata.add(new Integer(account.getID()));
+                        } else {
+                            return;
+                        }
+                    } catch (Exception e){
+                        LogItem.logError("TntImporter crashed", "", e);
+                        notifyError(notificationManager, "TntImporter Exception", e);
                     }
                 }
             }
@@ -125,6 +136,38 @@ public class TntImportService extends IntentService {
 
         stopForeground(true);
     }
+    protected void notifyError(NotificationManager notificationManager, String message, Exception e){
+        NotificationCompat.Builder builder =
+            new NotificationCompat.Builder(this)
+            .setSmallIcon(R.drawable.notification_icon)
+            .setContentTitle("OpenMPD import error")
+            .setContentText("Please click to report error.")
+            .setAutoCancel(true);
+
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setType("text/plain");
+        emailIntent.setData(Uri.parse("mailto: brad.stewart@p2c.com" ));
+
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, "brad.stewart@p2c.com");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "OpenMPD crash report: " + message);
+
+        String stackTrace = e.toString();
+        for (int i = 0; i < e.getStackTrace().length; i++){
+            stackTrace = stackTrace + "\n" + e.getStackTrace()[i].toString();
+        }
+
+        stackTrace = "OpenMPD import process ended with the following error:\n"
+                + stackTrace;
+
+        emailIntent.putExtra(Intent.EXTRA_TEXT, stackTrace);
+
+
+        PendingIntent emailPendingIntent =
+            PendingIntent.getActivity(this, 0, Intent.createChooser(emailIntent, "Send email with..."), PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(emailPendingIntent);
+        notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +8, builder.build());
+    }
+
     protected void notifyUser(NotificationCompat.Builder builder, NotificationManager notificationManager){
         // notify of important changes
         ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);

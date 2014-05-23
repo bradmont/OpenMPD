@@ -375,7 +375,7 @@ public class TntImporter {
             contact.dirtySave();
         }
 
-        if (data.get("SP_FIRST_NAME").length() > 1){
+        if (data.get("SP_FIRST_NAME") != null && data.get("SP_FIRST_NAME").length() > 1){
             Contact spouse = null;
             if (contacts.size() != 0){
                 try {
