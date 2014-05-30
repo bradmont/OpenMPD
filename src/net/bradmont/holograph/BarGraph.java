@@ -235,6 +235,7 @@ public class BarGraph extends View {
            
             case MotionEvent.ACTION_MOVE: 
                 mTranslationX = (mDownX - motionEvent.getX()) ;
+                getParent().requestDisallowInterceptTouchEvent(true);
                 if (mTranslationX > 0){ mTranslationX = 0;} // don't scroll past right edge
                 if (mTranslationX < -1 * (values.length - getBarCount() )*(barWidth+spacingWidth) ){ 
                     // don't scroll past left edge
