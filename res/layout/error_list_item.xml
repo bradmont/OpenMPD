@@ -9,6 +9,8 @@
         android:layout_height="wrap_content"
         android:textColor="#707070"
         android:textSize="7pt"
+        android:textIsSelectable="true"
+
         />
     <TextView
         android:id="@+id/msg2"
@@ -16,6 +18,8 @@
         android:layout_height="wrap_content"
         android:textColor="#707070"
         android:textSize="7pt"
+        android:textIsSelectable="true"
+
         />
     <TextView
         android:id="@+id/msg3"
@@ -23,5 +27,7 @@
         android:layout_height="wrap_content"
         android:textColor="#707070"
         android:textSize="7pt"
+        android:textIsSelectable="true"
+
         />
 </LinearLayout>
