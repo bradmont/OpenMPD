@@ -180,6 +180,13 @@ public class EditServiceAccountDialog extends DialogFragment{
                             // follow the expected behaviour)
                             // http://www.tntware.com/tntmpd/faqs/en/how-can-i-make-my-organization-39-s-online-donation-system-compatible-with-tntmpd.aspx
                                 OpenMPD.getInstance().userMessage( R.string.login_error);
+                                if (content != null){
+                                    String temp = "";
+                                    for (int i = 0; i < content.size(); i++){
+                                        temp += content.get(i) + "\n";
+                                    }
+                                    LogItem.logError("Sign in error", service.getString("base_url") + service.getString("balance_url"), temp);
+                                }
                         } else {
                             
                             for (int i = 0; i < content.size(); i++){
