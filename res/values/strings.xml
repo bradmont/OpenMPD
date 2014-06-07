@@ -131,6 +131,6 @@
     <string name="help_settings_title">Settings</string>
     <string name="help_settings">This page allows you to manage (add, delete, or edit) accounts to download your donor data online.\n\nYour organisation should be able to provide you with the login details you need (this is the same username and password you use to download donor data in TntMPD).</string>
 
-    <string name="update_news">You can now scroll your giving graph to see more than the last 12 months.\n\nGifts from donors who give often but not regularly (3 or more gifts/year) will be display as light yellow on your giving graph.</string>
+    <string name="update_news">Donors who have increased were not being shown in the giving graph for months before their increase. This has been fixed.</string>
 
 </resources>
