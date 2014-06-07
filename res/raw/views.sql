@@ -27,7 +27,7 @@ create view if not exists _monthly_base_giving as
     select month, sum(total_gifts) as base_total
     from partner_giving_status join partner_giving_by_month
         on partner_giving_status.tnt_people_id = partner_giving_by_month.tnt_people_id
-        where total_gifts=giving_amount and partner_type=60
+        where total_gifts<=giving_amount and partner_type=60
         group by month
         order by month;
 
