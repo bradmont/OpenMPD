@@ -9,5 +9,6 @@
        <attr name="barWeight" format="float" />
        <attr name="spacingWeight" format="float" />
        <attr name="maxTicks" format="integer" />
+       <attr name="labelTextSize" format="dimension" />
    </declare-styleable>
 </resources>

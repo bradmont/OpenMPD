@@ -28,6 +28,7 @@ public class BarGraph extends View {
     protected int [] colors = null; 
     protected int lineColor = 0;
     protected int maxTicks = 8; // maximum number of value labels
+    protected int labelTextSize = 16;
 
 
     protected Paint [] barPaints = null;
@@ -58,6 +59,8 @@ public class BarGraph extends View {
 
     protected Object [][] values = new Integer [0][0];
     protected String [] labels = null;
+    protected String [] groups = null;
+    protected int [] groupLabelOffset = null;
 
     public BarGraph(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -71,6 +74,7 @@ public class BarGraph extends View {
             spacingWeight = a.getFloat(R.styleable.BarGraph_spacingWeight, 1);
             lineColor = a.getInteger(R.styleable.BarGraph_lineColor, 1);
             maxTicks = a.getInteger(R.styleable.BarGraph_maxTicks, 8);
+            labelTextSize = a.getDimensionPixelSize(R.styleable.BarGraph_labelTextSize, 16);
 
             // colors is a comma separated list of color codes; process them.
             String colors_attr = a.getString(R.styleable.BarGraph_colors);
@@ -95,6 +99,7 @@ public class BarGraph extends View {
         }
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         linePaint.setColor(lineColor);
+        linePaint.setTextSize(labelTextSize);
     }
 
     protected void onSizeChanged (int w, int h, int oldw, int oldh){
@@ -149,6 +154,8 @@ public class BarGraph extends View {
         super.onDraw(canvas);
 
         // draw bars
+        String extraLabelRight="";
+        String extraLabelLeft = "";
         for (int i = 0; i < values.length ; i++){
 
             int index = values.length - i -1;
@@ -185,6 +192,55 @@ public class BarGraph extends View {
                     canvas.rotate(-45, label_left, canvas_bottom);
                     canvas.drawText(label , label_left, canvas_bottom, linePaint);
                     canvas.restore();
+                }
+                if (groups != null){
+                    // draw group label line if it goes here
+                    String group = groups[index];
+                    Rect r = new Rect();
+                    linePaint.getTextBounds(group, 0, group.length() - 1, r);
+                    float y = data_bottom - (maxTicks * tickSpacing*barHeightFactor) - r.centerY();
+
+                    if (groupLabelOffset[index] == 0){
+                        float x = right -barWidth ;
+                        if (x < data_left + spacingWidth){
+                            x = data_left + spacingWidth;
+                        }
+                        canvas.drawText(group , x, y, linePaint);
+                    } else if (!extraLabelLeft.equals(group)&&
+                        // left-and label when necessary
+                            left - (barWidth + spacingWidth) * (groupLabelOffset[index])
+                                < data_left){
+                        float x = data_left + spacingWidth;
+                        canvas.drawText(group , x, y, linePaint);
+                        extraLabelLeft = group;
+                    } else if (!extraLabelRight.equals(group) &&
+                        // right-hand label when necessary
+                        right - (barWidth + spacingWidth) * (groupLabelOffset[index] +1)
+                            > canvas_right - spacingWidth - r.width()){
+                        float x = canvas_right - barWidth;
+                        canvas.drawText(group , x, y, linePaint);
+                        extraLabelRight = group;
+                    }
+                    
+                    // draw group divider line if it goes here
+                    if (index!=0 && !groups[index-1].equals(groups[index])){
+                        if (left - spacingWidth/2 > data_left ){
+                            canvas.drawLine(left - (spacingWidth/2), data_bottom, 
+                                            left - (spacingWidth/2), canvas_top, linePaint);
+                        }
+                    }
+                    /*else if (index!=0 && !groups[index-1].equals(groups[index])){
+                        float y = data_bottom - (maxTicks * tickSpacing*barHeightFactor);
+                        String group = groups[index];
+                        Rect r = new Rect();
+                        linePaint.getTextBounds(group, 0, group.length() - 1, r);
+                        y = y - r.centerY();
+                        float x = left;
+                        if (right-barWidth < data_left){
+                            x = right-barWidth;
+                        }
+                        canvas.drawText(group , left, y, linePaint);
+                    }*/
                 }
             }
         }
@@ -328,7 +384,35 @@ public class BarGraph extends View {
         setDrawingCacheEnabled(false);
         invalidate();
         requestLayout();
+    }
+    public void setGroups(String [] groups){
+        this.groups = groups;
+        groupLabelOffset = new int[groups.length];
+        for (int i = 0; i < groups.length; i++){
 
+            int group_before = 0;
+            int group_after = 0;
+            // how many group members before & after this element
+            while (i+group_after < groups.length 
+                    && groups[i+group_after].equals(groups[i])){
+                group_after++;
+            }
+            while (i-group_before >= 0
+                    && groups[i-group_before].equals(groups[i])){
+                group_before++;
+            }
+            // how far is this element from the label?
+            if ((group_after + group_before +1) % 2 == 0){
+                    groupLabelOffset[i] = (group_before - group_after+1) / 2;
+            } else {
+                    groupLabelOffset[i] = (group_before - group_after) / 2;
+            }
+        }
+        init();
+
+        setDrawingCacheEnabled(false);
+        invalidate();
+        requestLayout();
     }
 
     /* Pretty ticks algorithm thanks to Steffen L Norgen, at

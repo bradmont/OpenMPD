@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import com.fima.cardsui.objects.Card;
 
 /**
@@ -81,9 +84,16 @@ public class GraphCard extends Card {
 
         vals = new Float[cur1.getCount()][4];
         String [] labels = new String[cur1.getCount()];
+        String [] groups = new String[cur1.getCount()];
+        String [] parts = null;
         cur1.moveToFirst();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM");
+        Calendar cal = Calendar.getInstance();
         for (int i = 0; i < cur1.getCount(); i++){
-            labels[i] = cur1.getString(0);
+            parts = cur1.getString(0).split("-");
+            groups[i] = parts[0];
+            cal.set(Calendar.MONTH, Integer.parseInt(parts[1]) -1);
+            labels[i] = dateFormat.format(cal.getTime());
             try {
                 vals[i][0] = cur1.getFloat(1);
             } catch (Exception e){
@@ -109,6 +119,7 @@ public class GraphCard extends Card {
         cur1.close(); 
         graph.setLabels(labels);
         graph.setValues(vals);
+        graph.setGroups(groups);
 		
 		return view;
 	}
