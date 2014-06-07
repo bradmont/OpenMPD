@@ -120,34 +120,29 @@ public class TntImporter {
 
     }
 
-    public boolean run(){
-        try {
-            if (progressbar != null){
-                progressbar.setIndeterminate(true);
-            }
-            if (builder != null){
-                builder.setProgress(progressmax, progress, true);
-                notifyManager.notify(notification_id, builder.build());
-            }
-            if (getContacts() == false){
-                return false;
-            }
-            if (progressbar != null){
-                progressbar.setIndeterminate(false);
-            }
-            if (builder != null){
-                builder.setProgress(progressmax, progress, false);
-                notifyManager.notify(notification_id, builder.build());
-            }
-            if (getGifts() == false){
-                return false;
-            }
-            account.setValue("last_import", getTodaysDate());
-            account.dirtySave();
-        } catch (Exception e){
-            e.printStackTrace();
+    public boolean run() throws Exception{
+        if (progressbar != null){
+            progressbar.setIndeterminate(true);
+        }
+        if (builder != null){
+            builder.setProgress(progressmax, progress, true);
+            notifyManager.notify(notification_id, builder.build());
+        }
+        if (getContacts() == false){
             return false;
         }
+        if (progressbar != null){
+            progressbar.setIndeterminate(false);
+        }
+        if (builder != null){
+            builder.setProgress(progressmax, progress, false);
+            notifyManager.notify(notification_id, builder.build());
+        }
+        if (getGifts() == false){
+            return false;
+        }
+        account.setValue("last_import", getTodaysDate());
+        account.dirtySave();
         return true;
     }
 
