@@ -44,6 +44,7 @@
             android:paddingBottom="0dp"
             custom:colors="#33b5e5,#ffbb33,#ffd980,#ff4444"
             custom:lineColor="#707070"
+            custom:labelTextSize="9dp"
             custom:barWeight="1"
             custom:spacingWeight=".33"
             custom:maxItems="12"
