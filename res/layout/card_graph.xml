@@ -48,6 +48,7 @@
             custom:barWeight="1"
             custom:spacingWeight=".33"
             custom:maxItems="12"
+            custom:maxTicks="9"
         />
 
     </LinearLayout>
