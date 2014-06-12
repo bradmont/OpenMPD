@@ -28,6 +28,7 @@ public class BarGraph extends View {
     protected int [] colors = null; 
     protected int lineColor = 0;
     protected int maxTicks = 8; // maximum number of value labels
+    protected int ticks = maxTicks; // maximum number of value labels
     protected int labelTextSize = 16;
 
 
@@ -115,7 +116,7 @@ public class BarGraph extends View {
         canvas_right = getPaddingLeft()+width;
         canvas_top = getPaddingTop();
 
-        String sampleLabel = Integer.toString( maxTicks * (int)tickSpacing);
+        String sampleLabel = Integer.toString( ticks * (int)tickSpacing);
         float label_width = linePaint.measureText( sampleLabel);
 
 
@@ -198,7 +199,7 @@ public class BarGraph extends View {
                     String group = groups[index];
                     Rect r = new Rect();
                     linePaint.getTextBounds(group, 0, group.length() - 1, r);
-                    float y = data_bottom - (maxTicks * tickSpacing*barHeightFactor) - r.centerY();
+                    float y = data_bottom - ((ticks-1) * tickSpacing*barHeightFactor) - r.centerY();
 
                     if (groupLabelOffset[index] == 0){
                         float x = right -barWidth ;
@@ -250,10 +251,13 @@ public class BarGraph extends View {
         canvas.drawLine(data_left, data_bottom, canvas_right, data_bottom, linePaint);
         //Log.i("net.bradmont.holograph", String.format("ticks: %d; tickSpacing %f", maxTicks, tickSpacing));
         Rect r = new Rect();
-        for (int tick = 0; tick <= maxTicks; tick++){
+        for (int tick = 0; tick < ticks; tick++){
             float y = data_bottom - (tick * tickSpacing*barHeightFactor);
 
-            if (maxTicks % 2 == 0 && tick % 2 == 0){
+            if (ticks % 2 != tick % 2 ){
+                // label every other tick; start at 0 if we have an odd
+                // number of ticks, else start at first non-zero tick
+                // this way the top tick always has a label
                 canvas.drawLine(data_left, y, data_left - tickWidth, y, linePaint);
                 String label = Integer.toString (tick* (int)tickSpacing);
                 linePaint.getTextBounds(label, 0, label.length() - 1, r);
@@ -419,7 +423,8 @@ public class BarGraph extends View {
     http://www.esurient-systems.ca/2011/03/algorithm-for-optimal-scaling-on-chart_8199.html
      */
     protected void calcNiceTicks(float max){
-        tickSpacing = prettyValue (maxValue / maxTicks -1, false);
+        tickSpacing = prettyValue (maxValue / (maxTicks -1), false);
+        ticks = (int) Math.ceil(maxValue / tickSpacing) + 1;
         maxValue = (float) Math.ceil( maxValue / tickSpacing) * tickSpacing;
     }
 
