@@ -75,6 +75,7 @@ public class BarGraph extends View {
             spacingWeight = a.getFloat(R.styleable.BarGraph_spacingWeight, 1);
             lineColor = a.getInteger(R.styleable.BarGraph_lineColor, 1);
             maxTicks = a.getInteger(R.styleable.BarGraph_maxTicks, 8);
+            ticks = maxTicks;
             labelTextSize = a.getDimensionPixelSize(R.styleable.BarGraph_labelTextSize, 16);
 
             // colors is a comma separated list of color codes; process them.
