@@ -154,7 +154,11 @@ public class TntImporter {
             builder.setProgress(2, 3, true);
             notifyManager.notify(notification_id, builder.build());
         }
-        arguments.add(new BasicNameValuePair( "Action", "TntAddrList"));
+        if (service.getString("base_url").endsWith("aspx")){
+            arguments.add(new BasicNameValuePair( "Action", "Donors"));
+        } else {
+            arguments.add(new BasicNameValuePair( "Action", "TntAddrList"));
+        }
         arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
         arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
 
@@ -224,7 +228,11 @@ public class TntImporter {
         }
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
 
-        arguments.add(new BasicNameValuePair( "Action", "TntDonList"));
+        if (service.getString("base_url").endsWith("aspx")){
+            arguments.add(new BasicNameValuePair( "Action", "Gifts"));
+        } else {
+            arguments.add(new BasicNameValuePair( "Action", "TntDonList"));
+        }
         arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
         arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
 
