@@ -156,6 +156,8 @@ public class EditServiceAccountDialog extends DialogFragment{
                         OpenMPD.getInstance().showWaitDialog(R.string.checking_login, R.string.please_wait);
                         TntImporter importer = new TntImporter(getActivity(), account);
                         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
+                        TntService service = (TntService) account.getRelated("tnt_service_id");
+
                         if (service.getString("base_url").endsWith("aspx")){
                             arguments.add(new BasicNameValuePair( "Action", "AccountBalance"));
                         } else {
@@ -164,7 +166,6 @@ public class EditServiceAccountDialog extends DialogFragment{
                         arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
                         arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
 
-                        TntService service = (TntService) account.getRelated("tnt_service_id");
                         ArrayList<String> content = null;
                         try {
                             content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments, false);
