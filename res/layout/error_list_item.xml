@@ -12,6 +12,14 @@
         android:textIsSelectable="true"
 
         />
+    <Button
+        android:id="@+id/report_error_button"
+        android:text="Report Error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        />
+
     <TextView
         android:id="@+id/msg2"
         android:layout_width="wrap_content"

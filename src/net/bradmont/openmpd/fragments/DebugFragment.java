@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,6 +47,8 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
     public static final String [] columns = {"msg1", "msg2", "msg3"};
     public static final int [] fields = {R.id.msg1, R.id.msg2, R.id.msg3};
 
+    private Cursor cursor = null;
+
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -58,16 +61,31 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
 
         View view = inflater.inflate(R.layout.debug_page, null);
         setHasOptionsMenu(true);
-        Cursor cursor = MPDDBHelper.get()
+        cursor = MPDDBHelper.get()
                    .getReadableDatabase()
                    .rawQuery("select * from log order by _id desc;", null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+        SimpleCursorAdapter adapter = new MyAdapter(getActivity(),
                     R.layout.error_list_item, cursor, columns, fields);
         ListView lv = (ListView) view.findViewById(R.id.list);
         lv.setAdapter(adapter);
         return view;
     }
 
+    private class MyAdapter extends SimpleCursorAdapter {
+        public MyAdapter(Context context, int layout, Cursor c, String[] from, int[] to){
+            super(context, layout, c, from, to);
+        }
+        public MyAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags){
+            super(context, layout, c, from, to, flags);
+        }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewGroup result = (ViewGroup) super.getView(position, convertView, parent);
+            Button b = (Button) result.findViewById(R.id.report_error_button);
+            b.setTag(position);
+            return result;
+        }
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -171,6 +189,25 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
                         address.dirtySave();
                     } catch (Exception e){}
                 }
+                break;
+            case R.id.report_error_button:
+                int position = (Integer) view.getTag();
+                cursor.moveToPosition(position);
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String [] {"brad.stewart@p2c.com"});
+
+                intent.putExtra(Intent.EXTRA_SUBJECT, "OpenMPD Debug Report");
+                String body = cursor.getString(1) + "\n" +
+                    cursor.getString(2) + "\n" +
+                    cursor.getString(3) + "\n";
+                intent.putExtra(Intent.EXTRA_TEXT, body);
+
+                OpenMPD.getInstance()
+                    .startActivity(
+                        Intent.createChooser(intent, "Send Email"));
+
                 break;
         }
     }
