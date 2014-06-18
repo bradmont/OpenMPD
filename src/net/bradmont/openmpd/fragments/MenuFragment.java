@@ -2,6 +2,7 @@ package net.bradmont.openmpd.fragments;
 
 import android.os.Bundle;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -46,36 +47,43 @@ public class MenuFragment extends ListFragment {
 	public void onListItemClick(ListView lv, View v, int position, long id) {
 		Fragment newContent = null;
         TextView tv = (TextView) v.findViewById(android.R.id.text1);
+        ((BaseActivity) getActivity()).toggle();
 		switch (position) {
 		case 0:
-            if (((HomeActivity) getActivity()).homeFragment == null){
-                ((HomeActivity) getActivity()).homeFragment = new HomeFragment();
+            if (getActivity() instanceof HomeActivity){
+                break;
             }
-			newContent = ((HomeActivity) getActivity()).homeFragment;
+            Intent intent = new Intent(getActivity(), HomeActivity.class);
+            intent.setFlags(intent.getFlags() 
+                | Intent.FLAG_ACTIVITY_NO_HISTORY 
+                | Intent.FLAG_ACTIVITY_CLEAR_TOP 
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
 			break;
 		case 1:
-            if (((HomeActivity) getActivity()).contactList == null){
-                ((HomeActivity) getActivity()).contactList = new ContactList();
+            if (getActivity() instanceof ContactListActivity){
+                break;
             }
-			newContent = ((HomeActivity) getActivity()).contactList;
+            intent = new Intent(getActivity(), ContactListActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
+
 			break;
-		/*case 2:
-            if (OpenMPD.giftList == null){
-                OpenMPD.giftList = new GiftList();
-            }
-			newContent = OpenMPD.giftList;
-			break;*/
 		case 2:
-            if (((HomeActivity) getActivity()).serviceAccountList == null){
-                ((HomeActivity) getActivity()).serviceAccountList = new ServiceAccountList();
+            if (getActivity() instanceof AccountListActivity){
+                break;
             }
-			newContent = ((HomeActivity) getActivity()).serviceAccountList;
+            intent = new Intent(getActivity(), AccountListActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
 			break;
 		case 3:
-            if (((HomeActivity) getActivity()).debugFragment == null){
-                ((HomeActivity) getActivity()).debugFragment = new DebugFragment();
+            if (getActivity() instanceof DebugActivity){
+                break;
             }
-			newContent = ((HomeActivity) getActivity()).debugFragment;
+            intent = new Intent(getActivity(), DebugActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
 			break;
 		}
 		if (newContent != null)
