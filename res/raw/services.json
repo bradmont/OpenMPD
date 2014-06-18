@@ -34,5 +34,13 @@
         "donations_url" : "",
         "addresses_url" : "",
         "addresses_by_personids_url" : ""
+    },
+    "CCO" : {
+        "name" : "CCO Canada",
+        "base_url" : "https://rews.cco.ca/dataserver/CCO/dataquery/TntQuery.aspx",
+        "balance_url" : "",
+        "donations_url" : "",
+        "addresses_url" : "",
+        "addresses_by_personids_url" : ""
     }
 }
