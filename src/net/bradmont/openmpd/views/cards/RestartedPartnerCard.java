@@ -13,8 +13,8 @@ import com.fima.cardsui.objects.Card;
 
 public class RestartedPartnerCard extends NotificationCard {
 
-	public RestartedPartnerCard(Notification n, Contact contact, ContactStatus status){
-		super(n, contact, status);
+	public RestartedPartnerCard(BaseActivity a, Notification n, Contact contact, ContactStatus status){
+		super(a, n, contact, status);
 	}
 
 	@Override

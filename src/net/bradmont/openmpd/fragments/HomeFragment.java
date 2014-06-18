@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import net.bradmont.openmpd.OpenMPD;
+import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.MPDDBHelper;
@@ -126,7 +126,7 @@ public class HomeFragment extends SherlockFragment {
                         .orderBy("date");
                 for (int i = 0; i < notifications.size(); i++){
                     Notification n = (Notification) notifications.get(i);
-                    NotificationCard card = NotificationCardFactory.newCard(n);
+                    NotificationCard card = NotificationCardFactory.newCard((BaseActivity) getActivity(), n);
 
                     if (card instanceof SpecialGiftCard ||
                         card instanceof AmountChangeCard){
@@ -208,7 +208,7 @@ public class HomeFragment extends SherlockFragment {
                     prefs.edit()
                         .putBoolean("debugEnabled", true)
                           .apply();
-                    OpenMPD.getInstance().userMessage(R.string.debug_enabled);
+                    ((BaseActivity)getActivity()).userMessage(R.string.debug_enabled);
                 }
                 HelpDialog.showHelp(getActivity(), R.string.help_main_title, R.string.help_main);
             return true;
@@ -218,7 +218,7 @@ public class HomeFragment extends SherlockFragment {
 
     public void showUpdateNews(final int version){
         final SharedPreferences prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
-        AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.update_news)
             .setTitle(R.string.whats_new);
 
@@ -266,7 +266,7 @@ public class HomeFragment extends SherlockFragment {
             }
 
             // release write lock for background thread
-            OpenMPD.getInstance().closeDB();
+            ((OpenMPD)getActivity()).closeDB();
 
             getActivity().startService(
                 new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids));

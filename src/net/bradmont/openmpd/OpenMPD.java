@@ -8,17 +8,14 @@ import net.bradmont.openmpd.controllers.*;
 import net.bradmont.supergreen.*;
 import net.bradmont.supergreen.models.ModelList;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.SharedPreferences;
 
 
@@ -28,12 +25,9 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
 
 import java.lang.Runnable;
 
@@ -44,9 +38,6 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class OpenMPD extends BaseActivity {
 	
-	private Fragment mContent;
-    private ProgressDialog waitDialog = null;
-    private static OpenMPD instance = null;
     private static DBHelper db;
     public static HomeFragment homeFragment = null;
     public static DebugFragment debugFragment = null;
@@ -54,7 +45,6 @@ public class OpenMPD extends BaseActivity {
     public static GiftList giftList = null;
     public static ServiceAccountList serviceAccountList = null;
 
-    final static ExecutorService workExecutor = Executors.newSingleThreadExecutor();
 
 	public OpenMPD() {
 		super(R.string.app_name);
@@ -64,7 +54,6 @@ public class OpenMPD extends BaseActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-        instance = this;
         db = new MPDDBHelper(this);
 		super.onCreate(savedInstanceState);
         Intent intent = getIntent();
@@ -160,86 +149,6 @@ public class OpenMPD extends BaseActivity {
 
     }
 	
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-        mContent = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-		getSupportFragmentManager().putFragment(outState, "mContent", mContent);
-	}
-	
-    public void onClick(View view){
-        // retrieve the fragment in R.id.content_frame (the visible main fragment)
-        ((OnClickListener) getSupportFragmentManager().findFragmentById(R.id.content_frame)).onClick(view);
-    }
-
-    public void queueTask(Runnable r){
-        // r.run(); // for debugging thread crashes
-        workExecutor.submit(r);
-    }
-
-    class MyMessagePasser implements Runnable{
-        public String message;
-        public Activity activity;
-        public void run() {
-            //Crouton.showText(activity, message, Style.ALERT);
-            Toast.makeText(activity, message, 1000).show();
-        }
-    }
-
-    public void userMessage(int resourceId){
-         userMessage(getResources().getString(resourceId));
-    }
-
-    public void userMessage(String message){
-        MyMessagePasser m = new MyMessagePasser();
-        m.activity = this;
-        m.message = message;
-        runOnUiThread(m);
-    }
-
-    public void showWaitDialog(final int title_id, final int body_id){
-        final Context context = this;
-        runOnUiThread(new Runnable(){
-            @Override
-            public void run(){
-                waitDialog = new ProgressDialog(context);
-                waitDialog.setTitle(R.string.checking_login);
-                waitDialog.setMessage("Please Wait");
-                waitDialog.show();
-            }
-        });
-    }
-    public void dismissWaitDialog(){
-        runOnUiThread(new Runnable(){
-            @Override
-            public void run(){
-                waitDialog.dismiss();
-            }
-        });
-    }
-
-
-	public void switchContent(Fragment fragment) {
-		mContent = fragment;
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame, fragment)
-		.commit();
-		getSlidingMenu().showContent();
-	}
-
-    public void moveToFragment(Fragment fragment){
-		mContent = fragment;
-		getSupportFragmentManager()
-		.beginTransaction()
-        .addToBackStack(null)
-		.replace(R.id.content_frame, fragment)
-        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-		.commit();
-    }
-    public static OpenMPD getInstance(){
-        return instance;
-    }
 
     public void closeDB(){
         if (db != null){
@@ -249,13 +158,4 @@ public class OpenMPD extends BaseActivity {
         }
     }
 
-    public static int getVersion() {
-        int v = 0;
-        try {
-            v = getInstance().getPackageManager().getPackageInfo(getInstance().getPackageName(), 0).versionCode;
-        } catch (NameNotFoundException e) {
-            // Huh? Really?
-        }
-        return v;
-    }
 }

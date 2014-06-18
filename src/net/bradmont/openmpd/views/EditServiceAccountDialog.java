@@ -149,11 +149,11 @@ public class EditServiceAccountDialog extends DialogFragment{
                 // check the account credentials
 
                 final Context context = getActivity();
-                OpenMPD.getInstance().queueTask(new Runnable(){
+                ((BaseActivity)getActivity()).queueTask(new Runnable(){
 
                     @Override
                     public void run(){
-                        OpenMPD.getInstance().showWaitDialog(R.string.checking_login, R.string.please_wait);
+                        ((BaseActivity)getActivity()).showWaitDialog(R.string.checking_login, R.string.please_wait);
                         TntImporter importer = new TntImporter(getActivity(), account);
                         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
                         arguments.add(new BasicNameValuePair( "Action", "TntBalance"));
@@ -165,12 +165,12 @@ public class EditServiceAccountDialog extends DialogFragment{
                         try {
                             content = importer.getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments, false);
                         } catch (RuntimeException e){
-                            OpenMPD.getInstance().dismissWaitDialog();
+                            ((BaseActivity)getActivity()).dismissWaitDialog();
                             Log.i("net.bradmont.openmpd", "SSL error caught");
                             showSSLError(service.getString("base_url"));
                             return;
                         }
-                        OpenMPD.getInstance().dismissWaitDialog();
+                        ((BaseActivity)getActivity()).dismissWaitDialog();
 
                         if (content == null || content.get(0).contains("ERROR") || content.size() > 5){
                             // if result is > 5 lines on a balance query, it's probably because the
@@ -179,7 +179,7 @@ public class EditServiceAccountDialog extends DialogFragment{
                             // seem to be one on the TNT website... (CCCi's servers don't seem to
                             // follow the expected behaviour)
                             // http://www.tntware.com/tntmpd/faqs/en/how-can-i-make-my-organization-39-s-online-donation-system-compatible-with-tntmpd.aspx
-                                OpenMPD.getInstance().userMessage( R.string.login_error);
+                                ((BaseActivity)getActivity()).userMessage( R.string.login_error);
                                 if (content != null){
                                     String temp = "";
                                     for (int i = 0; i < content.size(); i++){
@@ -193,7 +193,7 @@ public class EditServiceAccountDialog extends DialogFragment{
                                 Log.i("net.bradmont.openmpd", content.get(i));
                             }
                             try {
-                                OpenMPD.getInstance().userMessage( R.string.account_verified);
+                                ((BaseActivity)getActivity()).userMessage( R.string.account_verified);
                                 account.dirtySave();
                                 dismiss();
                                 if (saveCallback != null){
@@ -208,11 +208,11 @@ public class EditServiceAccountDialog extends DialogFragment{
                         }
                     }
                     public void showSSLError(final String url){
-                        OpenMPD.getInstance().runOnUiThread(new Runnable(){
+                        ((BaseActivity)getActivity()).runOnUiThread(new Runnable(){
                             @Override
                             public void run(){
                                 Log.i("net.bradmont.openmpd", "building dialog");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setMessage(R.string.ask_add_ssl_exception)
                                        .setTitle(R.string.ssl_cert_error);
                                 builder.setPositiveButton(R.string.ignore_certificate, new DialogInterface.OnClickListener() {
@@ -221,10 +221,10 @@ public class EditServiceAccountDialog extends DialogFragment{
                                                URL u = null;
                                                try { u = new URL(url); } catch (Exception e){}
                                                String host = u.getHost();
-                                               SharedPreferences.Editor prefs = OpenMPD.getInstance().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
+                                               SharedPreferences.Editor prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
                                                prefs.putBoolean("ignore_ssl_" + host, true);
                                                prefs.commit();
-                                               OpenMPD.getInstance().userMessage(R.string.ignoring_ssl);
+                                               ((BaseActivity)getActivity()).userMessage(R.string.ignoring_ssl);
                                            }
                                        });
                                 builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

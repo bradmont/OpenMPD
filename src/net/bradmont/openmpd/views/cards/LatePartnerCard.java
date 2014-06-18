@@ -13,8 +13,8 @@ import com.fima.cardsui.objects.Card;
 
 public class LatePartnerCard extends NotificationCard {
 
-	public LatePartnerCard(Notification n, Contact contact, ContactStatus status){
-		super(n, contact, status);
+	public LatePartnerCard(BaseActivity a, Notification n, Contact contact, ContactStatus status){
+		super(a, n, contact, status);
 	}
 
 	@Override

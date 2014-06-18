@@ -33,11 +33,13 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
     protected Notification n = null;
     protected Contact contact;
     protected ContactStatus status;
+    protected final BaseActivity activity ;
 
     protected View content;
 
-	public NotificationCard(Notification n, Contact contact, ContactStatus status){
+	public NotificationCard(final BaseActivity activity, Notification n, Contact contact, ContactStatus status){
 		super();
+        this.activity = activity;
         this.n = n;
         this.contact=contact;
         this.status=status;
@@ -51,7 +53,7 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
         setOnClickListener( new OnClickListener(){
             @Override
             public void onClick(View v){
-                OpenMPD.getInstance().moveToFragment(new ContactDetail(contact_id));
+                activity.moveToFragment(new ContactDetail(contact_id));
             }
         });
 	}
@@ -81,20 +83,20 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
                 try {
                     number = phone.getString("number").replaceAll("[^\\d]", "");
                 } catch (Exception e){
-                    OpenMPD.getInstance().userMessage(R.string.no_phone_number);
+                    activity.userMessage(R.string.no_phone_number);
                 }
                 if (number.length() == 0){
-                    OpenMPD.getInstance().userMessage(R.string.no_phone_number);
+                    activity.userMessage(R.string.no_phone_number);
                 } else {
                     number = "tel:" + number;
                     Intent intent = new Intent(Intent.ACTION_DIAL);
                     intent.setData(Uri.parse(number));
-                    OpenMPD.getInstance().startActivity(intent);
+                    activity.startActivity(intent);
                 }
 
                 break;
             case R.id.button_quick_email:
-                QuickMessenger q = new QuickMessenger(contact, getNotificationType());
+                QuickMessenger q = new QuickMessenger(activity, contact, getNotificationType());
                 q.showQuickMessageDialog();
                 break;
         }

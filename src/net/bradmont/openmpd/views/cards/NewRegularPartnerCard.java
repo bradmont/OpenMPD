@@ -12,8 +12,8 @@ import com.fima.cardsui.objects.Card;
 
 public class NewRegularPartnerCard extends NotificationCard {
 
-	public NewRegularPartnerCard(Notification n, Contact contact, ContactStatus status){
-		super(n, contact, status);
+	public NewRegularPartnerCard(BaseActivity a, Notification n, Contact contact, ContactStatus status){
+		super(a, n, contact, status);
 	}
 
 	@Override

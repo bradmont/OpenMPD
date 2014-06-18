@@ -40,8 +40,7 @@ public class SSLErrorCard extends Card {
                 SharedPreferences.Editor prefs = context.getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
                 prefs.putBoolean("ignore_ssl_" + host, true);
                 prefs.commit();
-                OpenMPD.getInstance().userMessage(R.string.ignoring_ssl);
-
+                ((BaseActivity) context).userMessage(R.string.ignoring_ssl);
             }
         });
 

@@ -13,8 +13,8 @@ import com.fima.cardsui.objects.Card;
 
 public class AmountChangeCard extends NotificationCard {
 
-	public AmountChangeCard(Notification n, Contact contact, ContactStatus status){
-		super(n, contact, status);
+	public AmountChangeCard(BaseActivity a, Notification n, Contact contact, ContactStatus status){
+		super(a, n, contact, status);
 	}
 
 	@Override

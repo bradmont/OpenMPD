@@ -204,7 +204,7 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
                     cursor.getString(3) + "\n";
                 intent.putExtra(Intent.EXTRA_TEXT, body);
 
-                OpenMPD.getInstance()
+                getActivity()
                     .startActivity(
                         Intent.createChooser(intent, "Send Email"));
 
