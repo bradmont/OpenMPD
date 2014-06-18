@@ -335,8 +335,21 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 gifts = new String[0];
             }
             values[i] = new Float[gifts.length];
+            boolean negatives = false;
+            float total = 0;
             for (int j = 0; j < gifts.length; j++){
                 values[i][j] = new Float( Float.parseFloat(gifts[j])/100f);
+                total = Float.parseFloat(gifts[j])/100f;
+                if (values[i][j] < 0){
+                    negatives = true;
+                }
+            }
+            if (negatives = true){
+                // if we have negative gifts in this month, combine month
+                // total into a single gift rather than dealing with
+                // ugly graphs
+                values[i] = new Float[1];
+                values[i][0] = new Float(total);
             }
             labels[i] = cur.getString(0);
             cur.moveToNext();
