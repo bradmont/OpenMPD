@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -47,7 +48,6 @@ public class MenuFragment extends ListFragment {
 	public void onListItemClick(ListView lv, View v, int position, long id) {
 		Fragment newContent = null;
         TextView tv = (TextView) v.findViewById(android.R.id.text1);
-        ((BaseActivity) getActivity()).toggle();
 		switch (position) {
 		case 0:
             if (getActivity() instanceof HomeActivity){
@@ -86,8 +86,12 @@ public class MenuFragment extends ListFragment {
             startActivity(intent);
 			break;
 		}
-		if (newContent != null)
-			switchFragment(newContent);
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            public void run() {
+                ((BaseActivity) getActivity()).showContent();
+            }
+        }, 500);
 	}
 
 	// the meat of switching the above fragment
