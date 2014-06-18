@@ -249,9 +249,9 @@ public class TntImportService extends IntentService {
             builder.setContentText(content);
             builder.setProgress(0, 0, false); // remove progress bar
 
-            Intent homeIntent = new Intent(this, OpenMPD.class);
+            Intent homeIntent = new Intent(this, HomeActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addParentStack(OpenMPD.class);
+            stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(homeIntent);
             PendingIntent homePendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

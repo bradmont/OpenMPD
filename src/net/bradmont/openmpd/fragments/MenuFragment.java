@@ -48,16 +48,16 @@ public class MenuFragment extends ListFragment {
         TextView tv = (TextView) v.findViewById(android.R.id.text1);
 		switch (position) {
 		case 0:
-            if (OpenMPD.homeFragment == null){
-                OpenMPD.homeFragment = new HomeFragment();
+            if (((HomeActivity) getActivity()).homeFragment == null){
+                ((HomeActivity) getActivity()).homeFragment = new HomeFragment();
             }
-			newContent = OpenMPD.homeFragment;
+			newContent = ((HomeActivity) getActivity()).homeFragment;
 			break;
 		case 1:
-            if (OpenMPD.contactList == null){
-                OpenMPD.contactList = new ContactList();
+            if (((HomeActivity) getActivity()).contactList == null){
+                ((HomeActivity) getActivity()).contactList = new ContactList();
             }
-			newContent = OpenMPD.contactList;
+			newContent = ((HomeActivity) getActivity()).contactList;
 			break;
 		/*case 2:
             if (OpenMPD.giftList == null){
@@ -66,16 +66,16 @@ public class MenuFragment extends ListFragment {
 			newContent = OpenMPD.giftList;
 			break;*/
 		case 2:
-            if (OpenMPD.serviceAccountList == null){
-                OpenMPD.serviceAccountList = new ServiceAccountList();
+            if (((HomeActivity) getActivity()).serviceAccountList == null){
+                ((HomeActivity) getActivity()).serviceAccountList = new ServiceAccountList();
             }
-			newContent = OpenMPD.serviceAccountList;
+			newContent = ((HomeActivity) getActivity()).serviceAccountList;
 			break;
 		case 3:
-            if (OpenMPD.debugFragment == null){
-                OpenMPD.debugFragment = new DebugFragment();
+            if (((HomeActivity) getActivity()).debugFragment == null){
+                ((HomeActivity) getActivity()).debugFragment = new DebugFragment();
             }
-			newContent = OpenMPD.debugFragment;
+			newContent = ((HomeActivity) getActivity()).debugFragment;
 			break;
 		}
 		if (newContent != null)
@@ -87,9 +87,9 @@ public class MenuFragment extends ListFragment {
 		if (getActivity() == null)
 			return;
 		
-		if (getActivity() instanceof OpenMPD) {
-			OpenMPD om = (OpenMPD) getActivity();
-			om.switchContent(fragment);
+		if (getActivity() instanceof BaseActivity) {
+			BaseActivity ba = (BaseActivity) getActivity();
+			ba.switchContent(fragment);
 		}
 	}
 

@@ -266,7 +266,7 @@ public class HomeFragment extends SherlockFragment {
             }
 
             // release write lock for background thread
-            ((OpenMPD)getActivity()).closeDB();
+            OpenMPD.get().closeDB();
 
             getActivity().startService(
                 new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids));

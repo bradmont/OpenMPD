@@ -53,7 +53,7 @@ public class MPDDBHelper extends DBHelper{
         // the main app activity as context. This means outside threads
         // will have to be careful to take care of this themselves.
         if (instance == null){
-            instance = new MPDDBHelper(OpenMPD.getInstance());
+            instance = new MPDDBHelper(OpenMPD.get());
         }
         return instance;
     }

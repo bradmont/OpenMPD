@@ -65,7 +65,6 @@ public class ServiceAccountList extends SherlockListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final OpenMPD app = (OpenMPD)getActivity();
 
 
         // set up adapter
@@ -118,7 +117,5 @@ public class ServiceAccountList extends SherlockListFragment {
         dialog.setAdapter((CursorAdapter) getListAdapter());
         dialog.show(getFragmentManager(), "edit_account_dialog");
         dialog.setAccount(new ServiceAccount((int)id));
-        //final OpenMPD app = (OpenMPD)getActivity();
-        //app.moveToFragment(new ContactDetail((int) id));
     }
 }

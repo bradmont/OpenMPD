@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -162,15 +161,6 @@ public class BaseActivity extends SlidingFragmentActivity {
 		.replace(R.id.content_frame, fragment)
         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 		.commit();
-    }
-    public static int getVersion() {
-        int v = 0;
-        try {
-            v = getInstance().getPackageManager().getPackageInfo(getInstance().getPackageName(), 0).versionCode;
-        } catch (NameNotFoundException e) {
-            // Huh? Really?
-        }
-        return v;
     }
     public static BaseActivity getInstance(){
         return instance;

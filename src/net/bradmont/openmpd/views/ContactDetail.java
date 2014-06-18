@@ -112,7 +112,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
-        ((OpenMPD)getActivity()).getSupportActionBar().setTitle(values.get("name"));
+        ((BaseActivity)getActivity()).getSupportActionBar().setTitle(values.get("name"));
 
         ArrayList<Link> links = new ArrayList<Link>(4);
 
@@ -197,16 +197,16 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             // header will be different depending on partner type
             if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
                 String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             }
             Link link = new Link();
             link.title = R.string.Notes;
@@ -368,7 +368,6 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final OpenMPD app = (OpenMPD)getActivity();
     }
 
     @Override

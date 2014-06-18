@@ -76,8 +76,6 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final OpenMPD app = (OpenMPD)getActivity();
-
 
         // set up adapter
         cursor = db_read.rawQuery(BASE_QUERY, null);
@@ -94,14 +92,14 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                             temp = temp +", "+ cursor.getString(0);
                         }
                         if (cursor.getString(2) != null){
-                            temp = temp + " " +app.getResources().getString(R.string._and_) + " " + cursor.getString(2);
+                            temp = temp + " " +getActivity().getResources().getString(R.string._and_) + " " + cursor.getString(2);
                         }
                         tv.setText(temp);
                         return true;
 
                     case 4:
                         // partner type
-                        String text = app.getResources()
+                        String text = getActivity().getResources()
                             .getString(ContactStatus.partnership(cursor.getInt(4)));
                         // replace ? with giving frequency (for REGULAR donors)
                         if (cursor.getString(7) != null){
@@ -139,7 +137,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
         SearchView searchView = new
-                SearchView( ((OpenMPD)getActivity()).getSupportActionBar().getThemedContext());
+                SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
@@ -259,7 +257,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        final OpenMPD app = (OpenMPD)getActivity();
-        app.moveToFragment(new ContactDetail((int) id));
+        final BaseActivity activity = (BaseActivity)getActivity();
+        activity.moveToFragment(new ContactDetail((int) id));
     }
 }

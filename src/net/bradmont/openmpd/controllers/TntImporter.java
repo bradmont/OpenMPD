@@ -572,11 +572,11 @@ public class TntImporter {
             builder.setContentTitle("SSL Certificate Error");
             builder.setContentText(url.getHost());
 
-            Intent sslCertIntent = new Intent(context, OpenMPD.class);
+            Intent sslCertIntent = new Intent(context, HomeActivity.class);
             sslCertIntent.putExtra("net.bradmont.openmpd.SSLErrorServer", url.getHost());
 
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            stackBuilder.addParentStack(OpenMPD.class);
+            stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(sslCertIntent);
             PendingIntent sslPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
