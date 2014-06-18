@@ -13,10 +13,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
-
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -128,9 +126,11 @@ public class TntImportService extends IntentService {
 
 
 
-            notifyUser(builder, notificationManager);
             // clear the cache on our summary graph
             GraphCard.clearCache();
+            GraphCard.createCache();
+
+            notifyUser(builder, notificationManager);
         }
         MPDDBHelper.get().close();
 
