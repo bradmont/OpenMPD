@@ -12,7 +12,7 @@ import com.fima.cardsui.objects.Card;
 
 public class NotificationCardFactory {
 
-	public static NotificationCard newCard(Notification n){
+	public static NotificationCard newCard(BaseActivity activity, Notification n){
         Contact contact = (Contact) n.getRelated("contact");
         ContactStatus status = (ContactStatus)MPDDBHelper
             .getReferenceModel("contact_status")
@@ -23,10 +23,10 @@ public class NotificationCardFactory {
                 int partnership = status.partnership(status.getInt("partner_type"));
                 if (partnership == R.string.monthly || partnership == R.string.regular){
                     if (status.getInt("status") == ContactStatus.STATUS_NEW){
-                        return new NewRegularPartnerCard(n, contact, status);
+                        return new NewRegularPartnerCard(activity, n, contact, status);
                     } else if (status.getInt("status") == ContactStatus.STATUS_CURRENT){
                         // not sure why these are getting marked as new partners
-                        return new RestartedPartnerCard(n, contact, status);
+                        return new RestartedPartnerCard(activity, n, contact, status);
                     }
                 }
                 break;
@@ -35,13 +35,13 @@ public class NotificationCardFactory {
 
                 switch (status.getInt("status")){
                     case ContactStatus.STATUS_LATE:
-                        return new LatePartnerCard(n, contact, status);
+                        return new LatePartnerCard(activity, n, contact, status);
 
                     case ContactStatus.STATUS_LAPSED:
-                        return new LapsedPartnerCard(n, contact, status);
+                        return new LapsedPartnerCard(activity, n, contact, status);
 
                     case ContactStatus.STATUS_DROPPED:
-                        return new DroppedPartnerCard(n, contact, status);
+                        return new DroppedPartnerCard(activity, n, contact, status);
 
                     case ContactStatus.STATUS_CURRENT:
                         try {
@@ -49,7 +49,7 @@ public class NotificationCardFactory {
                             if (oldstatus == ContactStatus.STATUS_LATE || 
                                 oldstatus == ContactStatus.STATUS_LAPSED || 
                                 oldstatus == ContactStatus.STATUS_DROPPED){
-                                return new RestartedPartnerCard(n, contact, status);
+                                return new RestartedPartnerCard(activity, n, contact, status);
                             } else {
                                 return null;
                             }
@@ -59,9 +59,9 @@ public class NotificationCardFactory {
                 }
                 break;
             case Notification.CHANGE_AMOUNT:
-                return new AmountChangeCard(n, contact, status);
+                return new AmountChangeCard(activity, n, contact, status);
             case Notification.SPECIAL_GIFT:
-                return new SpecialGiftCard(n, contact, status);
+                return new SpecialGiftCard(activity, n, contact, status);
             
         }
         return null;

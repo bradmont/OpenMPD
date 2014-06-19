@@ -25,8 +25,8 @@ import com.fima.cardsui.objects.Card;
 
 public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMenuItemClickListener {
 
-	public SpecialGiftCard(Notification n, final Contact contact, ContactStatus status){
-		super(n, contact, status);
+	public SpecialGiftCard(BaseActivity a, Notification n, final Contact contact, ContactStatus status){
+		super(a, n, contact, status);
 
 
 	}
@@ -88,7 +88,7 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_make_monthly:
-                OpenMPD.getInstance().userMessage(R.string.assigned_monthly);
+                activity.userMessage(R.string.assigned_monthly);
                 // do stuff to the ContactStatus
                 status.setValue("partner_type", ContactStatus.PARTNER_MONTHLY); 
                 status.setValue("status", ContactStatus.STATUS_CURRENT); 
@@ -106,7 +106,7 @@ public class SpecialGiftCard extends NotificationCard implements PopupMenu.OnMen
                 GraphCard.clearCache();
                 return true;
             case R.id.menu_make_annual:
-                OpenMPD.getInstance().userMessage(R.string.assigned_annual);
+                activity.userMessage(R.string.assigned_annual);
                 // do stuff to the ContactStatus
                 status.setValue("partner_type", ContactStatus.PARTNER_ANNUAL); 
                 status.setValue("status", ContactStatus.STATUS_CURRENT); 

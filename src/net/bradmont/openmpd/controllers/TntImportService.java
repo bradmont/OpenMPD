@@ -13,10 +13,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
-
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -128,9 +126,11 @@ public class TntImportService extends IntentService {
 
 
 
-            notifyUser(builder, notificationManager);
             // clear the cache on our summary graph
             GraphCard.clearCache();
+            GraphCard.createCache();
+
+            notifyUser(builder, notificationManager);
         }
         MPDDBHelper.get().close();
 
@@ -249,9 +249,9 @@ public class TntImportService extends IntentService {
             builder.setContentText(content);
             builder.setProgress(0, 0, false); // remove progress bar
 
-            Intent homeIntent = new Intent(this, OpenMPD.class);
+            Intent homeIntent = new Intent(this, HomeActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            stackBuilder.addParentStack(OpenMPD.class);
+            stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(homeIntent);
             PendingIntent homePendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

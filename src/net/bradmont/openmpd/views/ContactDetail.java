@@ -112,7 +112,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
-        ((OpenMPD)getActivity()).getSupportActionBar().setTitle(values.get("name"));
+        ((BaseActivity)getActivity()).getSupportActionBar().setTitle(values.get("name"));
 
         ArrayList<Link> links = new ArrayList<Link>(4);
 
@@ -197,16 +197,16 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             // header will be different depending on partner type
             if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
                 String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;
-                ((OpenMPD)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             }
             Link link = new Link();
             link.title = R.string.Notes;
@@ -252,7 +252,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             public void onClick(DialogInterface dialog, int id) {
                 local_status.setValue("notes", notes_text.getText().toString());
                 local_status.dirtySave();
-                OpenMPD.getInstance().switchContent(new ContactDetail(contact.getID()));
+                ((BaseActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
             }
         });
         ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -368,7 +368,6 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final OpenMPD app = (OpenMPD)getActivity();
     }
 
     @Override
@@ -411,7 +410,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 switch (link.type){
                     case EMAIL:
                         // TODO: Log contact
-                        QuickMessenger q = new QuickMessenger(contact);
+                        QuickMessenger q = new QuickMessenger(getActivity(), contact);
                         q.showQuickMessageDialog();
                         break;
                     case PHONE:
@@ -420,13 +419,13 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                         number = "tel:" + number;
                         intent = new Intent(Intent.ACTION_DIAL);
                         intent.setData(Uri.parse(number));
-                        OpenMPD.getInstance().startActivity(intent);
+                        getActivity().startActivity(intent);
                         break;
                     case ADDRESS:
                         String uri = "geo:0,0?q=" + Uri.encode(link.value);
                         intent = new Intent(android.content.Intent.ACTION_VIEW, 
                             Uri.parse(uri));
-                        OpenMPD.getInstance().startActivity(intent);
+                        getActivity().startActivity(intent);
                         break;
                     case NOTES:
                         editNotes();

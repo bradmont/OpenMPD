@@ -130,9 +130,8 @@ public class GraphCard extends Card {
         cur1.close();
         return result;
     }
-    public void createCache(){
+    public static void createCache(){
         MPDDBHelper.get().getWritableDatabase().execSQL(CACHE_SQL);
-        verifyCache();
     }
     public static void clearCache(){
         Log.i("net.bradmont.openmpd", "Clearing cache.");

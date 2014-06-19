@@ -4,6 +4,7 @@ import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.views.ContactDetail;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 
@@ -35,12 +36,15 @@ public class QuickMessenger {
 
     protected Contact contact;
     protected String messageFilter = null;
+    private Activity activity=null;
 
-	public QuickMessenger(Contact contact, String messageFilter){
+	public QuickMessenger(Activity activity, Contact contact, String messageFilter){
+        this.activity=activity;
         this.contact=contact;
         this.messageFilter = messageFilter;
     }
-	public QuickMessenger(Contact contact){
+	public QuickMessenger(Activity activity, Contact contact){
+        this.activity=activity;
         this.contact=contact;
     }
     public void showQuickMessageDialog(){
@@ -51,7 +55,7 @@ public class QuickMessenger {
         } else {
             sql = "select _id, name, subject, body from quick_message order by name;";
         }
-        AlertDialog.Builder ad = new AlertDialog.Builder(OpenMPD.getInstance());
+        AlertDialog.Builder ad = new AlertDialog.Builder(activity);
         ad.setTitle(R.string.choose_a_template);
 
         ad.setPositiveButton(R.string.send_blank, new DialogInterface.OnClickListener() {
@@ -66,11 +70,11 @@ public class QuickMessenger {
         });
 
         // set up listview
-        ListView message_list = (ListView) ((LayoutInflater) OpenMPD.getInstance()
+        ListView message_list = (ListView) ((LayoutInflater) activity
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.list, null);
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(sql, null);
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(OpenMPD.getInstance(),
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(activity,
             R.layout.quick_message_list_item, cur,
             new String [] {"name"},
             new int [] {R.id.name});
@@ -92,7 +96,7 @@ public class QuickMessenger {
 
     public void showPreview(final QuickMessage message, final Dialog parentDialog){
         // show a preview of the message, and the option to show it
-        AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         final String body = message.getString("body").replace("$name", contact.getString("fname"));
         final String subject = message.getString("subject").replace("$name", contact.getString("fname"));
@@ -120,9 +124,9 @@ public class QuickMessenger {
 
     }
     private void showEditTemplateDialog(final QuickMessage message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(OpenMPD.getInstance());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(R.string.edit_email_template);
-        final LinearLayout layout = (LinearLayout) ((LayoutInflater) OpenMPD.getInstance()
+        final LinearLayout layout = (LinearLayout) ((LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                 .inflate(R.layout.quick_message_edit, null);
         builder.setView(layout);
@@ -145,7 +149,7 @@ public class QuickMessenger {
         builder.setNeutralButton(R.string.save, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 saveTemplate(message, layout);
-                OpenMPD.getInstance().userMessage(R.string.saved);
+                ((BaseActivity) activity).userMessage(R.string.saved);
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -186,8 +190,7 @@ public class QuickMessenger {
             intent.putExtra(Intent.EXTRA_TEXT, body);
         }
 
-        OpenMPD.getInstance()
-            .startActivity(
+        activity.startActivity(
                 Intent.createChooser(intent, "Send Email"));
     }
 

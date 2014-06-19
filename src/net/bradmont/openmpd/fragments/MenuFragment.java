@@ -2,7 +2,9 @@ package net.bradmont.openmpd.fragments;
 
 import android.os.Bundle;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -48,38 +50,48 @@ public class MenuFragment extends ListFragment {
         TextView tv = (TextView) v.findViewById(android.R.id.text1);
 		switch (position) {
 		case 0:
-            if (OpenMPD.homeFragment == null){
-                OpenMPD.homeFragment = new HomeFragment();
+            if (getActivity() instanceof HomeActivity){
+                break;
             }
-			newContent = OpenMPD.homeFragment;
+            Intent intent = new Intent(getActivity(), HomeActivity.class);
+            intent.setFlags(intent.getFlags() 
+                | Intent.FLAG_ACTIVITY_NO_HISTORY 
+                | Intent.FLAG_ACTIVITY_CLEAR_TOP 
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
 			break;
 		case 1:
-            if (OpenMPD.contactList == null){
-                OpenMPD.contactList = new ContactList();
+            if (getActivity() instanceof ContactListActivity){
+                break;
             }
-			newContent = OpenMPD.contactList;
+            intent = new Intent(getActivity(), ContactListActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
+
 			break;
-		/*case 2:
-            if (OpenMPD.giftList == null){
-                OpenMPD.giftList = new GiftList();
-            }
-			newContent = OpenMPD.giftList;
-			break;*/
 		case 2:
-            if (OpenMPD.serviceAccountList == null){
-                OpenMPD.serviceAccountList = new ServiceAccountList();
+            if (getActivity() instanceof AccountListActivity){
+                break;
             }
-			newContent = OpenMPD.serviceAccountList;
+            intent = new Intent(getActivity(), AccountListActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
 			break;
 		case 3:
-            if (OpenMPD.debugFragment == null){
-                OpenMPD.debugFragment = new DebugFragment();
+            if (getActivity() instanceof DebugActivity){
+                break;
             }
-			newContent = OpenMPD.debugFragment;
+            intent = new Intent(getActivity(), DebugActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
 			break;
 		}
-		if (newContent != null)
-			switchFragment(newContent);
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            public void run() {
+                ((BaseActivity) getActivity()).showContent();
+            }
+        }, 500);
 	}
 
 	// the meat of switching the above fragment
@@ -87,9 +99,9 @@ public class MenuFragment extends ListFragment {
 		if (getActivity() == null)
 			return;
 		
-		if (getActivity() instanceof OpenMPD) {
-			OpenMPD om = (OpenMPD) getActivity();
-			om.switchContent(fragment);
+		if (getActivity() instanceof BaseActivity) {
+			BaseActivity ba = (BaseActivity) getActivity();
+			ba.switchContent(fragment);
 		}
 	}
 
