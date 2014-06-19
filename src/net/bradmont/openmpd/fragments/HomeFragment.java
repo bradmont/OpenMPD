@@ -165,9 +165,9 @@ public class HomeFragment extends SherlockFragment {
                 }
 
                 // update news
-                if (updateNews < OpenMPD.getVersion()){
+                /*if (updateNews < OpenMPD.getVersion()){
                     showUpdateNews( OpenMPD.getVersion());
-                }
+                }*/
                 break;
             case ONBOARD_FIRST_RUN:
             case ONBOARD_ACCOUNT_ADDED:
