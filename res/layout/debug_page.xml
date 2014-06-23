@@ -24,6 +24,13 @@
             android:layout_height="wrap_content"
             android:onClick="onClick"
             />
+        <Button
+            android:id="@+id/activate_message_templates"
+            android:text="Toggle message templates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            />
         <ListView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/list"
             android:layout_width="match_parent"

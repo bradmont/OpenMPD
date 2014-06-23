@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 
 import android.net.Uri;
@@ -48,6 +49,12 @@ public class QuickMessenger {
         this.contact=contact;
     }
     public void showQuickMessageDialog(){
+
+        SharedPreferences prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+        if (!prefs.getBoolean("messageTemplatesEnabled", false)){
+            sendMessage(null, "", "");
+            return;
+        }
 
         String sql;
         if (messageFilter != null){

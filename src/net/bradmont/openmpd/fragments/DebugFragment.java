@@ -8,6 +8,8 @@ import net.bradmont.openmpd.controllers.TntImporter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+
 
 import android.database.sqlite.*;
 import android.database.Cursor;
@@ -208,6 +210,13 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
                     .startActivity(
                         Intent.createChooser(intent, "Send Email"));
 
+                break;
+            case R.id.activate_message_templates:
+                OpenMPD.get()
+                    .getSharedPreferences("openmpd", Context.MODE_PRIVATE)
+                    .edit().putBoolean("messageTemplatesEnabled", true)
+                    .apply();
+                ((BaseActivity) getActivity()).userMessage("Enabled message templates.");
                 break;
         }
     }
