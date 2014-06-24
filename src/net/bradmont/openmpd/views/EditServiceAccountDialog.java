@@ -6,6 +6,7 @@ import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.supergreen.fields.*;
 import net.bradmont.supergreen.fields.constraints.ConstraintError;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -18,6 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.TextView;
@@ -25,8 +28,12 @@ import android.widget.TextView;
 
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 import java.lang.RuntimeException;
 import java.util.ArrayList;
@@ -40,14 +47,14 @@ import org.apache.http.message.*;
 public class EditServiceAccountDialog extends DialogFragment{
 
     ServiceAccount account = null;
-    CursorAdapter adapter = null;
     int [] view_ids = {R.id.tnt_service_id, R.id.username, R.id.password };
     String [] field_names = {"tnt_service_id", "username", "password"};
     View content_view = null;
     private FragmentManager manager=null;
     private String fragment_tag = null;
-
     private Runnable saveCallback = null;
+
+    private SimpleCursorAdapter parentAdapter = null;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -57,30 +64,9 @@ public class EditServiceAccountDialog extends DialogFragment{
 
         // set up spinner
         Spinner spinner = (Spinner) content_view.findViewById(R.id.tnt_service_id);
-        Cursor c = MPDDBHelper.get().getReadableDatabase()
-            .rawQuery("select _id, name, base_url from tnt_service where name_short != 'EXAMPLE';", null);
-        String [] spinner_columns = {"_id", "name", "base_url"};
-        int [] spinner_views = {R.id._id, R.id.name, R.id.server};
-        //String [] spinner_columns = { "name"};
-        //int [] spinner_views = { R.id.name};
-        SimpleCursorAdapter ca = new SimpleCursorAdapter(getActivity(),
-            R.layout.service_spinner_item, c, spinner_columns, spinner_views);
-        ca.setViewBinder(new SimpleCursorAdapter.ViewBinder(){
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                switch(columnIndex){
-                    case(2):
-                        // server name
-                        TextView tv = (TextView) view;
-                        try {
-                            URL url = new URL(cursor.getString(2));
-                            tv.setText(url.getHost());
-                            return true;
-                        } catch (Exception e){}
-                }
-                return false;
-            }
-        });
-        spinner.setAdapter(ca);
+        String [] lines = getLines();
+        ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
+        spinner.setAdapter(adapter);
 
         if (account != null){
             populateView();
@@ -98,6 +84,10 @@ public class EditServiceAccountDialog extends DialogFragment{
         return builder.create();
     }
 
+    public void setParentAdapter(SimpleCursorAdapter adapter){
+        parentAdapter = adapter;
+    }
+
     /**
       * Callback that's executed on a successful save
       */
@@ -110,12 +100,25 @@ public class EditServiceAccountDialog extends DialogFragment{
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new saveListener());
     }
 
-    /**
-     * Specify a cursorAdapter if dialog called from a listView. In this
-     * case, we will requery the cursor after we create a new object.
-     */
-    public void setAdapter(CursorAdapter adapter){
-        this.adapter = adapter;
+    public String [] getLines(){
+        InputStream inputStream = getActivity().getResources().openRawResource(R.raw.tnt_organisations);
+        InputStreamReader inputReader = new InputStreamReader (inputStream);
+        BufferedReader buffReader = new BufferedReader(inputReader);
+        String line;
+        ArrayList<String> lines = new ArrayList<String>();
+
+        try {
+            while (( line = buffReader.readLine()) != null) {
+                lines.add(line);
+            }   
+            buffReader.close();
+            inputReader.close();
+            inputStream.close();
+        } catch (IOException e) {
+                return null; 
+        }
+        return lines.toArray(new String[lines.size()]);
+
     }
 
     public void setAccount(ServiceAccount account){
@@ -250,10 +253,50 @@ public class EditServiceAccountDialog extends DialogFragment{
                      .show();
             }
 
+            parentAdapter.getCursor().requery();
 
-            if (adapter != null){
-                adapter.getCursor().requery();
-            }
         }
+    }
+
+    private class ServicesAdapter extends ArrayAdapter<String>{
+        private String [] [] values = null;
+        private int layoutResourceId;
+
+        public ServicesAdapter(Context context, int resource, int textViewResourceID, String[] objects){
+            super(context, resource, textViewResourceID, objects);
+            values = new String[objects.length][];
+            for (int i = 0; i < objects.length; i++){
+                values[i]=null;
+            }
+            layoutResourceId = resource;
+        }
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return getView(position, convertView, parent);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null){
+                LayoutInflater inflater = ((Activity)getContext()).getLayoutInflater();
+                view = inflater.inflate(layoutResourceId, parent, false);
+            }
+            if (values[position] == null){
+                values[position] = TntImporter.csvLineSplit(getItem(position));
+            }
+
+            TextView name = (TextView) view.findViewById(R.id.name);
+            TextView server = (TextView) view.findViewById(R.id.server);
+            name.setText(values[position][0]);
+            try {
+                URL url = new URL(values[position][1]);
+                server.setText(url.getHost());
+            } catch (Exception e){
+                server.setText("-");
+            }
+            return view;
+        }
+
     }
 }

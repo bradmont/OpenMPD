@@ -100,7 +100,7 @@ public class ServiceAccountList extends SherlockListFragment {
             case R.id.menu_add:
                 Log.i("net.bradmont.openmpd", "menu_add");
                 EditServiceAccountDialog dialog = new EditServiceAccountDialog();
-                dialog.setAdapter((CursorAdapter) getListAdapter());
+                dialog.setParentAdapter((SimpleCursorAdapter) getListAdapter());
                 dialog.show(getFragmentManager(), "edit_account_dialog");
                 return true;
             case R.id.menu_help:
@@ -114,7 +114,7 @@ public class ServiceAccountList extends SherlockListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         Log.i("net.bradmont.openmpd", String.format("Item clicked: %d", id));
         EditServiceAccountDialog dialog = new EditServiceAccountDialog();
-        dialog.setAdapter((CursorAdapter) getListAdapter());
+        dialog.setParentAdapter((SimpleCursorAdapter) getListAdapter());
         dialog.show(getFragmentManager(), "edit_account_dialog");
         dialog.setAccount(new ServiceAccount((int)id));
     }
