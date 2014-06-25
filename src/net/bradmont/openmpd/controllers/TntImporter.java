@@ -13,12 +13,12 @@ import org.apache.http.message.*;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
-import  javax.net.ssl.SSLContext;
-import  javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import javax.net.ssl.TrustManager;
-import  org.apache.http.conn.scheme.SchemeRegistry;
-import  org.apache.http.conn.scheme.Scheme;
-import  org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ClientConnectionManager;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import java.io.IOException;
