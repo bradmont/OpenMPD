@@ -143,15 +143,12 @@ public class EditServiceAccountDialog extends DialogFragment{
             // run through views, assign to values
             try {
                 // get name & password
-                Log.i("net.bradmont.openmpd", "Getting views.");
                 for (int i = 0; i < view_ids.length; i++){
                     View field_view = content_view.findViewById(view_ids[i]);
-                    Log.i("net.bradmont.openmpd", "Getting " +field_names[i]);
                     DBField field = account.getField(field_names[i]);
                     field.getFromView(field_view);
                 }
 
-                Log.i("net.bradmont.openmpd", "finding service in spinner");
                 // get selected service
                 Spinner spin = (Spinner) content_view.findViewById(R.id.tnt_service_id);
                 int position = spin.getSelectedItemPosition();
@@ -159,7 +156,6 @@ public class EditServiceAccountDialog extends DialogFragment{
                 String [] values = TntImporter.csvLineSplit(item);
 
                 // check if service already in tnt_service
-                Log.i("net.bradmont.openmpd", "checking for existing service");
                 SQLiteDatabase db = OpenMPD.getDB().getReadableDatabase();
                 Cursor c = db.rawQuery("select _id from tnt_service where name=?", new String[]{ values[0] });
                 TntService service = null;
@@ -171,15 +167,11 @@ public class EditServiceAccountDialog extends DialogFragment{
                     service.setValue("query_ini_url", values[1]);
                     service.save();
                     account.setValue("tnt_service_id", service.getID());
-                    Log.i("net.bradmont.openmpd", "service created");
                 } else {
-                    Log.i("net.bradmont.openmpd", "service exists");
                     c.moveToFirst();
                     account.setValue("tnt_service_id", c.getInt(0));
                 }
                 c.close();
-                    Log.i("net.bradmont.openmpd", "cursor closed");
-
 
                 // get its id, assign to account.tnt_service_id
                 
@@ -187,12 +179,10 @@ public class EditServiceAccountDialog extends DialogFragment{
                 // check the account credentials
 
                 final Context context = getActivity();
-                Log.i("net.bradmont.openmpd", "Queueing task");
                 ((BaseActivity)getActivity()).queueTask(new Runnable(){
 
                     @Override
                     public void run(){
-                        Log.i("net.bradmont.openmpd", "run()");
                         ((BaseActivity)getActivity()).showWaitDialog(R.string.connecting_server, R.string.please_wait);
                         TntImporter importer = new TntImporter(getActivity(), account);
                         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
@@ -206,16 +196,12 @@ public class EditServiceAccountDialog extends DialogFragment{
                                 Log.i("net.bradmont.openmpd", "error getting query.ini");
                                 return;
                             }
-                            Log.i("net.bradmont.openmpd", "done getting query.ini");
                             service.dirtySave();
-                        } else {
-                            Log.i("net.bradmont.openmpd", "no need to get query.ini");
-                        }
+                        } 
                         ((BaseActivity)getActivity()).dismissWaitDialog();
                         Log.i("net.bradmont.openmpd", "Getting balance");
                         ((BaseActivity)getActivity()).showWaitDialog(R.string.checking_login, R.string.please_wait);
 
-                        Log.i("net.bradmont.openmpd", "getting balance");
                         arguments.add(new BasicNameValuePair( "Action", service.getBalanceAction()));
                         arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
                         arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
@@ -235,7 +221,10 @@ public class EditServiceAccountDialog extends DialogFragment{
                         }
                         ((BaseActivity)getActivity()).dismissWaitDialog();
 
-                        if (content == null || content.get(0).contains("ERROR") || content.size() > 5){
+                        if (content == null || 
+                            content.get(0).contains("ERROR") || 
+                            content.get(0).contains("BAD_PASSWORD") || 
+                            content.size() > 5){
                             // if result is > 5 lines on a balance query, it's probably because the
                             // server sent an error. TODO: we need a better way of checking this;
                             // a comprehensive list of errors would be helpful, but there doesn't

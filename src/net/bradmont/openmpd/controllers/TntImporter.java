@@ -481,7 +481,6 @@ public class TntImporter {
     }
 
     public ArrayList<String> getStringsFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
-        Log.i("net.bradmont.openmpd", "getStringsFromUrl: " + url_raw);
 
         URL url = null;
         try {
@@ -501,7 +500,6 @@ public class TntImporter {
 
         BufferedReader rd = new BufferedReader(
                 new InputStreamReader(stream), 4096);
-        //Log.i("net.bradmont.openmpd", "InputStream & BufferedReader initialized");
         String line;
         ArrayList<String> lines = new ArrayList<String>(50);
         try{
@@ -538,7 +536,6 @@ public class TntImporter {
                 character = stream.read();
             }
             stream.close();
-            Log.i("net.bradmont.openmpd", "query.ini: " + sb.toString());
             return new StringReader(sb.toString());
 
         } catch (IOException e){
@@ -578,8 +575,9 @@ public class TntImporter {
             }
 
 
-            HttpPost httpPost = new HttpPost(url_raw);
+            HttpUriRequest httpRequest = null;
             if (arguments != null){
+                HttpPost httpPost = new HttpPost(url_raw);
                 httpPost.setEntity(new UrlEncodedFormEntity(arguments));
 
                 httpclient.getCredentialsProvider().setCredentials(
@@ -588,11 +586,15 @@ public class TntImporter {
                         ((BasicNameValuePair) arguments.get(1)).getValue(), // username
                         ((BasicNameValuePair) arguments.get(2)).getValue()
                         ));
+                httpRequest = httpPost;
+            } else {
+                httpRequest = new HttpGet(url_raw);
             }
 
             // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httpPost);
+            HttpResponse response = httpclient.execute(httpRequest);
             content = response.getEntity().getContent();
+
             return content;
         } catch (org.apache.http.conn.HttpHostConnectException e){
             if (builder != null){
@@ -666,7 +668,6 @@ public class TntImporter {
                     character = reader.read();
                 }
             } catch (Exception e){}
-            Log.i("net.bradmont.openmpd", sb.toString());
             return false;
         }
         Ini.Section org = ini.get("ORGANIZATION");
@@ -689,7 +690,6 @@ public class TntImporter {
                 !ini.containsKey("DONATIONS") ||
                 !ini.containsKey("ADDRESSES") ||
                 !ini.containsKey("ADDRESSES_BY_PERSONIDS") ){
-                Log.i("net.bradmont.openmpd", "Missing section");
             return false;
 
         }
