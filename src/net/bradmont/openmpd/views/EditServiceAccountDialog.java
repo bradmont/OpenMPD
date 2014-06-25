@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -68,6 +69,7 @@ public class EditServiceAccountDialog extends DialogFragment{
         String [] lines = getLines();
         ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
 
         if (account != null){
             populateView();
@@ -102,7 +104,11 @@ public class EditServiceAccountDialog extends DialogFragment{
     }
 
     public String [] getLines(){
-        InputStream inputStream = getActivity().getResources().openRawResource(R.raw.tnt_organisations);
+        return getLines(R.raw.tnt_organisations);
+    }
+
+    public String [] getLines(int resource_id){
+        InputStream inputStream = getActivity().getResources().openRawResource(resource_id);
         InputStreamReader inputReader = new InputStreamReader (inputStream);
         BufferedReader buffReader = new BufferedReader(inputReader);
         String line;
@@ -132,6 +138,27 @@ public class EditServiceAccountDialog extends DialogFragment{
             Log.i("net.bradmont.openmpd", "Getting " +field_names[i]);
             DBField field = account.getField(field_names[i]);
             field.putToView(v);
+        }
+    }
+
+    private class MyOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+            Spinner spinner = (Spinner) parent;
+            String value = (String) spinner.getItemAtPosition(position);
+            if (value.startsWith("More,")){
+                Log.i("net.bradmont.openmpd", "MORE selected");
+                String [] lines = getLines(R.raw.tnt_organisations_untested);
+                ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
+                spinner.setAdapter(adapter);
+            } else if (value.startsWith("Return,")){
+                Log.i("net.bradmont.openmpd", "LESS selected");
+                String [] lines = getLines();
+                ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
+                spinner.setAdapter(adapter);
+            }
+        }
+
+        public void onNothingSelected(AdapterView<?> parent){
         }
     }
 
@@ -339,7 +366,7 @@ public class EditServiceAccountDialog extends DialogFragment{
                 URL url = new URL(values[position][1]);
                 server.setText(url.getHost());
             } catch (Exception e){
-                server.setText("-");
+                server.setText(values[position][1]);
             }
             return view;
         }
