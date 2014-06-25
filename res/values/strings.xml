@@ -106,8 +106,10 @@
 
     <!-- Toast values -->
     <string name="checking_login">Checking Login</string>
+    <string name="connecting_server">Connecting to dataserver</string>
     <string name="please_wait">Please Wait</string>
     <string name="login_error">Login error, please verify your credentials</string>
+    <string name="connect_server_error">Error connecting to server, it seems that this service is not valid</string>
     <string name="account_verified">Account Verified</string>
     <string name="assigned_monthly">Assigned to monthly. Expires in 3 months.</string>
     <string name="assigned_annual">Assigned to annual. Expires in 14 months.</string>

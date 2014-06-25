@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,8 +48,8 @@ import org.apache.http.message.*;
 public class EditServiceAccountDialog extends DialogFragment{
 
     ServiceAccount account = null;
-    int [] view_ids = {R.id.tnt_service_id, R.id.username, R.id.password };
-    String [] field_names = {"tnt_service_id", "username", "password"};
+    int [] view_ids = {R.id.username, R.id.password };
+    String [] field_names = {"username", "password"};
     View content_view = null;
     private FragmentManager manager=null;
     private String fragment_tag = null;
@@ -141,6 +142,7 @@ public class EditServiceAccountDialog extends DialogFragment{
             }
             // run through views, assign to values
             try {
+                // get name & password
                 Log.i("net.bradmont.openmpd", "Getting views.");
                 for (int i = 0; i < view_ids.length; i++){
                     View field_view = content_view.findViewById(view_ids[i]);
@@ -149,25 +151,74 @@ public class EditServiceAccountDialog extends DialogFragment{
                     field.getFromView(field_view);
                 }
 
+                Log.i("net.bradmont.openmpd", "finding service in spinner");
+                // get selected service
+                Spinner spin = (Spinner) content_view.findViewById(R.id.tnt_service_id);
+                int position = spin.getSelectedItemPosition();
+                String item = (String) ((ArrayAdapter)spin.getAdapter()).getItem(position);
+                String [] values = TntImporter.csvLineSplit(item);
+
+                // check if service already in tnt_service
+                Log.i("net.bradmont.openmpd", "checking for existing service");
+                SQLiteDatabase db = OpenMPD.getDB().getReadableDatabase();
+                Cursor c = db.rawQuery("select _id from tnt_service where name=?", new String[]{ values[0] });
+                TntService service = null;
+                if (c.getCount() == 0){
+                    Log.i("net.bradmont.openmpd", "service doesn't exist");
+                    // if not, create it
+                    service = new TntService();
+                    service.setValue("name", values[0]);
+                    service.setValue("query_ini_url", values[1]);
+                    service.save();
+                    account.setValue("tnt_service_id", service.getID());
+                    Log.i("net.bradmont.openmpd", "service created");
+                } else {
+                    Log.i("net.bradmont.openmpd", "service exists");
+                    c.moveToFirst();
+                    account.setValue("tnt_service_id", c.getInt(0));
+                }
+                c.close();
+                    Log.i("net.bradmont.openmpd", "cursor closed");
+
+
+                // get its id, assign to account.tnt_service_id
+                
+
                 // check the account credentials
 
                 final Context context = getActivity();
+                Log.i("net.bradmont.openmpd", "Queueing task");
                 ((BaseActivity)getActivity()).queueTask(new Runnable(){
 
                     @Override
                     public void run(){
-                        ((BaseActivity)getActivity()).showWaitDialog(R.string.checking_login, R.string.please_wait);
+                        Log.i("net.bradmont.openmpd", "run()");
+                        ((BaseActivity)getActivity()).showWaitDialog(R.string.connecting_server, R.string.please_wait);
                         TntImporter importer = new TntImporter(getActivity(), account);
                         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
                         TntService service = (TntService) account.getRelated("tnt_service_id");
-
-                        if (service.getString("base_url").endsWith("aspx")){
-                            arguments.add(new BasicNameValuePair( "Action", "AccountBalance"));
+                        if (service.getString("base_url") == null || (!service.getString("base_url").startsWith("http") && !service.getString("balance_url").startsWith("http"))){
+                            Log.i("net.bradmont.openmpd", "getting query.ini");
+                            if (!TntImporter.processQueryIni(service)){
+                                ((BaseActivity)getActivity()).userMessage( R.string.connect_server_error);
+                                LogItem.logError("Error parsing Query.ini", service.getString("query_ini_url"), "");
+                                ((BaseActivity)getActivity()).dismissWaitDialog();
+                                Log.i("net.bradmont.openmpd", "error getting query.ini");
+                                return;
+                            }
+                            Log.i("net.bradmont.openmpd", "done getting query.ini");
+                            service.dirtySave();
                         } else {
-                            arguments.add(new BasicNameValuePair( "Action", "TntBalance"));
+                            Log.i("net.bradmont.openmpd", "no need to get query.ini");
                         }
-                        arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
-                        arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
+                        ((BaseActivity)getActivity()).dismissWaitDialog();
+                        Log.i("net.bradmont.openmpd", "Getting balance");
+                        ((BaseActivity)getActivity()).showWaitDialog(R.string.checking_login, R.string.please_wait);
+
+                        Log.i("net.bradmont.openmpd", "getting balance");
+                        arguments.add(new BasicNameValuePair( "Action", service.getBalanceAction()));
+                        arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
+                        arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
 
                         ArrayList<String> content = null;
                         try {
@@ -175,7 +226,11 @@ public class EditServiceAccountDialog extends DialogFragment{
                         } catch (RuntimeException e){
                             ((BaseActivity)getActivity()).dismissWaitDialog();
                             Log.i("net.bradmont.openmpd", "SSL error caught");
-                            showSSLError(service.getString("base_url"));
+                            if (service.getString("base_url").startsWith("http")){
+                                showSSLError(service.getString("base_url"));
+                            } else {
+                                showSSLError(service.getString("balance_url"));
+                            }
                             return;
                         }
                         ((BaseActivity)getActivity()).dismissWaitDialog();
@@ -229,7 +284,7 @@ public class EditServiceAccountDialog extends DialogFragment{
                                                URL u = null;
                                                try { u = new URL(url); } catch (Exception e){}
                                                String host = u.getHost();
-                                               SharedPreferences.Editor prefs = getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
+                                               SharedPreferences.Editor prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
                                                prefs.putBoolean("ignore_ssl_" + host, true);
                                                prefs.commit();
                                                ((BaseActivity)getActivity()).userMessage(R.string.ignoring_ssl);
@@ -253,7 +308,9 @@ public class EditServiceAccountDialog extends DialogFragment{
                      .show();
             }
 
-            parentAdapter.getCursor().requery();
+            if (parentAdapter != null){
+                parentAdapter.getCursor().requery();
+            }
 
         }
     }

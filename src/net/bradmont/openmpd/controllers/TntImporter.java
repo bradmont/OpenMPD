@@ -22,6 +22,7 @@ import  org.apache.http.conn.ClientConnectionManager;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
@@ -78,6 +79,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.BufferedReader;
 
+import org.ini4j.Ini;
+
 /** Controller to connect to and import data from TntDataServer instances.
   *
   */
@@ -94,7 +97,7 @@ public class TntImporter {
     private TntService service = null;
     private int progress = 0;
     private int progressmax=0;
-    private int notification_id=ContactsEvaluator.NOTIFICATION_ID;
+    private static int notification_id=ContactsEvaluator.NOTIFICATION_ID;
     private static String EPOCH_DATE="01/01/1970";
 
     public TntImporter(Context context, ServiceAccount account){
@@ -154,13 +157,9 @@ public class TntImporter {
             builder.setProgress(2, 3, true);
             notifyManager.notify(notification_id, builder.build());
         }
-        if (service.getString("base_url").endsWith("aspx")){
-            arguments.add(new BasicNameValuePair( "Action", "Donors"));
-        } else {
-            arguments.add(new BasicNameValuePair( "Action", "TntAddrList"));
-        }
-        arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
-        arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
+        arguments.add(new BasicNameValuePair( "Action", service.getAddressesAction()));
+        arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
+        arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
 
         // Always download contacts from all time, since TNTDataService only
         // gives donor info for donors who are new TO THE ORGANISATION,
@@ -228,13 +227,9 @@ public class TntImporter {
         }
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
 
-        if (service.getString("base_url").endsWith("aspx")){
-            arguments.add(new BasicNameValuePair( "Action", "Gifts"));
-        } else {
-            arguments.add(new BasicNameValuePair( "Action", "TntDonList"));
-        }
-        arguments.add(new BasicNameValuePair( "Username", account.getString("username")));
-        arguments.add(new BasicNameValuePair( "Password", account.getString("password")));
+        arguments.add(new BasicNameValuePair( "Action", service.getDonationsAction()));
+        arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
+        arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
 
         if (account.getString("last_import") == null){
             arguments.add(new BasicNameValuePair( "DateFrom", EPOCH_DATE));
@@ -485,10 +480,21 @@ public class TntImporter {
         return getStringsFromUrl(url, arguments, true);
     }
 
-    public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments, boolean handleCertError){
-        Log.i("net.bradmont.openmpd", "getStringsFromUrl: " + url);
+    public ArrayList<String> getStringsFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
+        Log.i("net.bradmont.openmpd", "getStringsFromUrl: " + url_raw);
 
-        InputStream stream = getStreamFromUrl(url, arguments, handleCertError);
+        URL url = null;
+        try {
+            url = new URL(url_raw);
+        } catch (Exception e){
+            return null;
+        }
+
+        if (builder != null){
+            builder.setContentText(url.getHost());
+            notifyManager.notify(notification_id, builder.build());
+        }
+        InputStream stream = getStreamFromUrl(url_raw, arguments, handleCertError, builder, notifyManager);
         if (stream == null){
             return null;
         }
@@ -514,7 +520,37 @@ public class TntImporter {
         return lines;
     }
 
-    public InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
+    private static StringReader getCleanedStringReaderFromUrl(String url){
+        try {
+            InputStream stream = getStreamFromUrl(url, null, false);
+            StringBuilder sb = new StringBuilder();
+            int character = 0;
+            boolean started = false;
+            // read and chop off non-ascii gunk at the beginning
+            character = stream.read();
+            while (character != -1){
+                if ( (char) character == '['){
+                    started=true;
+                }
+                if (started){
+                    sb.append( (char) character);
+                }
+                character = stream.read();
+            }
+            stream.close();
+            Log.i("net.bradmont.openmpd", "query.ini: " + sb.toString());
+            return new StringReader(sb.toString());
+
+        } catch (IOException e){
+            return null;
+        }
+    }
+
+    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
+        return getStreamFromUrl(url_raw, arguments, handleCertError, null, null);
+    }
+
+    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError, NotificationCompat.Builder builder, NotificationManager notifyManager){
         InputStream content = null;
         
         URL url = null;
@@ -525,7 +561,7 @@ public class TntImporter {
         }
         try {
             DefaultHttpClient httpclient = null;
-            SharedPreferences prefs = context.getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+            SharedPreferences prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
             if (prefs.getBoolean("ignore_ssl_" + url.getHost(), false) == true){ 
                 httpclient = getNewHttpClient();
             } else {
@@ -541,20 +577,19 @@ public class TntImporter {
                 targetHost = new HttpHost(url.getHost(), 443, url.getProtocol()); 
             }
 
-            if (builder != null){
-                builder.setContentText(url.getHost());
-                notifyManager.notify(notification_id, builder.build());
-            }
 
-            httpclient.getCredentialsProvider().setCredentials(
+            HttpPost httpPost = new HttpPost(url_raw);
+            if (arguments != null){
+                httpPost.setEntity(new UrlEncodedFormEntity(arguments));
+
+                httpclient.getCredentialsProvider().setCredentials(
                     new AuthScope(targetHost.getHostName(), targetHost.getPort()), 
                     new UsernamePasswordCredentials(
                         ((BasicNameValuePair) arguments.get(1)).getValue(), // username
                         ((BasicNameValuePair) arguments.get(2)).getValue()
                         ));
+            }
 
-            HttpPost httpPost = new HttpPost(url_raw);
-            httpPost.setEntity(new UrlEncodedFormEntity(arguments));
             // Execute HTTP Post Request
             HttpResponse response = httpclient.execute(httpPost);
             content = response.getEntity().getContent();
@@ -571,27 +606,27 @@ public class TntImporter {
                 throw new RuntimeException("SSLError Certificate not accepted");
             }
             NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) OpenMPD.get().getSystemService(Context.NOTIFICATION_SERVICE);
 
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context)
+            NotificationCompat.Builder nBuilder =
+                new NotificationCompat.Builder(OpenMPD.get())
                 .setSmallIcon(R.drawable.notification_icon);
 
-            builder.setContentTitle("SSL Certificate Error");
-            builder.setContentText(url.getHost());
+            nBuilder.setContentTitle("SSL Certificate Error");
+            nBuilder.setContentText(url.getHost());
 
-            Intent sslCertIntent = new Intent(context, HomeActivity.class);
+            Intent sslCertIntent = new Intent(OpenMPD.get(), HomeActivity.class);
             sslCertIntent.putExtra("net.bradmont.openmpd.SSLErrorServer", url.getHost());
 
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(OpenMPD.get());
             stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(sslCertIntent);
             PendingIntent sslPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(sslPendingIntent);
+            nBuilder.setContentIntent(sslPendingIntent);
 
 
-            notificationManager.notify(666, builder.build());
+            notificationManager.notify(666, nBuilder.build());
             return null;
 
 
@@ -603,7 +638,90 @@ public class TntImporter {
         }
         return content;
     }
-    public DefaultHttpClient getNewHttpClient() {
+
+    public static boolean processQueryIni(TntService service){
+        Ini ini = null;
+        StringReader reader = null;
+        try {
+            //ini = new Ini(getStreamFromUrl(service.getString("query_ini_url"), null, false));
+            reader = getCleanedStringReaderFromUrl(service.getString("query_ini_url"));
+            if (reader == null){ return false;}
+            ini = new Ini(reader);
+        } catch (IOException e){
+            Log.i("net.bradmont.openmpd", "IOException");
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            Log.i("net.bradmont.openmpd",sw.toString());
+            return false;
+        }
+        if (!ini.containsKey("ORGANIZATION")){
+            Log.i("net.bradmont.openmpd", "no section ORGANIZATION. huh.");
+            Log.i("net.bradmont.openmpd", service.getString("query_ini_url"));
+            StringBuilder sb = new StringBuilder();
+            try {
+                reader = getCleanedStringReaderFromUrl(service.getString("query_ini_url"));
+                int character = reader.read();
+                while (character != -1){
+                    sb.append((char) character);
+                    character = reader.read();
+                }
+            } catch (Exception e){}
+            Log.i("net.bradmont.openmpd", sb.toString());
+            return false;
+        }
+        Ini.Section org = ini.get("ORGANIZATION");
+
+        if (org.containsKey("RedirectQueryIni") && org.get("RedirectQueryIni").startsWith("http")){
+            // if this query.ini url is outdated, it should redirect to a current one.
+            service.setValue("query_ini_url", org.get("RedirectQueryIni"));
+            return processQueryIni(service);
+        }
+        service.setValue("base_url", ""); // eventually get rid of base_url; for the moment leave
+                                         // it blank for new services
+        if (org.containsKey("Code")){
+            service.setValue("name_short", org.get("Code"));
+        }
+        if (org.containsKey("QueryAuthentication") && org.get("QueryAuthentication") == "1"){
+            service.setValue("http_auth", true);
+        }
+
+        if (!ini.containsKey("ACCOUNT_BALANCE") || 
+                !ini.containsKey("DONATIONS") ||
+                !ini.containsKey("ADDRESSES") ||
+                !ini.containsKey("ADDRESSES_BY_PERSONIDS") ){
+                Log.i("net.bradmont.openmpd", "Missing section");
+            return false;
+
+        }
+
+        Ini.Section balance = ini.get("ACCOUNT_BALANCE");
+        Ini.Section donations = ini.get("DONATIONS");
+        Ini.Section addresses = ini.get("ADDRESSES");
+        Ini.Section addresses_by_personids = ini.get("ADDRESSES_BY_PERSONIDS");
+
+        if (!balance.containsKey("Url") || !balance.containsKey("Post") ||
+                !donations.containsKey("Url") || !donations.containsKey("Post") ||
+                !addresses.containsKey("Url") || !addresses.containsKey("Post") ||
+                !addresses_by_personids.containsKey("Url") || !addresses_by_personids.containsKey("Post") ){
+            return false;
+        }
+
+        service.setValue("balance_url", balance.get("Url"));
+        service.setValue("balance_formdata", balance.get("Post"));
+
+        service.setValue("donations_url", donations.get("Url"));
+        service.setValue("donations_formdata", donations.get("Post"));
+
+        service.setValue("addresses_url", addresses.get("Url"));
+        service.setValue("addresses_formdata", addresses.get("Post"));
+
+        service.setValue("addresses_by_personids_url", addresses_by_personids.get("Url"));
+        service.setValue("addresses_by_personids_formdata", addresses_by_personids.get("Post"));
+
+        return true; 
+    }
+
+    public static DefaultHttpClient getNewHttpClient() {
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);
@@ -629,7 +747,7 @@ public class TntImporter {
 
 
 
-    public class MySSLSocketFactory extends SSLSocketFactory {
+    public static class MySSLSocketFactory extends SSLSocketFactory {
         SSLContext sslContext = SSLContext.getInstance("TLS");
 
         public MySSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {

@@ -1,4 +1,5 @@
-Name,QueryIni,ISO3166
+Power to Change - Canada,http://tntmpd.powertochange.org/tntmpd/Query.ini,can
+Cru - USA,https://staffweb.cru.org/ss/tntmpd/query.ini,usa
 306 Foundation,https://donorlinkonline.com/dataserver/ds_306Foundation/dataquery/TntQuery.aspx,
 Agape Bulgaria,https://tntdataserver.eu/dataserver/bgr/dataquery/TntQuery.aspx,bgr
 Agape Europe AOA,https://tntdataserver.eu/dataserver/AgapeAOA/dataquery/TntQuery.aspx,
@@ -58,7 +59,6 @@ Campus fuer Christus e.V. - Germany,https://tntdataserver.eu/dataserver/deu/data
 CCO Canada,https://rews.cco.ca/dataserver/CCO/dataquery/TntQuery.aspx,
 Center for Mission Mobilization,https://remote.thecmm.net/dataserver/TNT-CMM/dataquery/tntquery.aspx,
 Cru - Singapore,https://tntdataserverasia.com/dataserver/sgp/dataquery/tntquery.aspx,sgp
-Cru - USA,https://staffweb.cru.org/ss/tntmpd/query.ini,usa
 Cruzada Estudiantil - Costa Rica,https://tntdataserver.com/dataserver/cri/dataquery/tntquery.aspx,cri
 Cruzada Estudiantil - Dominican Republic,https://tntdataserver.com/dataserver/dom/dataquery/tntquery.aspx,dom
 Cruzada Estudiantil - El Salvador,https://tntdataserver.com/dataserver/els/dataquery/tntquery.aspx,slv
@@ -94,7 +94,6 @@ Novy zivot,https://tntdataserver.eu/dataserver/cze/dataquery/TntQuery.aspx,cze
 Ruch Nowego Zycia - POLAND,https://tntdataserver.eu/dataserver/plr/dataquery/TntQuery.aspx,pol
 Obra Social Agape,https://tntdataserver.eu/dataserver/spo/dataquery/TntQuery.aspx,
 Perspectives,https://remote.thecmm.net/dataserver/TNT-USCWM-PSP/dataquery/tntquery.aspx,
-Power to Change - Canada,http://tntmpd.powertochange.org/tntmpd/Query.ini,can
 Power to Change - Canada (Intl.),http://tntmpd.powertochange.org/intl/Query.ini,
 SIM USA,https://tntweb.sim.org/dataserver/simusa/dataquery/tntquery.aspx,
 Tandem Ministries,https://tntdataserverasia.com/dataserver/nzl/dataquery/tntquery.aspx,nzl

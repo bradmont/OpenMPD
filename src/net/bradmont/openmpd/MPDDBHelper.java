@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 18;
+    private static int DATABASE_VERSION = 19;
 
     @Override
     protected void registerModels(){
@@ -210,6 +210,12 @@ public class MPDDBHelper extends DBHelper{
             db.execSQL("drop view _monthly_base_giving;");
             db.execSQL( "create view if not exists _monthly_base_giving as select month, sum(total_gifts) as base_total from partner_giving_status join partner_giving_by_month on partner_giving_status.tnt_people_id = partner_giving_by_month.tnt_people_id where total_gifts<=giving_amount and partner_type=60 group by month order by month; ");
             db.execSQL("drop table if exists giving_summary_cache;");
+        }
+        if (oldVersion < 19){
+            db.execSQL("alter table tnt_service add query_ini_url string;");
+            db.execSQL("update tnt_service set query_ini_url='http://tntmpd.powertochange.org/tntmpd/Query.ini', name = 'Power to Change - Canada' where name_short='P2C'");
+            db.execSQL("update tnt_service set query_ini_url='https://staffweb.cru.org/ss/tntmpd/query.ini', name = 'Cru - USA' where name_short='CCC'");
+            db.execSQL("update tnt_service set query_ini_url='https://rews.cco.ca/dataserver/CCO/dataquery/TntQuery.aspx', name = 'CCO Canada' where name_short='CCO'");
         }
     }
 

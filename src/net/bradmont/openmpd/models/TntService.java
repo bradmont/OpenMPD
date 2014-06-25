@@ -90,43 +90,11 @@ public class TntService extends DBModel{
         addField(new StringField("addresses_by_personids_formdata"));
         getField("addresses_by_personids_formdata").setDefault("Action=TntAddrList&Username=%s&Password=%s&PID=%s");
 
+        addField(new StringField("query_ini_url"));
 
         TABLE_NAME=TABLE;
         super.init();
     }
-
-    public void createDefaults(){
-        // Abusing this method to instantiate TntServices rather than return SQL.
-        String raw_json = readRawTextFile(MPDDBHelper.get().getContext(), R.raw.services);
-        try {
-            JSONObject json = new JSONObject(raw_json);
-            String [] fieldnames = { "name", "base_url", "balance_url", 
-                "balance_formdata", "donations_url", "donations_formdata",
-                "addresses_url", "addresses_formdata", "addresses_by_personids_url",
-                "addresses_by_personids_formdata" };
-            
-            for (Iterator<String> iKeys= json.keys(); iKeys.hasNext(); ){
-                String key = iKeys.next();
-                JSONObject obj = json.getJSONObject(key);
-                TntService serv = (TntService) newInstance();
-                serv.setValue("name_short", key);
-
-                if (obj.has("http_auth")){
-                    serv.setValue("http_auth", obj.getBoolean("http_auth"));   
-                }
-                for (String field: fieldnames){
-                    if (obj.has(field)){
-                        serv.setValue(field, obj.getString(field));   
-                    }
-                }
-                if (serv.getString("name_short") != "EXAMPLE"){
-                    serv.dirtySave();
-                }
-            }
-        } catch (JSONException e){ 
-            Log.i("net.bradmont.openmpd", "JSONException caught.");
-        }
-    }   
 
     public static String readRawTextFile(Context ctx, int resId) {
         InputStream inputStream = ctx.getResources().openRawResource(resId);
@@ -144,5 +112,57 @@ public class TntService extends DBModel{
                 return null;
         }
         return text.toString();
+     }
+
+     private String [] [] getArgs(String formdata){
+        String [] pairs = formdata.split("&");
+        String [] [] results = new String [pairs.length][];
+        for (int i = 0; i < pairs.length; i++){
+            results[i] = pairs[i].split("=");
+        }
+        return results;
+     }
+
+     private String getArgNameByValue(String formdata, String value){
+        String [] [] args = getArgs(formdata);
+        for (int i = 0; i < args.length; i++){
+            if (args[i][1].equals(value)){
+                return args[i][0];
+            }
+        }
+        return null;
+     }
+
+     private String getValueByArgName(String formdata, String key){
+        String [] [] args = getArgs(formdata);
+        for (int i = 0; i < args.length; i++){
+            if (args[i][0].equals(key)){
+                return args[i][1];
+            }
+        }
+        return null;
+     }
+     
+     public String getUsernameKey(){
+        return getArgNameByValue(getString("balance_formdata"), "$ACCOUNT$");
+     }
+     public String getPasswordKey(){
+        return getArgNameByValue(getString("balance_formdata"), "$PASSWORD$");
+     }
+
+     public String getBalanceAction(){
+        return getValueByArgName(getString("balance_formdata"), "Action");
+     }
+
+     public String getDonationsAction(){
+        return getValueByArgName(getString("donations_formdata"), "Action");
+     }
+
+     public String getAddressesAction(){
+        return getValueByArgName(getString("addresses_formdata"), "Action");
+     }
+
+     public String getAddressesByPersonidsAction(){
+        return getValueByArgName(getString("addresses_by_personids_formdata"), "Action");
      }
 }

@@ -91,13 +91,7 @@ public class HomeActivity extends BaseActivity {
 		getSlidingMenu().setBehindScrollScale(0);
         setSlidingActionBarEnabled(false);
 
-        // if it hasn't been done, populate our TntService table
-        TntService t = new TntService();
-        ModelList services = t.getAll(); 
-        if (services.size() == 0){
-            t.createDefaults();
-        }
-        // ditto for QuickMessage
+        // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
         ModelList messages = q.getAll(); 
         if (messages.size() == 0){

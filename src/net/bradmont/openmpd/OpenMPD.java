@@ -22,6 +22,9 @@ public class OpenMPD extends Application {
     }
 
     public static MPDDBHelper getDB(){
+        if (db == null){
+            db = new MPDDBHelper(this);
+        }
         return db;
     }
 
