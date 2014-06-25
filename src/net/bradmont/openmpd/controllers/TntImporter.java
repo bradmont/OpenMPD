@@ -528,6 +528,7 @@ public class TntImporter {
     private static StringReader getCleanedStringReaderFromUrl(String url){
         try {
             InputStream stream = getStreamFromUrl(url, null, false);
+            if (stream == null) { return null; }
             StringBuilder sb = new StringBuilder();
             int character = 0;
             boolean started = false;
@@ -651,6 +652,11 @@ public class TntImporter {
     public static boolean processQueryIni(TntService service){
         Ini ini = null;
         StringReader reader = null;
+        try {
+            URL u = new URL(service.getString("query_ini_url"));
+        } catch (Exception e){
+            return false;
+        }
         try {
             //ini = new Ini(getStreamFromUrl(service.getString("query_ini_url"), null, false));
             reader = getCleanedStringReaderFromUrl(service.getString("query_ini_url"));
