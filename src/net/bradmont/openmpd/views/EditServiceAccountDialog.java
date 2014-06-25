@@ -150,7 +150,7 @@ public class EditServiceAccountDialog extends DialogFragment{
                 String [] lines = getLines(R.raw.tnt_organisations_untested);
                 ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
                 spinner.setAdapter(adapter);
-            } else if (value.startsWith("Return,")){
+            } else if (value.startsWith("**Return**,")){
                 Log.i("net.bradmont.openmpd", "LESS selected");
                 String [] lines = getLines();
                 ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
