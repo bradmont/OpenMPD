@@ -131,6 +131,13 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, true);
             notifyManager.notify(notification_id, builder.build());
         }
+
+        // upgrade from legacy tnt_service to using query.ini properly
+        if (service.getUsernameKey() == null || service.getUsernameKey().length() < 2){
+            processQueryIni(service);
+            service.dirtySave();
+        }
+
         if (getContacts() == false){
             return false;
         }
