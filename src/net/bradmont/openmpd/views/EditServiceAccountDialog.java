@@ -139,6 +139,27 @@ public class EditServiceAccountDialog extends DialogFragment{
             DBField field = account.getField(field_names[i]);
             field.putToView(v);
         }
+        TntService service = (TntService) account.getRelated("tnt_service_id");
+
+        if (!setSpinnerSelection(service.getString("name"))){
+            Spinner spin = (Spinner) content_view.findViewById(R.id.tnt_service_id);
+            String [] lines = getLines(R.raw.tnt_organisations_untested);
+            ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
+            spin.setAdapter(adapter);
+            setSpinnerSelection(service.getString("name"));
+        }
+    }
+
+    private boolean setSpinnerSelection(String name){
+        name = name +",";
+        Spinner spin = (Spinner) content_view.findViewById(R.id.tnt_service_id);
+        for (int i = 0; i < spin.getCount(); i++){
+            if ( ((String) spin.getItemAtPosition(i)).startsWith(name)){
+                spin.setSelection(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     private class MyOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
