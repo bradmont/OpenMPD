@@ -50,7 +50,7 @@ public class EmailAddress extends DBModel{
         getField("id").setExtraArguments("autoincrement");
 
         addField(new StringField("address"));
-        addField(new DateField("added_date"));
+        addField(new StringField("added_date"));
         addField(new BooleanField("operational"));
         addField(new StringField("label"));
 

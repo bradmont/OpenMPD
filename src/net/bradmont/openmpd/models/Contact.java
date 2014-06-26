@@ -479,6 +479,31 @@ public class Contact extends DBModel{
 
         }
     }
+
+    public Address getAddress(){
+        ModelList l = getRelatedList(MPDDBHelper.get().getReferenceModel("address"), "contact_id");
+        if (l.size() == 0){
+            return null;
+        }
+        return (Address) l.get(0);
+    }
+    public PhoneNumber getPhone(){
+        ModelList l = getRelatedList(MPDDBHelper.get().getReferenceModel("phone_number"), "contact_id");
+        if (l.size() == 0){
+            return null;
+        }
+        return (PhoneNumber) l.get(0);
+    }
+
+    public EmailAddress getEmail(){
+        ModelList l = getRelatedList(MPDDBHelper.get().getReferenceModel("email_address"), "contact_id");
+        if (l.size() == 0){
+            return null;
+        }
+        return (EmailAddress) l.get(0);
+    }
+
+
     @Override
     public String [] generateUpdateSQL(int oldVersion){
         if (oldVersion < 7){

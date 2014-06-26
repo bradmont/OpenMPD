@@ -416,9 +416,25 @@ public class TntImporter {
             }
         }
 
+        Address address = null;
+        PhoneNumber phone = null;
+        EmailAddress email = null;
+
         if (contacts.size() == 0){
+            address = new Address();
+            phone = new PhoneNumber();
+            email = new EmailAddress();
+        } else {
+            address = contact.getAddress();
+            phone = contact.getPhone();
+            email = contact.getEmail();
+        }
+
+        if (address != null && 
+                (address.getString("valid_from") == null ||
+                !address.getString("valid_from").equals(data.get("ADDR_CHANGED")) )
+                ){
             // TODO: evaluate if address has changed.
-            Address address = new Address();
             address.setValue("addr1", data.get("ADDR1"));
             address.setValue("addr2", data.get("ADDR2"));
             address.setValue("addr3", data.get("ADDR3"));
@@ -429,23 +445,33 @@ public class TntImporter {
             address.setValue("country_short", data.get("COUNTRY"));
             address.setValue("country_long", data.get("COUNTRY_DESCR"));
             // TODO:
-            //address.setValue("valid_from", values["ADDR_CHANGED"]);
-            //address.setValue("deliverable", values["ADDR_DELIVERABLE"]);
+            address.setValue("valid_from", data.get("ADDR_CHANGED"));
+            //address.setValue("deliverable", data.get("ADDR_DELIVERABLE"));
             address.setValue("contact_id", contact);
             address.dirtySave();
+        }
 
-            PhoneNumber phone = new PhoneNumber();
+
+        if (phone != null && 
+            ( phone.getString("added_date") == null ||
+            !phone.getString("added_date").equals(data.get("PHONE_CHANGED")))
+        ){
+
             phone.setValue("number", data.get("PHONE"));
-            //phone.setValue("added", values["PHONE_CHANGED"]);
-            //phone.setValue("operational", values["PHONE_OPERATIONAL"]);
+            phone.setValue("added_date", data.get("PHONE_CHANGED"));
+            //phone.setValue("operational", data.get("PHONE_OPERATIONAL"));
             phone.setValue("label", "Default");
             phone.setValue("contact_id", contact);
             phone.dirtySave();
+        }
 
-            EmailAddress email = new EmailAddress();
+        if (phone != null && 
+            (email.getString("added_date") == null ||
+            !email.getString("added_date").equals(data.get("EMAIL_CHANGED")))
+        ){
             email.setValue("address", data.get("EMAIL"));
-            //email.setValue("added_date", values["EMAIL_CHANGED"]);
-            //email.setValue("operational", values["EMAIL_OPERATIONAL"]);
+            email.setValue("added_date", data.get("EMAIL_CHANGED"));
+            //email.setValue("operational", data.get("EMAIL_OPERATIONAL"));
             email.setValue("label", "Default");
             email.setValue("contact_id", contact);
             email.dirtySave();

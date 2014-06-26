@@ -63,7 +63,7 @@ public class Address extends DBModel{
         addField(new StringField("country_short"));
         addField(new StringField("country_long"));
 
-        addField(new DateField("valid_from"));
+        addField(new StringField("valid_from"));
         addField(new BooleanField("deliverable"));
 
         addField(new ForeignKeyField("contact_id", Contact.getReferenceInstance()));
