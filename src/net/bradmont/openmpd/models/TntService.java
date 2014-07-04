@@ -91,6 +91,8 @@ public class TntService extends DBModel{
         getField("addresses_by_personids_formdata").setDefault("Action=TntAddrList&Username=%s&Password=%s&PID=%s");
 
         addField(new StringField("query_ini_url"));
+        addField(new BooleanField("untested_service"));
+        getField("untested_service").setDefault(false);
 
         TABLE_NAME=TABLE;
         super.init();

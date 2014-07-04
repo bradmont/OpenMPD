@@ -42,6 +42,7 @@
     <string name="new_template">New Template</string>
 
     <string name="whats_new">What\'s new?</string>
+    <string name="thank_you_swipe_away">Thank You! (You can swipe this card away now)</string>
 
     <!-- partner types -->
     <string name="unknown">Unknown</string>
@@ -82,6 +83,8 @@
     <string name="ignore_certificate">Ignore error</string>
     <string name="ignoring_ssl">SSL errors on this server will be ignored in the future.</string>
     <string name="debug_enabled">Debug enabled. Please close and reopen the app to access debug.</string>
+    <string name="report_success">Successful data import</string>
+    <string name="report_success_body">It looks like you\'re using an untested service, which successfully imported your donor data. Please help us make OpenMPD better by sending us a login report. It\'ll take about 20 seconds.</string>
 
     <!-- summary card strings -->
     <string name="summary_card_title">Monthly Average: %s</string>

@@ -55,6 +55,7 @@ public class EditServiceAccountDialog extends DialogFragment{
     private FragmentManager manager=null;
     private String fragment_tag = null;
     private Runnable saveCallback = null;
+    private boolean untested = false;
 
     private SimpleCursorAdapter parentAdapter = null;
 
@@ -171,11 +172,13 @@ public class EditServiceAccountDialog extends DialogFragment{
                 String [] lines = getLines(R.raw.tnt_organisations_untested);
                 ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
                 spinner.setAdapter(adapter);
+                untested = true;
             } else if (value.startsWith("**Return**,")){
                 Log.i("net.bradmont.openmpd", "LESS selected");
                 String [] lines = getLines();
                 ArrayAdapter<String> adapter = new ServicesAdapter(getActivity(), R.layout.service_spinner_item, R.id.name, lines);
                 spinner.setAdapter(adapter);
+                untested = false;
             }
         }
 
@@ -213,6 +216,10 @@ public class EditServiceAccountDialog extends DialogFragment{
                     service = new TntService();
                     service.setValue("name", values[0]);
                     service.setValue("query_ini_url", values[1]);
+                    String firstLine = (String) spin.getItemAtPosition(0);
+                    if (untested == true){
+                        service.setValue("untested_service", 1);
+                    }
                     service.save();
                     account.setValue("tnt_service_id", service.getID());
                 } else {

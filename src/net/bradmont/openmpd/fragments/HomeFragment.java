@@ -80,6 +80,7 @@ public class HomeFragment extends SherlockFragment {
         int tutorialSwipe = prefs.getInt("tutorialSwipe", 0);
         int tutorialClickTitle = prefs.getInt("tutorialClickTitle", 0);
         int updateNews = prefs.getInt("updateNews", 0);
+        int untestedServiceReported = prefs.getInt("untestedServiceReported", 0);
 
 
         if (askSSLIgnore != null){
@@ -113,6 +114,13 @@ public class HomeFragment extends SherlockFragment {
                 GraphCard graphCard = new GraphCard();
                 graphCard.setIsSwipeable(false);
                 cardsui.addCardToLastStack(graphCard);
+
+                if (untestedServiceReported == 0){
+                    ModelList services = MPDDBHelper.filter("tnt_service", "untested_service", 1);
+                    if (services.size() != 0){
+                        cardsui.addCardToLastStack(new ServiceSuccessCard(services.get(0)));
+                    }
+                }
 
 
                 CardStack happyStack = new CardStack();

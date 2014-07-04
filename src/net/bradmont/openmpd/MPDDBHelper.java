@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 19;
+    private static int DATABASE_VERSION = 20;
 
     @Override
     protected void registerModels(){
@@ -216,6 +216,9 @@ public class MPDDBHelper extends DBHelper{
             db.execSQL("update tnt_service set query_ini_url='http://tntmpd.powertochange.org/tntmpd/Query.ini', name = 'Power to Change - Canada' where name_short='P2C'");
             db.execSQL("update tnt_service set query_ini_url='https://staffweb.cru.org/ss/tntmpd/query.ini', name = 'Cru - USA' where name_short='CCC'");
             db.execSQL("update tnt_service set query_ini_url='https://rews.cco.ca/dataserver/CCO/dataquery/TntQuery.aspx', name = 'CCO Canada' where name_short='CCO'");
+        }
+        if (oldVersion < 20){
+            db.execSQL("alter table tnt_service add untested_service int default 0;");
         }
     }
 
