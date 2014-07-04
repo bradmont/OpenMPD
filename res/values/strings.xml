@@ -136,6 +136,6 @@
     <string name="help_settings_title">Settings</string>
     <string name="help_settings">This page allows you to manage (add, delete, or edit) accounts to download your donor data online.\n\nYour organisation should be able to provide you with the login details you need (this is the same username and password you use to download donor data in TntMPD).</string>
 
-    <string name="update_news">IMPROVED: labels on giving graph are much nicer and clearer.\nFIXED: Donors who have increased were not being shown in the giving graph for months before their increase. This has been fixed.</string>
+    <string name="update_news">This release fixes a number of bugs preparing for 1.0, and adds support for a numbr of new organisations.</string>
 
 </resources>
