@@ -344,7 +344,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                     negatives = true;
                 }
             }
-            if (negatives = true){
+            if (negatives == true){
                 // if we have negative gifts in this month, combine month
                 // total into a single gift rather than dealing with
                 // ugly graphs
