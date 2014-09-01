@@ -11,10 +11,10 @@
     <application android:label="@string/app_name" 
             android:icon="@drawable/ic_launcher"
             android:name="net.bradmont.openmpd.OpenMPD"
-            android:theme="@style/Theme.Sherlock.Light.DarkActionBar">
+            android:theme="@style/OpenMPD">
         <activity android:name="net.bradmont.openmpd.HomeActivity"
-                  android:theme="@style/Theme.Sherlock.Light.DarkActionBar"
-                  android:label="@string/app_name">
+                    android:theme="@style/OpenMPD"
+                    android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -9,5 +9,8 @@
     <color name="gray">#A0A0A0</color>
     <color name="dark_gray">#404040</color>
     <color name="purple">#AA66CC</color>
+    <color name="app_primary">#5677fc</color>
+    <color name="app_background">#fafafa</color>
+    <color name="text_dark">#000000</color>
     
 </resources>
