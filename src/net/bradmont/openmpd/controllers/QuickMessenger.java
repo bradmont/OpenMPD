@@ -27,7 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import com.fima.cardsui.objects.Card;
 
 /*
  * Manage Quick Action messages, including selecting and sending messages,

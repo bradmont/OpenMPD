@@ -202,6 +202,9 @@ public class AnalyticsFragment extends Fragment {
     public static void createCache(){
         MPDDBHelper.get().getWritableDatabase().execSQL(CACHE_SQL);
     }
+    public static void clearCache(){
+        MPDDBHelper.get().getWritableDatabase().execSQL(CLEAR_CACHE_SQL);
+    }
 
 
 }

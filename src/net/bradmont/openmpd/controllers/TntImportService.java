@@ -23,9 +23,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.fragments.HomeFragment;
 import net.bradmont.openmpd.models.*;
-import net.bradmont.openmpd.views.cards.GraphCard;
+import net.bradmont.openmpd.fragments.AnalyticsFragment;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.supergreen.models.*;
@@ -119,16 +118,16 @@ public class TntImportService extends IntentService {
                 .setContentText(" ");
             evaluator.run();
 
-            getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
+            /*getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
                 .edit()
                 .putInt("onboardState", HomeFragment.ONBOARD_FINISHED)
-                .apply();
+                .apply();*/ // TODO: Onboarding done
 
 
 
             // clear the cache on our summary graph
-            GraphCard.clearCache();
-            GraphCard.createCache();
+            AnalyticsFragment.clearCache();
+            AnalyticsFragment.createCache();
 
             notifyUser(builder, notificationManager);
         }
@@ -186,7 +185,7 @@ public class TntImportService extends IntentService {
             switch (n.getInt("type")){
                 case Notification.CHANGE_PARTNER_TYPE:
                     int partnership = status.partnership(status.getInt("partner_type"));
-                    if (partnership == R.string.monthly || partnership == R.string.regular){
+                    if (partnership == R.string.per_month || partnership == R.string.regular){
                         new_partners++;
                     }
                     break;

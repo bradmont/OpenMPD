@@ -38,12 +38,6 @@ import net.bradmont.openmpd.R;
 
 public class HomeActivity extends BaseActivity {
 	
-    public static HomeFragment homeFragment = null;
-    public static DebugFragment debugFragment = null;
-    public static ContactList contactList = null;
-    public static GiftList giftList = null;
-    public static ServiceAccountList serviceAccountList = null;
-
 
 	public HomeActivity() {
 		super(R.string.app_name);

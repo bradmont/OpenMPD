@@ -5,7 +5,6 @@ import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.controllers.QuickMessenger;
-import net.bradmont.openmpd.views.cards.*;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 

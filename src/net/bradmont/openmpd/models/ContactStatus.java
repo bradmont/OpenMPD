@@ -159,7 +159,7 @@ public class ContactStatus extends DBModel{
             case 50:
                 return R.string.regular;
             case 60:
-                return R.string.monthly ;
+                return R.string.per_month ;
         }
         return 0;
     }

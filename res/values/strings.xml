@@ -15,7 +15,7 @@
 
     <string name="monthly">Monthly</string>
     <string name="quarterly_and_annual">Quarterly &amp; Annual</string>
-    <string name="avg_special">Avg Special</string>
+    <string name="avg_special">Special (Avg)</string>
     <string name="repeating_irregular">Repeating Irregular</string>
     <string name="dropped_support">Dropped Support</string>
     <string name="late_colon">Late</string>
