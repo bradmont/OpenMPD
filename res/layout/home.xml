@@ -4,7 +4,7 @@
     xmlns:custom="http://schemas.android.com/apk/res/net.bradmont.openmpd"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:background="#e3e3e3"
+    android:background="@color/app_background"
     android:layout_height="fill_parent" android:layout_gravity="center">
     <!-- CardUI -->
     <com.fima.cardsui.views.CardUI
