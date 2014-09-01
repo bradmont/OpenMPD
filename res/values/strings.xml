@@ -9,6 +9,18 @@
     <string name="analytics">Analytics</string>
     <string name="notifications">Notifications</string>
     <string name="monthly_average">Monthly Average</string>
+    <string name="twelve_month_average">12 Month Average</string>
+    <string name="weighted_average">Weighted Average</string>
+    <string name="ongoing_total">Ongoing Total</string>
+
+    <string name="monthly">Monthly</string>
+    <string name="quarterly_and_annual">Quarterly &amp; Annual</string>
+    <string name="avg_special">Avg Special</string>
+    <string name="repeating_irregular">Repeating Irregular</string>
+    <string name="dropped_support">Dropped Support</string>
+    <string name="late_colon">Late</string>
+    <string name="lapsed_colon">Lapsed</string>
+
     <string name="_and_"> and </string>
     <string name="and">and</string>
     <string name="add">Add</string>
@@ -19,6 +31,7 @@
     <string name="never">Never</string>
     <string name="data_import">Importing Data</string>
     <string name="giving_summary">Giving Summary</string>
+    <string name="partner_summary">Partner Summary</string>
     <string name="gift_history">Gift History</string>
     <string name="clear_data">Clear Data</string>
     <string name="randomise_names">Randomise Contact Data</string>
@@ -54,7 +67,7 @@
     <string name="frequent"> Frequent</string>
     <string name="annual">/yr</string>
     <string name="regular">/?mo</string>
-    <string name="monthly">/mo</string>
+    <string name="per_month">/mo</string>
 
     <!-- partner statuses -->
     <string name="dropped">Dropped</string>
