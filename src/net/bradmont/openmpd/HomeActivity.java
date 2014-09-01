@@ -23,6 +23,7 @@ import android.database.sqlite.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -34,7 +35,6 @@ import java.lang.Runnable;
 import net.bradmont.openmpd.BaseActivity;
 import net.bradmont.openmpd.fragments.*;
 import net.bradmont.openmpd.R;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class HomeActivity extends BaseActivity {
 	

@@ -29,10 +29,10 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.lang.Runnable;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
+import android.support.v4.app.Fragment;
+import android.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,7 +44,7 @@ import java.util.ArrayList;
 
 
 
-public class DebugFragment extends SherlockFragment implements OnClickListener{
+public class DebugFragment extends Fragment implements OnClickListener{
 
     public static final String [] columns = {"msg1", "msg2", "msg3"};
     public static final int [] fields = {R.id.msg1, R.id.msg2, R.id.msg3};
@@ -100,7 +100,7 @@ public class DebugFragment extends SherlockFragment implements OnClickListener{
     }
 
     @Override
-    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+    public boolean onOptionsItemSelected (MenuItem item){
         switch (item.getItemId() ){
             case R.id.menu_refresh:
                 Log.i("net.bradmont.openmpd", "menu_refresh");

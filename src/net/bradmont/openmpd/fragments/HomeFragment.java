@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,14 +34,14 @@ import net.bradmont.openmpd.views.EditServiceAccountDialog;
 import net.bradmont.supergreen.models.ModelList;
 import net.bradmont.holograph.BarGraph;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import com.fima.cardsui.views.CardUI;
 import com.fima.cardsui.objects.CardStack;
 import com.fima.cardsui.objects.Card;
 
 
-public class HomeFragment extends SherlockFragment {
+public class HomeFragment extends Fragment {
 
     public static final int ONBOARD_FIRST_RUN=0;
     public static final int ONBOARD_ACCOUNT_ADDED=1;
@@ -201,13 +202,13 @@ public class HomeFragment extends SherlockFragment {
     public void onResume(){
         super.onResume();
         // set title
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+        ((FragmentActivity) getActivity()).getActionBar()
             .setTitle(R.string.app_name);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+        ((FragmentActivity) getActivity()).getActionBar()
             .setSubtitle(null);
     }
     @Override
-    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+    public boolean onOptionsItemSelected (MenuItem item){
         switch (item.getItemId() ){
             case R.id.menu_help:
                 debug_count++;
