@@ -57,40 +57,7 @@ public class HomeActivity extends BaseActivity {
         Intent intent = getIntent();
         
 
-		// set the Above View
-		if (savedInstanceState != null)
-			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-		if (mContent == null){
-            homeFragment = new HomeFragment();
-            if (intent.hasExtra("net.bradmont.openmpd.SSLErrorServer")){
-                Log.i("net.bradmont.openmpd", "processing SSLError");
-                String host = intent.getStringExtra("net.bradmont.openmpd.SSLErrorServer");
-                homeFragment.setAskSSLIgnore(host);
-            }
-			mContent = homeFragment;
-        }
-
 		
-		// set the Above View
-		setContentView(R.layout.content_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame, mContent)
-		.commit();
-		
-		// set the Behind View
-		setBehindContentView(R.layout.menu_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.menu_frame, new MenuFragment())
-		.commit();
-		
-		// customize the SlidingMenu
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-		getSlidingMenu().setBehindWidthRes(R.dimen.menu_width);
-		getSlidingMenu().setBehindScrollScale(0);
-        setSlidingActionBarEnabled(false);
-
         // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
         ModelList messages = q.getAll(); 

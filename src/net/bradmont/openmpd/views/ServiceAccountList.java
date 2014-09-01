@@ -25,12 +25,12 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.lang.Runnable;
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
+import android.support.v4.app.ListFragment;
+import android.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
 
-public class ServiceAccountList extends SherlockListFragment {
+public class ServiceAccountList extends ListFragment {
     public static final String [] columns = {"name", "username", "last_import"};
     public static final int [] fields = {R.id.name, R.id.username, R.id.last_import};
 
@@ -95,7 +95,7 @@ public class ServiceAccountList extends SherlockListFragment {
         inflater.inflate(R.menu.serviceaccountlist, menu);
     }
     @Override
-    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+    public boolean onOptionsItemSelected (MenuItem item){
         switch (item.getItemId() ){
             case R.id.menu_add:
                 Log.i("net.bradmont.openmpd", "menu_add");

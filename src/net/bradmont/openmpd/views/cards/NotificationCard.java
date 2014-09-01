@@ -53,7 +53,7 @@ public abstract class NotificationCard extends Card implements View.OnClickListe
         setOnClickListener( new OnClickListener(){
             @Override
             public void onClick(View v){
-                activity.moveToFragment(new ContactDetail(contact_id));
+                //activity.moveToFragment(new ContactDetail(contact_id));
             }
         });
 	}

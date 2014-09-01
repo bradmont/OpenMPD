@@ -6,33 +6,34 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 import android.app.Activity;
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.PagerAdapter;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
-
 import net.bradmont.openmpd.fragments.*;
 import net.bradmont.openmpd.views.*;
 
-public class BaseActivity extends SlidingFragmentActivity {
+public class BaseActivity extends FragmentActivity {
+
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
 
 	private int mTitleRes;
-	protected ListFragment mFrag;
-	protected Fragment mContent;
     private static BaseActivity instance = null;
 
     final static ExecutorService workExecutor = Executors.newSingleThreadExecutor();
@@ -49,33 +50,101 @@ public class BaseActivity extends SlidingFragmentActivity {
         instance = this;
 		setTitle(mTitleRes);
 
-		// set the Behind View
-		setBehindContentView(R.layout.menu_frame);
-		if (savedInstanceState == null) {
-			FragmentTransaction t = this.getSupportFragmentManager().beginTransaction();
-			mFrag = new ContactList();
-			t.replace(R.id.menu_frame, mFrag);
-			t.commit();
-		} else {
-			mFrag = (ListFragment)this.getSupportFragmentManager().findFragmentById(R.id.menu_frame);
-		}
+        setContentView(R.layout.viewpager);
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new HomePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
 
-		// customize the SlidingMenu
-		SlidingMenu sm = getSlidingMenu();
-		sm.setShadowWidthRes(R.dimen.shadow_width);
-		sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-		sm.setFadeDegree(0.35f);
-		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        // set up tabs
+        final ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ActionBar.TabListener tabListener = new HomeTabListener();
+        actionBar.addTab(
+            actionBar.newTab().setText(R.string.analytics).setTabListener(tabListener));
+        actionBar.addTab(
+            actionBar.newTab().setText(R.string.contacts).setTabListener(tabListener));
+        actionBar.addTab(
+            actionBar.newTab().setText(R.string.notifications).setTabListener(tabListener));
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mPager.setOnPageChangeListener(
+            new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    // swipe handler
+                    getActionBar().setSelectedNavigationItem(position);
+                }
+            }
+        );
+
+        
+
 	}
+
+    private class HomeTabListener implements ActionBar.TabListener {
+
+        public HomeTabListener(){}
+        @Override
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            return;
+        }
+
+        @Override
+        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+            mPager.setCurrentItem(tab.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        }
+
+    }
+
+    private class HomePagerAdapter extends FragmentPagerAdapter {
+
+        private Fragment mAnalyticsFragment = null;
+        private Fragment mContactsFragment = null;
+        private Fragment mNotificationsFragment = null;
+
+        public HomePagerAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position){
+                case 0:
+                    if (mAnalyticsFragment == null){
+                        mAnalyticsFragment = new ContactList();
+                    }
+                    return mAnalyticsFragment;
+                case 1:
+                    if (mContactsFragment == null){
+                        mContactsFragment = new ContactList();
+                    }
+                    return mContactsFragment;
+                case 2:
+                    if (mNotificationsFragment == null){
+                        mNotificationsFragment = new ContactList();
+                    }
+                    return mNotificationsFragment;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+
+    }
+
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			toggle();
 			return true;
 		/*case R.id.github:
 			Util.goToGitHub(this);
@@ -86,14 +155,12 @@ public class BaseActivity extends SlidingFragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getSupportMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-        mContent = getSupportFragmentManager().findFragmentById(R.id.content_frame);
-		getSupportFragmentManager().putFragment(outState, "mContent", mContent);
 	}
     public void onClick(View view){
         // retrieve the fragment in R.id.content_frame (the visible main fragment)
@@ -144,24 +211,7 @@ public class BaseActivity extends SlidingFragmentActivity {
             }
         });
     }
-	public void switchContent(Fragment fragment) {
-		mContent = fragment;
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame, fragment)
-		.commit();
-		getSlidingMenu().showContent();
-	}
 
-    public void moveToFragment(Fragment fragment){
-		mContent = fragment;
-		getSupportFragmentManager()
-		.beginTransaction()
-        .addToBackStack(null)
-		.replace(R.id.content_frame, fragment)
-        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-		.commit();
-    }
     public static BaseActivity getInstance(){
         return instance;
     }

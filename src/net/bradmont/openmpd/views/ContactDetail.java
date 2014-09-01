@@ -27,17 +27,17 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
+import android.support.v4.app.Fragment;
+import android.app.ActionBar;
+import android.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Runnable;
 
-public class ContactDetail extends SherlockFragment implements OnClickListener{
+public class ContactDetail extends Fragment implements OnClickListener{
     private HashMap<String, String> values = new HashMap();
 
     private Cursor cursor = null;
@@ -112,7 +112,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
-        ((BaseActivity)getActivity()).getSupportActionBar().setTitle(values.get("name"));
+        ((BaseActivity)getActivity()).getActionBar().setTitle(values.get("name"));
 
         ArrayList<Link> links = new ArrayList<Link>(4);
 
@@ -197,16 +197,16 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             // header will be different depending on partner type
             if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
                 String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;
-                ((BaseActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             }
             Link link = new Link();
             link.title = R.string.Notes;
@@ -252,7 +252,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
             public void onClick(DialogInterface dialog, int id) {
                 local_status.setValue("notes", notes_text.getText().toString());
                 local_status.dirtySave();
-                ((BaseActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
+                //((BaseActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
             }
         });
         ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -263,7 +263,7 @@ public class ContactDetail extends SherlockFragment implements OnClickListener{
     }
 
     @Override
-    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+    public boolean onOptionsItemSelected (MenuItem item){
         AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
         switch (item.getItemId() ){
             case R.id.menu_gift_history:

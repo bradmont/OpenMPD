@@ -6,6 +6,8 @@
     <string name="download">Download</string>
     <string name="evaluate">Evaluate</string>
     <string name="contacts">Contacts</string>
+    <string name="analytics">Analytics</string>
+    <string name="notifications">Notifications</string>
     <string name="monthly_average">Monthly Average</string>
     <string name="_and_"> and </string>
     <string name="and">and</string>

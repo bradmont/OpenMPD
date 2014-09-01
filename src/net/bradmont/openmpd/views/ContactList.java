@@ -25,18 +25,18 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.widget.SearchView;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ListFragment;
+import android.app.ActionBar;
+import android.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.SearchView;
 
 
 import java.lang.Runnable;
 
-public class ContactList extends SherlockListFragment implements OnClickListener{
+public class ContactList extends ListFragment implements OnClickListener{
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift};
 
@@ -137,7 +137,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
         SearchView searchView = new
-                SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
+                SearchView( ((BaseActivity)getActivity()).getActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
@@ -180,7 +180,7 @@ public class ContactList extends SherlockListFragment implements OnClickListener
                                 | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
     }
     @Override
-    public boolean onOptionsItemSelected (com.actionbarsherlock.view.MenuItem item){
+    public boolean onOptionsItemSelected (MenuItem item){
         String [] args = new String[1];
         Cursor newCursor = null;
         switch (item.getItemId() ){
@@ -236,9 +236,9 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     public void onResume(){
         super.onResume();
         // set title
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+        ((FragmentActivity) getActivity()).getActionBar()
             .setTitle(R.string.app_name);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar()
+        ((FragmentActivity) getActivity()).getActionBar()
             .setSubtitle(null);
     }
 
@@ -258,6 +258,6 @@ public class ContactList extends SherlockListFragment implements OnClickListener
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         final BaseActivity activity = (BaseActivity)getActivity();
-        activity.moveToFragment(new ContactDetail((int) id));
+        // activity.moveToFragment(new ContactDetail((int) id));
     }
 }
