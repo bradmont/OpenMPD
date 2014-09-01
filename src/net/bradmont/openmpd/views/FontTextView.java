@@ -14,7 +14,7 @@ import net.bradmont.openmpd.R;
  * in assets/fonts.
  */
 public class FontTextView extends TextView {
-    public static final String DEFAULT_FONT="RobotoCondensed-Regular.ttf";
+    public static final String DEFAULT_FONT="Roboto-Light.ttf";
     public static final String ICONS1_FONT="Android-Dev-Icons-1.ttf";
     public static final String ICONS2_FONT="Android-Dev-Icons-2.ttf";
 
