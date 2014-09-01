@@ -11,4 +11,7 @@
        <attr name="maxTicks" format="integer" />
        <attr name="labelTextSize" format="dimension" />
    </declare-styleable>
+       <declare-styleable name="FontTextView">
+           <attr name="fontName" format="string" />
+       </declare-styleable>
 </resources>
