@@ -145,6 +145,9 @@ public class ContactList extends ListFragment implements OnClickListener{
                 String [] args = new String[1];
                 args[0] = newText;
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
+                if (!db_read.isOpen()){
+                    db_read = MPDDBHelper.get().getReadableDatabase();
+                }
                 Cursor newCursor = db_read.rawQuery("select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
                 "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
