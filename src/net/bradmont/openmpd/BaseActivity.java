@@ -124,7 +124,7 @@ public class BaseActivity extends FragmentActivity {
                     return mContactsFragment;
                 case 2:
                     if (mNotificationsFragment == null){
-                        mNotificationsFragment = new ContactList();
+                        mNotificationsFragment = new NotificationsFragment();
                     }
                     return mNotificationsFragment;
             }
