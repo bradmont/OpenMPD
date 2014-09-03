@@ -58,7 +58,7 @@ public class BarGraph extends View {
     protected float mTranslationX = 0;
     protected float mDownX = 0;
 
-    private static final String [] suffixes = {"", "0", "C", "k", "0k", "00k", "M", "0M", "00M", "G" };
+    private static final String [] suffixes = {"", "0", "00", "k", "0k", "00k", "M", "0M", "00M", "G" };
 
 
     protected Object [][] values = new Integer [0][0];
@@ -515,6 +515,9 @@ public class BarGraph extends View {
 
     private String makeLabel(int label){
         String result = Integer.toString(label);
+        if (result.length() <= labelZeros){
+            return result;
+        }
         result = result.substring(0, result.length() - labelZeros);
         return result + suffixes[labelZeros];
     }
