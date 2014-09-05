@@ -35,12 +35,11 @@
     <color name="elv_popup_text_color">#FFFFFF</color>
 
     <color name="user_icon_pink">#e91e63</color>
-    <color name="user_icon_purple">#673ab7</color>
-    <color name="user_icon_indigo">#3f51b5</color>
+    <color name="user_icon_purple">#9c27b0</color>
+    <color name="user_icon_blue">#5677fc</color>
     <color name="user_icon_light_blue">#03a9f4</color>
-    <color name="user_icon_teal">#009688</color>
+    <color name="user_icon_green">#42bd41</color>
     <color name="user_icon_yellow">#ffeb3b</color>
-    <color name="user_icon_blue_grey">#607d8b</color>
 
     <!-- save this one for notifications -->
     <color name="user_icon_orange">#ff5722</color>
@@ -48,11 +47,10 @@
     <array name="user_icon_colors">
         <item>@color/user_icon_pink</item>
         <item>@color/user_icon_purple</item>
-        <item>@color/user_icon_indigo</item>
+        <item>@color/user_icon_blue</item>
         <item>@color/user_icon_light_blue</item>
-        <item>@color/user_icon_teal</item>
+        <item>@color/user_icon_green</item>
         <item>@color/user_icon_yellow</item>
-        <item>@color/user_icon_blue_grey</item>
     </array>
 
     
