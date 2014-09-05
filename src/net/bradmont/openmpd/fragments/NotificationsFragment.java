@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 
+import android.util.TypedValue;
+
 import net.bradmont.openmpd.models.Notification;
 import net.bradmont.openmpd.models.ContactStatus;
 import net.bradmont.openmpd.views.Analytics;
@@ -39,8 +41,8 @@ public class NotificationsFragment extends ListFragment{
     // the user
 
 
-    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "date"};
-    private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon, R.id.date};
+    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "date", "type"};
+    private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon, R.id.date, R.id.quickactions};
     private static int[] icon_colors = null;
 
     @Override
@@ -208,6 +210,20 @@ public class NotificationsFragment extends ListFragment{
                     } else {
                         return false;
                     }
+                case R.id.quickactions:
+                    if (cursor.getInt(columnIndex) == Notification.SPECIAL_GIFT){
+                        TextView phone = (TextView) view.findViewById(R.id.action_icon);
+                        phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, 
+                            getResources().getDimension(R.dimen.icon_text_size_small));
+                        view.findViewById(R.id.overflow).setVisibility(View.VISIBLE);
+                        return true;
+                    } else {
+                        TextView phone = (TextView) view.findViewById(R.id.action_icon);
+                        phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, 
+                            getResources().getDimension(R.dimen.icon_text_size));
+                        view.findViewById(R.id.overflow).setVisibility(View.GONE);
+                        return true;
+                    }
                 case R.id.status:
                     tv = (TextView) view;
                     return false;
@@ -224,6 +240,7 @@ public class NotificationsFragment extends ListFragment{
                         } else {
                             view.setVisibility(View.GONE);
                         }
+                        cursor.moveToNext();
                     }
                     return true;
             }

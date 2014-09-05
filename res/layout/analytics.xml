@@ -5,7 +5,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     <LinearLayout
-        android:padding="@dimen/list_padding"
+        android:paddingTop="@dimen/list_padding"
+        android:paddingBottom="@dimen/list_padding"
+        android:paddingLeft="@dimen/list_padding"
+        android:paddingRight="@dimen/list_padding_right"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:background="@color/app_background"

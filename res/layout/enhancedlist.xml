@@ -12,4 +12,6 @@
     android:layout_height="match_parent"
     android:background="@color/app_background"
     android:paddingLeft="@dimen/list_padding"
-    android:paddingRight="@dimen/list_padding" />
+    android:paddingTop="@dimen/list_padding"
+    android:paddingBottom="@dimen/list_padding"
+    android:paddingRight="@dimen/list_padding_right" />
