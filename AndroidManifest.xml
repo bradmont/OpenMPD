@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="ContactListActivity" />
+        <activity android:name=".activities.ContactDetailActivity" />
         <activity android:name="AccountListActivity" />
         <activity android:name="DebugActivity" />
 

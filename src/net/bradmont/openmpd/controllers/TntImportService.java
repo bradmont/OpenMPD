@@ -185,7 +185,7 @@ public class TntImportService extends IntentService {
             switch (n.getInt("type")){
                 case Notification.CHANGE_PARTNER_TYPE:
                     int partnership = status.partnership(status.getInt("partner_type"));
-                    if (partnership == R.string.per_month || partnership == R.string.regular){
+                    if (partnership == R.string.per_month || partnership == R.string.per_n_months){
                         new_partners++;
                     }
                     break;

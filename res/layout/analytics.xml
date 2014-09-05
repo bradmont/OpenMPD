@@ -24,7 +24,8 @@
             android:layout_width="fill_parent"
             android:padding="@dimen/list_padding"
             android:layout_height="wrap_content"
-            android:background="@color/app_foreground"
+            android:background="@drawable/layer_card_background"
+            android:layout_marginBottom="@dimen/card_spacing"
             >
             <LinearLayout
                 android:orientation="horizontal"
@@ -85,18 +86,14 @@
                     />
             </LinearLayout>
         </LinearLayout>
-        <View
-            android:layout_height="@dimen/shadow_height"
-            android:layout_width="fill_parent"
-            android:layout_marginBottom="@dimen/card_spacing"
-            android:background="@color/shadow" />
         <!-- graph card -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:padding="@dimen/list_padding"
             android:layout_height="wrap_content"
-            android:background="@color/app_foreground"
+            android:background="@drawable/layer_card_background"
+            android:layout_marginBottom="@dimen/card_spacing"
             >
             <net.bradmont.holograph.BarGraph 
                 android:id="@+id/magic_graph"
@@ -114,12 +111,6 @@
             />
 
         </LinearLayout>
-        <View
-            android:layout_height="@dimen/shadow_height"
-            android:layout_width="fill_parent"
-            android:layout_marginBottom="@dimen/card_spacing"
-            android:background="@color/shadow" />
-
         <net.bradmont.openmpd.views.FontTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -135,7 +126,8 @@
             android:layout_width="fill_parent"
             android:padding="@dimen/list_padding"
             android:layout_height="wrap_content"
-            android:background="@color/app_foreground"
+            android:background="@drawable/layer_card_background"
+            android:layout_marginBottom="@dimen/card_spacing"
             >
             <!-- title -->
             <LinearLayout
@@ -299,18 +291,14 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-        <View
-            android:layout_height="@dimen/shadow_height"
-            android:layout_width="fill_parent"
-            android:layout_marginBottom="@dimen/card_spacing"
-            android:background="@color/shadow" />
         <!-- fourth card -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:padding="@dimen/list_padding"
             android:layout_height="wrap_content"
-            android:background="@color/app_foreground"
+            android:background="@drawable/layer_card_background"
+            android:layout_marginBottom="@dimen/card_spacing"
             >
             <!-- title -->
             <LinearLayout
@@ -392,10 +380,5 @@
                 <!-- spacer -->
             </LinearLayout>
         </LinearLayout>
-        <View
-            android:layout_height="@dimen/shadow_height"
-            android:layout_width="fill_parent"
-            android:layout_marginBottom="@dimen/card_spacing"
-            android:background="@color/shadow" />
     </LinearLayout>
 </ScrollView>

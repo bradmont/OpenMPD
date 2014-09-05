@@ -65,8 +65,8 @@
     <string name="onetime">One Time</string>
     <string name="occasional"> Occasional</string>
     <string name="frequent"> Frequent</string>
-    <string name="annual">/yr</string>
-    <string name="regular">/?mo</string>
+    <string name="per_year">/yr</string>
+    <string name="per_n_months">/?mo</string>
     <string name="per_month">/mo</string>
 
     <!-- partner statuses -->
@@ -112,15 +112,17 @@
     <string name="next_month_stable_giving">Next Month Stable Giving:</string>
 
     <!-- notification card strings -->
-    <string name="new_partner">New Partner: %s</string>
+    <string name="new_partner">New Partner</string>
     <string name="new_monthly_partner">New Monthly Partner</string>
     <string name="new_regular_partner">New Regular Partner</string>
-    <string name="late_partner_title">%s is late</string>
-    <string name="restarted_partner_title">%s restarted!</string>
-    <string name="lapsed_partner_title">%s has lapsed</string>
-    <string name="dropped_partner_title">%s dropped off</string>
-    <string name="amount_change_title">%s changed giving amount</string>
-    <string name="special_gift_title">%s made a special gift</string>
+    <string name="late_partner">Late Partner</string>
+    <string name="restarted_partner">Restarted Partner</string>
+    <string name="lapsed_partner">Lapsed Partner</string>
+    <string name="dropped_partner">Dropped Partner</string>
+    <string name="amount_change">Amount Change</string>
+    <string name="special_gift">Special Gift</string>
+    <string name="partner_continued">Continued</string>
+    <string name="change_type">Change Type</string>
 
     <!-- Toast values -->
     <string name="checking_login">Checking Login</string>

@@ -155,9 +155,9 @@ public class ContactStatus extends DBModel{
             case 35:
                 return R.string.frequent;
             case 40:
-                return R.string.annual;
+                return R.string.per_year;
             case 50:
-                return R.string.regular;
+                return R.string.per_n_months;
             case 60:
                 return R.string.per_month ;
         }

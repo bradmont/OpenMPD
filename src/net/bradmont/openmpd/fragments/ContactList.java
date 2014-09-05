@@ -1,11 +1,13 @@
-package net.bradmont.openmpd.views;
+package net.bradmont.openmpd.fragments;
 
 import net.bradmont.supergreen.models.*;
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.activities.ContactDetailActivity;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.TntImportService;
+import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.views.*;
 
 import android.content.Context;
 import android.content.Intent;
@@ -36,12 +38,14 @@ import android.widget.SearchView;
 
 import java.lang.Runnable;
 
-public class ContactList extends ListFragment implements OnClickListener{
+public class ContactList extends ListFragment {
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift};
 
     private SQLiteDatabase db_read = MPDDBHelper.get().getReadableDatabase();
     private Cursor cursor = null;
+
+    private ListView mListView = null;
 
     private SimpleCursorAdapter adapter = null;
     private static final String BASE_QUERY = "select A.fname as fname, A.lname as lname, " +
@@ -66,11 +70,11 @@ public class ContactList extends ListFragment implements OnClickListener{
             Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-        ListView lv = (ListView)  inflater.inflate(R.layout.list, null);
+        mListView = (ListView)  inflater.inflate(R.layout.list, null);
         LayoutInflater layoutInflater = (LayoutInflater)getActivity()
                 .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 
-        return lv;
+        return mListView;
     }
 
     @Override
@@ -131,6 +135,7 @@ public class ContactList extends ListFragment implements OnClickListener{
         });
 
         setListAdapter(adapter);
+        mListView.setOnItemClickListener(new ContactListClickListener());
 
     }
     @Override
@@ -245,22 +250,14 @@ public class ContactList extends ListFragment implements OnClickListener{
             .setSubtitle(null);
     }
 
-    @Override
-    public void onClick(View view){
-    }
 
-    public void tntImport(){
-
-        ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
-        for (int i = 0; i < accounts.size(); i++){
-            getActivity().startService(new Intent(getActivity(), TntImportService.class).putExtra("net.bradmont.openmpd.account_id", accounts.get(i).getID()) );
+    private class ContactListClickListener implements ListView.OnItemClickListener{
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.i("net.bradmont.openmpd", "click");
+            Intent intent = new Intent(getActivity(), ContactDetailActivity.class);
+            intent.putExtra("contactId", (int) id);
+            startActivity(intent);
         }
-
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        final BaseActivity activity = (BaseActivity)getActivity();
-        // activity.moveToFragment(new ContactDetail((int) id));
     }
 }

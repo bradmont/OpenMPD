@@ -18,6 +18,7 @@
 
     <dimen name="slidingmenu_offset">60dp</dimen>
     <dimen name="list_padding">16dp</dimen>
+    <dimen name="card_padding">12dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
     <dimen name="menu_width">40mm</dimen>
     <dimen name="big_text">36dp</dimen>
@@ -28,6 +29,7 @@
     <integer name="num_cols">1</integer>
 
     <!-- redesign dimens -->
+    <dimen name="icon_text_size">22pt</dimen>
     <dimen name="title_text_size">12pt</dimen>
     <dimen name="detail_text_size">6pt</dimen>
     <dimen name="shadow_height">4dp</dimen>

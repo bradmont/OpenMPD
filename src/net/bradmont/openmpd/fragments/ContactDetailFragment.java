@@ -1,9 +1,10 @@
-package net.bradmont.openmpd.views;
+package net.bradmont.openmpd.fragments;
 
 import net.bradmont.supergreen.models.*;
 import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.QuickMessenger;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
@@ -27,6 +28,8 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+
 import android.app.ActionBar;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -36,7 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Runnable;
 
-public class ContactDetail extends Fragment implements OnClickListener{
+public class ContactDetailFragment extends Fragment implements OnClickListener{
     private HashMap<String, String> values = new HashMap();
 
     private Cursor cursor = null;
@@ -52,22 +55,24 @@ public class ContactDetail extends Fragment implements OnClickListener{
     public static final int ADDRESS = 3;
     public static final int NOTES = 4;
 
-    public ContactDetail(int id){
+    public ContactDetailFragment(int id){
         contact = new Contact(id);
     }
 
-    public ContactDetail(){
+    public ContactDetailFragment(){
         this.contact = null;
     }
-    public ContactDetail(Contact contact){
+    public ContactDetailFragment(Contact contact){
         this.contact=contact;
     }
 
     public void setContact(int id){
         contact = new Contact(id);
+        populateView();
     }
     public void setContact(Contact contact){
         this.contact=contact;
+        populateView();
     }
 
     @Override
@@ -82,7 +87,13 @@ public class ContactDetail extends Fragment implements OnClickListener{
 
         layout = inflater.inflate(R.layout.contact_detail, null);
         setHasOptionsMenu(true);
-
+        if (contact != null){
+            populateView();
+        }
+        return layout;
+    }
+    private void populateView(){
+        View layout = getView();
 
         values.put("fname", contact.getString("fname"));
         values.put("lname", contact.getString("lname"));
@@ -111,7 +122,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
-        ((BaseActivity)getActivity()).getActionBar().setTitle(values.get("name"));
+        ((FragmentActivity)getActivity()).getActionBar().setTitle(values.get("name"));
 
         ArrayList<Link> links = new ArrayList<Link>(4);
 
@@ -196,16 +207,16 @@ public class ContactDetail extends Fragment implements OnClickListener{
             // header will be different depending on partner type
             if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
                 String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;
-                ((BaseActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
             }
             Link link = new Link();
             link.title = R.string.Notes;
@@ -230,7 +241,6 @@ public class ContactDetail extends Fragment implements OnClickListener{
             // Hide bar graph if no gifts in last year
             layout.findViewById(R.id.bar_graph_layout).setVisibility(View.GONE);
         }
-        return layout;
     }
     @Override
         public void onCreateOptionsMenu (Menu menu, MenuInflater inflater){
@@ -251,7 +261,7 @@ public class ContactDetail extends Fragment implements OnClickListener{
             public void onClick(DialogInterface dialog, int id) {
                 local_status.setValue("notes", notes_text.getText().toString());
                 local_status.dirtySave();
-                //((BaseActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
+                //((FragmentActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
             }
         });
         ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

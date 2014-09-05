@@ -2,7 +2,6 @@ package net.bradmont.openmpd.controllers;
 
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.models.*;
-import net.bradmont.openmpd.views.ContactDetail;
 
 import android.app.Activity;
 import android.app.AlertDialog;

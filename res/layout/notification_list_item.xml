@@ -1,64 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
-        android:gravity="center_vertical"
+    android:background="@null"
+    android:layout_margin="0dp"
+    android:padding="0dp"
     android:layout_height="wrap_content" >
-    <!-- name -->
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+
+    <net.bradmont.openmpd.views.FontTextView
+        android:id="@+id/date"
+        android:visibility="gone"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#404040"
-        android:textSize="10pt"
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/title_text_size"
+        android:text="@string/giving_summary"
+        android:layout_marginBottom="@dimen/card_spacing"
         />
 
+    <!-- card -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:gravity="center_vertical"
+        android:background="@drawable/layer_card_background"
+        android:layout_marginBottom="@dimen/card_padding"
+        android:padding="@dimen/card_padding"
         android:layout_height="wrap_content" >
-        <!-- Giving Status -->
+        <!-- icon -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/user_icon"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/user_icon_circle"
+                android:layout_width="80dp"
+                android:layout_height="80dp"/>
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/initials"
+                android:layout_width="80dp"
+                android:layout_height="78dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/icon_text_size"
+                android:text="JS"
+                android:gravity="center"
+                />
+
+        </FrameLayout>
+        
+
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-            />
-            <TextView
-                android:id="@+id/amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#99cc00"
-                android:textSize="10pt"
-                android:text="Unknown" />
-            <TextView
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="fill_parent" 
+            android:paddingLeft="@dimen/card_padding"
+            android:paddingTop="4dp"
+            >
+            <net.bradmont.openmpd.views.FontTextView
                 android:id="@+id/type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="10pt"
-                android:textColor="#99cc00"
+                android:textSize="@dimen/title_text_size"
+                android:textColor="@color/text_medium"
                 android:text="Unknown" />
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10pt"
-                android:textColor="#99cc00"
-                android:text="Unknown" />
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10pt"
-                android:textColor="#99cc00"
-                android:text="Unknown" />
+            <!-- Giving Status -->
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/card_padding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <net.bradmont.openmpd.views.FontTextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:id="@+id/amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+            </LinearLayout>
+            <!-- last gift -->
         </LinearLayout>
-        <!-- last gift -->
+        <net.bradmont.openmpd.views.FontTextView
+            android:id="@+id/acton_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/text_medium"
+            android:textSize="@dimen/icon_text_size"
+            android:text="T"
+            android:gravity="center"
+            custom:fontName="icons2"
+            />
+
     </LinearLayout>
-
 </LinearLayout>
-

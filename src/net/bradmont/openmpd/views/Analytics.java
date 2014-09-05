@@ -172,5 +172,13 @@ public class Analytics {
         }
         return mThisMonth;
     }
+    public static String getToday(){
+        if (mThisMonth == null){
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar cal = Calendar.getInstance();
+            mThisMonth = dateFormat.format(cal.getTime());
+        }
+        return mThisMonth;
+    }
 
 }
