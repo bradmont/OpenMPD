@@ -298,7 +298,7 @@ public class NotificationsFragment extends ListFragment{
         public void insert(int archived_id){
             MPDDBHelper.get().getWritableDatabase().execSQL(
                     "update notification set status = ? where _id = ?",
-                    new String [] {Integer.toString(Notification.STATUS_ACKNOWLEDGED), Integer.toString(archived_id)});
+                    new String [] {Integer.toString(Notification.STATUS_NOTIFIED), Integer.toString(archived_id)});
             Cursor cursor = MPDDBHelper.get().getReadableDatabase()
                 .rawQuery(NOTIFICATIONS_QUERY, 
                 new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
