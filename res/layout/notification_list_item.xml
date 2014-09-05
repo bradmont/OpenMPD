@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/title_text_size"
                 android:textColor="@color/text_medium"
-                android:maxLines="1"
+                android:singleLine="true"
                 android:text="Unknown" />
             <!-- Giving Status -->
             <LinearLayout
