@@ -23,7 +23,6 @@ import android.util.TypedValue;
 
 import net.bradmont.openmpd.models.Notification;
 import net.bradmont.openmpd.models.ContactStatus;
-import net.bradmont.openmpd.views.Analytics;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
 import net.bradmont.openmpd.*;
 
