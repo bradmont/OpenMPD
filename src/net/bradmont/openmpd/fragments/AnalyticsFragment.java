@@ -26,7 +26,7 @@ import android.widget.ListView;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.views.HelpDialog;
-import net.bradmont.openmpd.views.Analytics;
+import net.bradmont.openmpd.helpers.Analytics;
 import net.bradmont.holograph.BarGraph;
 
 import android.support.v4.app.FragmentActivity;
