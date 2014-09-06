@@ -310,7 +310,10 @@ public class NotificationsFragment extends ListFragment{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id){
             Intent intent = new Intent(getActivity(), ContactDetailActivity.class);
-            intent.putExtra("contactId", (int) id);
+            mAdapter.getCursor().moveToPosition(position);
+            int contact_id = mAdapter.getCursor().getInt(
+                    mAdapter.getCursor().getColumnIndex("contact_id"));
+            intent.putExtra("contactId", contact_id);
             startActivity(intent);
 
         }
