@@ -95,6 +95,18 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     private void populateView(){
         View layout = getView();
 
+        if (contact.getString("fname") == null && contact.getString("lname") == null){
+            // ugly hack to move around a bug in the import routines when
+            // donor data is dirty
+            try {
+                spouse = (Contact) contact.getRelated("spouse");
+                String temp = spouse.getString("tnt_people_id");
+                temp = temp.substring(1);
+                contact.setValue("tnt_people_id", temp);
+            } catch (Exception e){ 
+                // at this point, we're pretty much screwed...
+            }
+        }
         values.put("fname", contact.getString("fname"));
         values.put("lname", contact.getString("lname"));
 
@@ -322,6 +334,12 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     private boolean buildGraph(BarGraph graph, String tnt_people_id){
         String [] args = new String [1];
         args[0] = contact.getString("tnt_people_id");
+        if (args[0] == null){
+            args[0] = spouse.getString("tnt_people_id");
+        }
+        if (args[0] == null){
+            return false;
+        }
 
         Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
             "select sum(amount) from (select amount, a.month from (select distinct month from gift order by month desc limit 13) a join gift b on a.month=b.month where tnt_people_id=?);", args);
