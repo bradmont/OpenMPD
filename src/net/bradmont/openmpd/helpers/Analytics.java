@@ -1,4 +1,4 @@
-package net.bradmont.openmpd.views;
+package net.bradmont.openmpd.helpers;
 
 import net.bradmont.openmpd.OpenMPD;
 import net.bradmont.openmpd.MPDDBHelper;
