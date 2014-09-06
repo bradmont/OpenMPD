@@ -518,7 +518,11 @@ public class BarGraph extends View {
         if (result.length() <= labelZeros){
             return result;
         }
-        result = result.substring(0, result.length() - labelZeros);
+        try {
+            result = result.substring(0, result.length() - labelZeros);
+        } catch (java.lang.StringIndexOutOfBoundsException e){
+            return result;
+        }
         return result + suffixes[labelZeros];
     }
 
