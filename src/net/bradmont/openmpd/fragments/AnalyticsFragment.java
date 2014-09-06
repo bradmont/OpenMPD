@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ViewSwitcher;
 
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.R;
@@ -96,7 +97,24 @@ public class AnalyticsFragment extends Fragment {
             .setText(Analytics.getOngoingTotal());
 
 
-        populateGraph(view);
+        if (verifyCache()){
+            populateGraph(view);
+        } else {
+            final ViewSwitcher switcher = (ViewSwitcher) view.findViewById(R.id.graph_switcher);
+            final View rootView = view;
+            switcher.showNext();
+            ((BaseActivity) getActivity()).queueTask(new Runnable(){
+                public void run(){
+                    createCache();
+                    getActivity().runOnUiThread( new Runnable(){
+                        public void run(){
+                            populateGraph(rootView);
+                            switcher.showNext();
+                        }
+                    });
+                }
+            });
+        }
         return view;
     }
 

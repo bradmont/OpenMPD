@@ -22,6 +22,7 @@
 
     <!-- card -->
     <LinearLayout 
+        android:id="@+id/card"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:background="@drawable/layer_card_background"

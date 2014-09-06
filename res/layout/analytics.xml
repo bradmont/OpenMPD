@@ -98,20 +98,47 @@
             android:background="@drawable/layer_card_background"
             android:layout_marginBottom="@dimen/card_spacing"
             >
-            <net.bradmont.holograph.BarGraph 
-                android:id="@+id/magic_graph"
+            <ViewSwitcher
+                android:id="@+id/graph_switcher"
                 android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:padding="0dp"
-                android:paddingBottom="0dp"
-                custom:colors="#5677fc,#ff9800,#ffc107,#e51c23"
-                custom:lineColor="#707070"
-                custom:labelTextSize="9dp"
-                custom:barWeight="1"
-                custom:spacingWeight=".33"
-                custom:maxItems="12"
-                custom:maxTicks="9"
-            />
+                android:layout_height="wrap_content" 
+                android:inAnimation="@android:anim/slide_in_left"
+                android:outAnimation="@android:anim/slide_out_right" 
+                >
+                <net.bradmont.holograph.BarGraph 
+                    android:id="@+id/magic_graph"
+                    android:layout_width="fill_parent"
+                    android:layout_height="200dp"
+                    android:padding="0dp"
+                    android:paddingBottom="0dp"
+                    custom:colors="#5677fc,#ff9800,#ffc107,#e51c23"
+                    custom:lineColor="#707070"
+                    custom:labelTextSize="9dp"
+                    custom:barWeight="1"
+                    custom:spacingWeight=".33"
+                    custom:maxItems="12"
+                    custom:maxTicks="9"
+                />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="200dp"
+                    android:gravity="center"
+                    >
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true" />
+                    <net.bradmont.openmpd.views.FontTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_medium"
+                        android:textSize="@dimen/title_text_size"
+                        android:text="@string/regenerating_graph"
+                        android:layout_marginTop="@dimen/card_spacing"
+                        />
+                </LinearLayout>
+            </ViewSwitcher>
 
         </LinearLayout>
         <net.bradmont.openmpd.views.FontTextView

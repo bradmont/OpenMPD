@@ -124,7 +124,7 @@
     <string name="partner_continued">Continued</string>
     <string name="change_type">Change Type</string>
 
-    <!-- Toast values -->
+    <!-- Toast and user notice values -->
     <string name="checking_login">Checking Login</string>
     <string name="connecting_server">Connecting to dataserver</string>
     <string name="please_wait">Please Wait</string>
@@ -133,10 +133,14 @@
     <string name="account_verified">Account Verified</string>
     <string name="assigned_monthly">Assigned to monthly. Expires in 3 months.</string>
     <string name="assigned_annual">Assigned to annual. Expires in 14 months.</string>
+    <string name="assigned_quarterly">Assigned to quarterly. Expires in 6 months.</string>
     <string name="no_phone_number">No phone number available for this contact.</string>
+    <string name="regenerating_graph">Regenerating graph...</string>
 
     <!-- menu strings -->
     <string name="make_monthly">This is monthly</string>
+    <string name="make_quarterly">This is quarterly</string>
+    <string name="make_semi_annual">This is semi annual</string>
     <string name="make_annual">This is annual</string>
 
     <!-- help/tutorial strings -->

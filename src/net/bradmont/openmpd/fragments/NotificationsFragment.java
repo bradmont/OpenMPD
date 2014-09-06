@@ -8,18 +8,27 @@ import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.SimpleCursorAdapter;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 
 import android.util.TypedValue;
+import android.util.Log;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import net.bradmont.openmpd.models.Notification;
 import net.bradmont.openmpd.models.ContactStatus;
@@ -32,12 +41,15 @@ public class NotificationsFragment extends ListFragment{
     
     private EnhancedListAdapter mAdapter;
     private EnhancedListView mListView;
+    private OnClickListener mOnClickListener = null;
 
     private final static String NOTIFICATIONS_QUERY = 
-        "select notification.*, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) order by date desc;";
+        "select notification.*, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
     // and not (type = 2 and contact_status = 5 and manual_set_expires > date) 
     // filters out  "Continued" notifications for donors set as regular by 
     // the user
+    // and not (0 < partner_type < 10) is to weed out old notifications from a previous app version
+    // and not (contact_status = "5" and message="4") weeds out notification change from "new" to "current"
 
 
     private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "date", "type"};
@@ -60,6 +72,7 @@ public class NotificationsFragment extends ListFragment{
                 .rawQuery(NOTIFICATIONS_QUERY, 
                 new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
 
+        mOnClickListener = new NotificationCardClickListener();
         mAdapter = new EnhancedListAdapter(getActivity(),
                  R.layout.notification_list_item, cursor, columns, fields);
         mAdapter.setViewBinder(new NotificationListViewBinder());
@@ -67,9 +80,8 @@ public class NotificationsFragment extends ListFragment{
 
         mListView.setDismissCallback(new NotificationDismissCallback());
         mListView.setOnItemClickListener(new NotificationClickListener());
-        //mListView.setSwipingLayout(R.id.swiping_layout);
+        mListView.setSwipingLayout(R.id.card);
 
-        //mListView.setSwipingLayout(true);
 
         mListView.enableSwipeToDismiss();
         mListView.setSwipeDirection(EnhancedListView.SwipeDirection.BOTH);
@@ -189,9 +201,10 @@ public class NotificationsFragment extends ListFragment{
                                         } else if (cursor.getString(cursor.getColumnIndex("manual_set_expires"))
                                                 .compareTo( cursor.getString(cursor.getColumnIndex("date"))) >= 0){
                                             value = getString(R.string.partner_continued);
+                                        } else if (oldstatus == ContactStatus.STATUS_NEW){
+                                            value = "Maintained";
                                         }
                                     } catch (Exception e){
-                                        value = value + "Weird";
                                     }
                                     break;
                             }
@@ -215,6 +228,8 @@ public class NotificationsFragment extends ListFragment{
                         phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, 
                             getResources().getDimension(R.dimen.icon_text_size_small));
                         view.findViewById(R.id.overflow).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.overflow).setOnClickListener(mOnClickListener);
+                        view.findViewById(R.id.overflow).setTag(cursor.getInt(0));
                         return true;
                     } else {
                         TextView phone = (TextView) view.findViewById(R.id.action_icon);
@@ -318,4 +333,90 @@ public class NotificationsFragment extends ListFragment{
         }
     }
 
+    private class NotificationCardClickListener implements View.OnClickListener, PopupMenu.OnMenuItemClickListener{
+
+        private View mView = null;
+        private Notification mNotification = null; 
+        private ContactStatus mContactStatus = null; 
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.overflow:
+                    mView = v;
+                    Integer nID = (Integer) v.getTag();
+                    Log.i("net.bradmont.openmpd", "Loading notification " +nID);
+                    mNotification = new Notification(nID);
+                    mContactStatus = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status")
+                        .getByField("contact_id", mNotification.getInt("contact"));
+                    PopupMenu popup = new PopupMenu(getActivity(), v);
+                    MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.special_gift_card_actions, popup.getMenu());
+                    popup.setOnMenuItemClickListener(this);
+                    popup.show();
+                    break;
+                case R.id.action_icon:
+                    ((BaseActivity) getActivity()).userMessage("quick call");
+            }
+        }
+        public boolean onMenuItemClick(MenuItem item){
+            switch (item.getItemId()) {
+                case R.id.menu_make_monthly:
+                    ((BaseActivity) getActivity()).userMessage(R.string.assigned_monthly);
+                    // do stuff to the ContactStatus
+                    mContactStatus.setValue("partner_type", ContactStatus.PARTNER_MONTHLY); 
+                    mContactStatus.setValue("status", ContactStatus.STATUS_CURRENT); 
+                    mContactStatus.setValue("giving_amount", Integer.parseInt(mNotification.getString("message")));
+                    mContactStatus.setValue("gift_frequency", 1); 
+
+                    // set up expiry date for manual status
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, 3); // expire in 3 months
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String expires_date = dateFormat.format(cal.getTime());
+                    mContactStatus.setValue("manual_set_expires", expires_date);
+
+                    mContactStatus.dirtySave();
+                    AnalyticsFragment.clearCache();
+                    return true;
+                case R.id.menu_make_quarterly:
+                    ((BaseActivity) getActivity()).userMessage(R.string.assigned_quarterly);
+                    // do stuff to the ContactStatus
+                    mContactStatus.setValue("partner_type", ContactStatus.PARTNER_REGULAR); 
+                    mContactStatus.setValue("status", ContactStatus.STATUS_CURRENT); 
+                    mContactStatus.setValue("giving_amount", Integer.parseInt(mNotification.getString("message")));
+                    mContactStatus.setValue("gift_frequency", 6); 
+
+                    // set up expiry date for manual status
+                    cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, 6); // expire in 14 months
+                    dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    expires_date = dateFormat.format(cal.getTime());
+                    mContactStatus.setValue("manual_set_expires", expires_date);
+
+                    mContactStatus.dirtySave();
+                    AnalyticsFragment.clearCache();
+                    return true;
+                case R.id.menu_make_annual:
+                    ((BaseActivity) getActivity()).userMessage(R.string.assigned_annual);
+                    // do stuff to the ContactStatus
+                    mContactStatus.setValue("partner_type", ContactStatus.PARTNER_ANNUAL); 
+                    mContactStatus.setValue("status", ContactStatus.STATUS_CURRENT); 
+                    mContactStatus.setValue("giving_amount", Integer.parseInt(mNotification.getString("message")));
+                    mContactStatus.setValue("gift_frequency", 12); 
+
+                    // set up expiry date for manual status
+                    cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, 14); // expire in 14 months
+                    dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    expires_date = dateFormat.format(cal.getTime());
+                    mContactStatus.setValue("manual_set_expires", expires_date);
+
+                    mContactStatus.dirtySave();
+                    AnalyticsFragment.clearCache();
+                    return true;
+            }
+            return false;
+        }
+    }
 }
