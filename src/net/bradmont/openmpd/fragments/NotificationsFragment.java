@@ -33,6 +33,7 @@ import java.util.Calendar;
 import net.bradmont.openmpd.models.Notification;
 import net.bradmont.openmpd.models.ContactStatus;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
+import net.bradmont.openmpd.helpers.TextTools;
 import net.bradmont.openmpd.*;
 
 import net.bradmont.openmpd.views.EnhancedListView;
@@ -245,12 +246,12 @@ public class NotificationsFragment extends ListFragment{
                     String date = cursor.getString(columnIndex);
                     if (cursor.getPosition() ==0){
                         view.setVisibility(View.VISIBLE);
-                        ((TextView) view).setText(date);
+                        ((TextView) view).setText(TextTools.prettyDate(date));
                     } else {
                         cursor.moveToPrevious();
                         if (!date.equals(cursor.getString(columnIndex))){
                             view.setVisibility(View.VISIBLE);
-                            ((TextView) view).setText(date);
+                            ((TextView) view).setText(TextTools.prettyDate(date));
                         } else {
                             view.setVisibility(View.GONE);
                         }

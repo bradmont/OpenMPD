@@ -6,10 +6,6 @@ import net.bradmont.openmpd.MPDDBHelper;
 import android.content.Context;
 import android.database.Cursor;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 
 
 
@@ -112,7 +108,7 @@ public class Analytics {
     }
 
     public static String getAverageSpecial (){
-        String month = getThisMonth();
+        String month = TextTools.getThisMonth();
         String [] args = new String[2];
         args[0] = month;
         args[1] = Integer.toString(OpenMPD.get().getApplicationContext()
@@ -121,7 +117,7 @@ public class Analytics {
 
     }
     public static String getAverage (){
-        String month = getThisMonth();
+        String month = TextTools.getThisMonth();
         String [] args = new String[2];
         args[0] = month;
         args[1] = Integer.toString(OpenMPD.get().getApplicationContext()
@@ -130,7 +126,7 @@ public class Analytics {
     }
 
     public static String getWeightedAverage (){
-        String month = getThisMonth();
+        String month = TextTools.getThisMonth();
         String [] args = new String[2];
         args[0] = month;
         int period = OpenMPD.get().getApplicationContext()
@@ -163,22 +159,6 @@ public class Analytics {
         int result = cur.getInt(0);
         cur.close();
         return result;
-    }
-    public static String getThisMonth(){
-        if (mThisMonth == null){
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
-            Calendar cal = Calendar.getInstance();
-            mThisMonth = dateFormat.format(cal.getTime());
-        }
-        return mThisMonth;
-    }
-    public static String getToday(){
-        if (mThisMonth == null){
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            mThisMonth = dateFormat.format(cal.getTime());
-        }
-        return mThisMonth;
     }
 
 }

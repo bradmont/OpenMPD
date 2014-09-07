@@ -69,6 +69,10 @@
     <string name="per_n_months">/?mo</string>
     <string name="per_month">/mo</string>
 
+    <!-- date related -->
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+
     <!-- partner statuses -->
     <string name="dropped">Dropped</string>
     <string name="lapsed">Lapsed</string>
