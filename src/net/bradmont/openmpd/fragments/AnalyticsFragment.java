@@ -13,6 +13,8 @@ import android.support.v4.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View.OnClickListener;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +72,8 @@ public class AnalyticsFragment extends Fragment {
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.analytics, null);
+
+        setHasOptionsMenu(true);
 
         ((TextView) view.findViewById(R.id.twelve_month_average))
             .setText(Analytics.getAverage());
@@ -184,6 +188,9 @@ public class AnalyticsFragment extends Fragment {
             .setTitle(R.string.app_name);
         ((FragmentActivity) getActivity()).getActionBar()
             .setSubtitle(null);
+    }
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.analytics_fragment, menu);
     }
     @Override
     public boolean onOptionsItemSelected (MenuItem item){
