@@ -308,7 +308,7 @@ public class NotificationsFragment extends ListFragment{
      */
     static int getColor(String value, String value2){
         int spouse_color = getColorIndex(value2, -1);
-        return icon_colors[getColorIndex(value, spouse_color)];
+        return icon_colors[(spouse_color + (icon_colors.length/2)) % icon_colors.length];
     }
 
     static int getColor(String value){
