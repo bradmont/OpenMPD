@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ClipDrawable;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -45,7 +46,7 @@ public class NotificationsFragment extends ListFragment{
     private OnClickListener mOnClickListener = null;
 
     private final static String NOTIFICATIONS_QUERY = 
-        "select notification.*, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
+        "select notification.*, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency, spouse.fname as spouse_fname, spouse.lname as spouse_lname from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id left outer join contact as spouse on contact.spouse_id=spouse._id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
     // and not (type = 2 and contact_status = 5 and manual_set_expires > date) 
     // filters out  "Continued" notifications for donors set as regular by 
     // the user
@@ -53,8 +54,8 @@ public class NotificationsFragment extends ListFragment{
     // and not (contact_status = "5" and message="4") weeds out notification change from "new" to "current"
 
 
-    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "date", "type"};
-    private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon, R.id.date, R.id.quickactions};
+    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "spouse_fname", "date", "type"};
+    private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon_left, R.id.user_icon_right, R.id.date, R.id.quickactions};
     private static int[] icon_colors = null;
 
     @Override
@@ -96,29 +97,59 @@ public class NotificationsFragment extends ListFragment{
             TextView tv = null;
             String value = "";
             switch (view.getId()){
-                case R.id.user_icon :
+                case R.id.user_icon_left :
                     value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
                             cursor.getString(cursor.getColumnIndex("lname")) ;
                     ImageView iconView = (ImageView) view;
-                    Drawable icon = getActivity().getResources().getDrawable(R.drawable.user_icon_circle);
-                    icon.setColorFilter( getColor(value), Mode.MULTIPLY );
-                    iconView.setImageDrawable(icon);
+                    iconView.getDrawable().setColorFilter( getColor(value), Mode.MULTIPLY );
+
+                    iconView.getDrawable().setLevel(5000);
+
+                    return true;
+                case R.id.user_icon_right :
+                    iconView = (ImageView) view;
+
+                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
+                        value = cursor.getString(cursor.getColumnIndex("spouse_fname")) + " " +
+                                cursor.getString(cursor.getColumnIndex("spouse_lname")) ;
+                        String spouse_value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
+                                cursor.getString(cursor.getColumnIndex("lname")) ;
+                        iconView.getDrawable().setColorFilter( getColor(value, spouse_value), Mode.MULTIPLY );
+                    } else {
+                        value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
+                                cursor.getString(cursor.getColumnIndex("lname")) ;
+                        iconView.getDrawable().setColorFilter( getColor(value), Mode.MULTIPLY );
+                    }
+                    iconView.getDrawable().setLevel(5000);
+
                     return true;
                 case R.id.initials :
                     tv = (TextView) view;
                     try {
                         value += cursor.getString(cursor.getColumnIndex("fname")).substring(0,1);
                     } catch (Exception e){}
-                    try {
-                        value += cursor.getString(cursor.getColumnIndex("lname")).substring(0,1);
-                    } catch (Exception e){}
+                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
+                        try {
+                            value += cursor.getString(cursor.getColumnIndex("spouse_fname")).substring(0,1);
+                        } catch (Exception e){}
+                    } else {
+                        try {
+                            value += cursor.getString(cursor.getColumnIndex("lname")).substring(0,1);
+                        } catch (Exception e){}
+                    }
 
                     tv.setText(value);
                     return true;
                 case R.id.name :
                     tv = (TextView) view;
-                    value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
-                            cursor.getString(cursor.getColumnIndex("lname")) ;
+                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
+                        value = cursor.getString(cursor.getColumnIndex("fname")) +
+                                "&" + cursor.getString(cursor.getColumnIndex("spouse_fname")) +
+                                " " + cursor.getString(cursor.getColumnIndex("lname")) ;
+                    } else {
+                        value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
+                                cursor.getString(cursor.getColumnIndex("lname")) ;
+                    }
 
                     tv.setText(value);
 
@@ -270,13 +301,30 @@ public class NotificationsFragment extends ListFragment{
          * string (so we can have a consistent color for a contact)
          */
     }
+
+    /*
+     * Color for a given string (name), ensuring it is not thhe same color
+     * provided by value2
+     */
+    static int getColor(String value, String value2){
+        int spouse_color = getColorIndex(value2, -1);
+        return icon_colors[getColorIndex(value, spouse_color)];
+    }
+
     static int getColor(String value){
+        return icon_colors[getColorIndex(value, -1)];
+    }
+
+    static int getColorIndex(String value, int unwantedIndex){
         int total = 0;
         for (int i = 0; i < value.length(); i++){
             total += (int) value.charAt(i);
         }
         total = total % icon_colors.length;
-        return icon_colors[total];
+        if (total == unwantedIndex){
+            total = (total +1) % icon_colors.length;
+        }
+        return total;
     }
 
     private class NotificationDismissCallback implements EnhancedListView.OnDismissCallback{

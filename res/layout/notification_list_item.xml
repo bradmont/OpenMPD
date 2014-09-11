@@ -34,12 +34,20 @@
             android:paddingBottom="@dimen/card_extra_padding"
             android:layout_height="wrap_content">
             <ImageView
-                android:id="@+id/user_icon"
+                android:id="@+id/user_icon_left"
+                android:src="@drawable/user_icon_semicircle_left"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/user_icon_circle"
+                />
+            <ImageView
+                android:id="@+id/user_icon_right"
+                android:src="@drawable/user_icon_semicircle_right"
                 android:layout_width="80dp"
-                android:layout_height="80dp"/>
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
             <net.bradmont.openmpd.views.FontTextView
                 android:id="@+id/initials"
                 android:maxLines="1"
