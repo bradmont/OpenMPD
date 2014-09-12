@@ -119,7 +119,7 @@ public class BaseActivity extends FragmentActivity {
                     return mAnalyticsFragment;
                 case 1:
                     if (mContactsFragment == null){
-                        mContactsFragment = new ContactList();
+                        mContactsFragment = new ContactListFragment();
                     }
                     return mContactsFragment;
                 case 2:

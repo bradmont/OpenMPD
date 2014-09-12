@@ -33,6 +33,7 @@
     <dimen name="icon_text_size">20pt</dimen>
     <dimen name="icon_text_size_small">18pt</dimen>
     <dimen name="title_text_size">12pt</dimen>
+    <dimen name="medium_text_size">9pt</dimen>
     <dimen name="detail_text_size">6pt</dimen>
     <dimen name="shadow_height">4dp</dimen>
     <dimen name="card_spacing">12dp</dimen>

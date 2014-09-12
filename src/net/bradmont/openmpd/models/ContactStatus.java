@@ -153,7 +153,7 @@ public class ContactStatus extends DBModel{
             case 30:
                 return R.string.occasional;
             case 35:
-                return R.string.frequent;
+                return R.string.per_month_average;
             case 40:
                 return R.string.per_year;
             case 50:
@@ -162,6 +162,27 @@ public class ContactStatus extends DBModel{
                 return R.string.per_month ;
         }
         return 0;
+    }
+    public static int getTypeStringRes(int p){
+        switch (p){
+            case 0:
+                return R.string.unknown;
+            case 10:
+                return R.string.none;
+            case 20:
+                return R.string.onetime;
+            case 30:
+                return R.string.occasional;
+            case 35:
+                return R.string.frequent;
+            case 40:
+                return R.string.annual;
+            case 50:
+                return R.string.regular;
+            case 60:
+                return R.string.monthly ;
+        }
+        return R.string.unknown;
     }
     public static int getStatusStringRes(int p){
         switch(p){

@@ -1,82 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
-        android:gravity="center_vertical"
+    android:background="@null"
+    android:layout_margin="0dp"
+    android:padding="0dp"
+    android:descendantFocusability="blocksDescendants" 
     android:layout_height="wrap_content" >
-    <!-- name -->
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+
+    <net.bradmont.openmpd.views.FontTextView
+        android:id="@+id/type"
+        android:visibility="gone"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#404040"
-        android:textSize="10pt"
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/title_text_size"
+        android:text="@string/giving_summary"
+        android:paddingBottom="@dimen/card_spacing"
+        android:paddingTop="@dimen/card_spacing"
         />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
+    <!-- card -->
+    <LinearLayout 
+        android:id="@+id/card"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:paddingTop="@dimen/card_padding"
+        android:paddingBottom="@dimen/card_padding"
         android:layout_height="wrap_content" >
-        <!-- Giving Status -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-            />
-            <TextView
-                android:id="@+id/amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#99cc00"
-                android:textSize="10pt"
-                android:text="Unknown" />
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10pt"
-                android:textColor="#99cc00"
-                android:text="Unknown" />
-        </LinearLayout>
-        <!-- last gift -->
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
+        <!-- icon -->
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-            <TextView
-                android:text="@string/last_gift"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#707070"
-                android:textSize="7pt"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/user_icon_left"
+                android:src="@drawable/user_icon_semicircle_left"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
                 />
-            <TextView
-                android:layout_width="wrap_content"
-                android:textSize="7pt"
-                android:layout_height="wrap_content"
-                android:text=" " />
-            <TextView
-                android:id="@+id/last_gift"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#707070"
-                android:textSize="7pt"
+            <ImageView
+                android:id="@+id/user_icon_right"
+                android:src="@drawable/user_icon_semicircle_right"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/initials"
+                android:maxLines="1"
+                android:layout_width="60dp"
+                android:layout_height="58dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/icon_text_size"
+                android:text="JS"
+                android:gravity="center"
                 />
-            <TextView
-                android:id="@+id/last_contact"
+
+        </FrameLayout>
+        
+
+        <!-- text content -->
+        <LinearLayout 
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="fill_parent" 
+            android:paddingLeft="@dimen/card_padding"
+            android:paddingRight="@dimen/card_padding"
+            android:paddingTop="0dp"
+            android:layout_marginTop="0dp"
+            >
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:textColor="#707070"
-                android:textSize="7pt"
-                />
+                android:textSize="@dimen/medium_text_size"
+                android:textColor="@color/text_medium"
+                android:singleLine="true"
+                android:text="Unknown" />
+            <!-- Giving Status -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/card_extra_padding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <net.bradmont.openmpd.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/last_gift"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text=" "
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:id="@+id/last_gift"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:id="@+id/amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+                <net.bradmont.openmpd.views.FontTextView
+                    android:id="@+id/status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/detail_text_size"
+                    android:textColor="@color/text_medium"
+                    />
+            </LinearLayout>
         </LinearLayout>
+        <!-- quick actions -->
     </LinearLayout>
-
 </LinearLayout>
-

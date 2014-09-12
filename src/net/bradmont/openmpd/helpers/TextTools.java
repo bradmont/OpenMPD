@@ -43,10 +43,27 @@ public class TextTools{
             } else if (date.get(Calendar.WEEK_OF_YEAR) == today.get(Calendar.WEEK_OF_YEAR)){
                 return (new SimpleDateFormat("EEEE")).format(date.getTime());
             } else {
-                return (new SimpleDateFormat("MMMM dd")).format(date.getTime());
+                return (new SimpleDateFormat("MMMM d")).format(date.getTime());
             }
         } else {
-            return (new SimpleDateFormat("MMMM dd, YYYY")).format(date.getTime());
+            return (new SimpleDateFormat("MMMM d, yyyy")).format(date.getTime());
+        }
+    }
+    public static String prettyShortDate(String date_string){
+        Calendar date = mkCalendar(date_string);
+        Calendar today = Calendar.getInstance();
+        if (date_string.equals(getToday())){
+            return OpenMPD.get().getResources().getString(R.string.today);
+        } else if (date.get(Calendar.YEAR) == today.get(Calendar.YEAR)){
+            if (date.get(Calendar.DAY_OF_YEAR) + 1 == today.get(Calendar.DAY_OF_YEAR)){
+                return OpenMPD.get().getResources().getString(R.string.yesterday);
+            } else if (date.get(Calendar.WEEK_OF_YEAR) == today.get(Calendar.WEEK_OF_YEAR)){
+                return (new SimpleDateFormat("EEEE")).format(date.getTime());
+            } else {
+                return (new SimpleDateFormat("d MMM")).format(date.getTime());
+            }
+        } else {
+            return (new SimpleDateFormat("MMM d, yyyy")).format(date.getTime());
         }
     }
 

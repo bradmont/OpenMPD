@@ -30,6 +30,7 @@
     <string name="save">Save</string>
     <string name="saved">Saved</string>
     <string name="never">Never</string>
+    <string name="partners">Partners</string>
     <string name="data_import">Importing Data</string>
     <string name="giving_summary">Giving Summary</string>
     <string name="partner_summary">Partner Summary</string>
@@ -64,11 +65,14 @@
     <string name="unknown">Unknown</string>
     <string name="none">None</string>
     <string name="onetime">One Time</string>
-    <string name="occasional"> Occasional</string>
-    <string name="frequent"> Frequent</string>
+    <string name="occasional">Occasional</string>
+    <string name="frequent">Frequent</string>
+    <string name="annual">Annual</string>
+    <string name="regular">Regular</string>
     <string name="per_year">/yr</string>
     <string name="per_n_months">/?mo</string>
     <string name="per_month">/mo</string>
+    <string name="per_month_average">/mo (avg)</string>
 
     <!-- date related -->
     <string name="today">Today</string>
