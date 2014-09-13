@@ -66,6 +66,13 @@ public class ContactListFragment extends ListFragment {
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
                 "and (C.partner_type=30 or C.partner_type=20) order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
 
+    private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
+                "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
+                "contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, 
@@ -262,12 +269,7 @@ public class ContactListFragment extends ListFragment {
                 if (!db_read.isOpen()){
                     db_read = MPDDBHelper.get().getReadableDatabase();
                 }
-                Cursor newCursor = db_read.rawQuery("select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
-                "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by A.lname, A.fname", args);
+                Cursor newCursor = db_read.rawQuery(SEARCH_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
