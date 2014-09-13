@@ -45,8 +45,8 @@ public class ContactStatus extends DBModel{
     public static final int [] STATUS_COLORS = {
         0xFF707070,  // none
         0xFFA0A0A0,  // dropped
-        0xFFFF4444,  // lapsed
-        0xFFFFBB33,  // late
+        0xFF607d8b,  // lapsed
+        0xFF795548,  // late
         0xFF99CC00,  // new
         0xFF33B5E5  // current
     };
@@ -183,6 +183,24 @@ public class ContactStatus extends DBModel{
                 return R.string.monthly ;
         }
         return R.string.unknown;
+    }
+    public static int getTypeColorRes(int p){
+        switch (p){
+            case PARTNER_MONTHLY:
+                return R.color.monthly_partner;
+            case PARTNER_REGULAR:
+            case PARTNER_ANNUAL:
+                return R.color.regular_partner;
+            case PARTNER_FREQUENT:
+                return R.color.frequent_partner;
+            case PARTNER_OCCASIONAL:
+            case PARTNER_ONETIME:
+                return R.color.special_partner;
+            case PARTNER_NONE:
+            case PARTNER_UNKNOWN:
+                return R.color.text_medium;
+        }
+        return R.color.black;
     }
     public static int getStatusStringRes(int p){
         switch(p){

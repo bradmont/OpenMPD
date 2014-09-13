@@ -148,25 +148,43 @@ public class ContactListFragment extends ListFragment {
                         return true;
                     case R.id.status:
                         // partner type
+                        status = cursor.getInt(cursor.getColumnIndex("status"));
+                        type = cursor.getInt(cursor.getColumnIndex("partner_type"));
                         tv = (TextView) view;
                         String text = getActivity().getResources()
-                            .getString(ContactStatus.partnership(cursor.getInt(4)));
+                            .getString(ContactStatus.partnership(type));
                         // replace ? with giving frequency (for REGULAR donors)
                         if (cursor.getString(7) != null){
                             text = text.replace("?", cursor.getString(7));
                         }
                         tv.setText(text);
-                        tv.setTextColor(ContactStatus.STATUS_COLORS[cursor.getInt(6)]);
+                        if (status == ContactStatus.STATUS_LATE ||
+                                status == ContactStatus.STATUS_LAPSED ||
+                                status == ContactStatus.STATUS_DROPPED){
+                            tv.setTextColor(ContactStatus.STATUS_COLORS[status]);
+                        } else {
+                            tv.setTextColor(getActivity().getResources()
+                                    .getColor(ContactStatus.getTypeColorRes(type)));
+                        }
                         return true;
                     case R.id.amount:
                         // amount
+                        status = cursor.getInt(cursor.getColumnIndex("status"));
+                        type = cursor.getInt(cursor.getColumnIndex("partner_type"));
                         tv = (TextView) view;
                         if (cursor.getInt(5) == 0){
                             tv.setText("");
                         } else {
                             tv.setText(" $" + Integer.toString(cursor.getInt(5)/100));
                         }
-                        tv.setTextColor(ContactStatus.STATUS_COLORS[cursor.getInt(6)]);
+                        if (status == ContactStatus.STATUS_LATE ||
+                                status == ContactStatus.STATUS_LAPSED ||
+                                status == ContactStatus.STATUS_DROPPED){
+                            tv.setTextColor(ContactStatus.STATUS_COLORS[status]);
+                        } else {
+                            tv.setTextColor(getActivity().getResources()
+                                    .getColor(ContactStatus.getTypeColorRes(type)));
+                        }
                         return true;
                     case R.id.last_gift:
                         tv = (TextView) view;
