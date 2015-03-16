@@ -28,7 +28,8 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+
 
 import android.app.ActionBar;
 import android.view.MenuItem;
@@ -134,7 +135,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
                 contact.getString("fname") + " "+
                     contact.getString("lname"));
         }
-        ((FragmentActivity)getActivity()).getActionBar().setTitle(values.get("name"));
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(values.get("name"));
 
         ArrayList<Link> links = new ArrayList<Link>(4);
 
@@ -219,16 +220,16 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             // header will be different depending on partner type
             if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
                 String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
                 // TODO: set up last_gift in partner_status
                 String subTitle = partner_type + ". " + 
                     getActivity().getResources().getString(R.string.last_gift) + 
                     status.getString("last_gift");
-                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             } else {
                 String subTitle = partner_type;
-                ((FragmentActivity)getActivity()).getActionBar().setSubtitle(subTitle);
+                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
             }
             Link link = new Link();
             link.title = R.string.Notes;

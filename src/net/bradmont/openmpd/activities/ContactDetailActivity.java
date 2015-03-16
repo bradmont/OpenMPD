@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.DialogFragment;
 
 import android.util.Log;
@@ -26,7 +26,7 @@ import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.R;
 
 
-public class ContactDetailActivity extends FragmentActivity {
+public class ContactDetailActivity extends ActionBarActivity {
 
     private int mContactId = 1;
 
