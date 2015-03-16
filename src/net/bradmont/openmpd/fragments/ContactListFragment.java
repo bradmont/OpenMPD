@@ -30,6 +30,7 @@ import android.widget.*;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.app.ActionBar;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -258,7 +259,7 @@ public class ContactListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
         SearchView searchView = new
-                SearchView( ((BaseActivity)getActivity()).getActionBar().getThemedContext());
+                SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
@@ -280,23 +281,26 @@ public class ContactListFragment extends ListFragment {
         });
         menu.findItem(R.id.menu_search)
                 .setActionView(searchView)
-                .setOnActionExpandListener(new MenuItem.OnActionExpandListener(){
-                    // so we can reset the search when the searchView is closed
-                    @Override
-                    public boolean onMenuItemActionExpand(MenuItem item) {
-                        return true;
-                    }
-                    @Override
-                    public boolean onMenuItemActionCollapse(MenuItem item) {
-                        Cursor newCursor = db_read.rawQuery(BASE_QUERY, null);
-                        adapter.changeCursor(newCursor);
-                        cursor = newCursor;
-                        return true;
-                    }
-                })
                 .setShowAsAction(
                         MenuItem.SHOW_AS_ACTION_IF_ROOM
                                 | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        MenuItemCompat.setOnActionExpandListener(
+                menu.findItem(R.id.menu_search),
+                new MenuItemCompat.OnActionExpandListener(){
+                // so we can reset the search when the searchView is closed
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    return true;
+                }
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    Cursor newCursor = db_read.rawQuery(BASE_QUERY, null);
+                    adapter.changeCursor(newCursor);
+                    cursor = newCursor;
+                    return true;
+                }
+            });
+        
     }
     @Override
     public boolean onOptionsItemSelected (MenuItem item){
@@ -355,10 +359,6 @@ public class ContactListFragment extends ListFragment {
     public void onResume(){
         super.onResume();
         // set title
-        ((FragmentActivity) getActivity()).getActionBar()
-            .setTitle(R.string.app_name);
-        ((FragmentActivity) getActivity()).getActionBar()
-            .setSubtitle(null);
     }
     /*
      * Color for a given string (name), ensuring it is not thhe same color

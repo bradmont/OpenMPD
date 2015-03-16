@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTheme" parent="MyTheme.Base"/>
+    <style name="MyTheme.Base" parent="Theme.AppCompat">
+        <!--<item name="android:actionBarStyle">@style/MyActionBar</item> -->
+        <!-- Set AppCompat’s actionBarStyle -->
+
+        <!-- Set AppCompat’s color theming attrs -->
+        <item name="colorPrimary">@color/app_primary</item>
+        <item name="colorPrimaryDark">@color/app_primary_dark</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="android:windowNoTitle">true</item>
+        
+        <!-- The rest of your attributes -->
+    </style>
+     <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
+         <item name="background">@color/app_primary</item>
+         <item name="android:background">@color/app_primary</item>
+         <item name="backgroundSplit">@color/black</item>
+         <item name="android:backgroundSplit">@color/black</item>
+     </style>
+</resources>

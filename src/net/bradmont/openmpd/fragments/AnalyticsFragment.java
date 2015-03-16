@@ -183,11 +183,6 @@ public class AnalyticsFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        // set title
-        ((FragmentActivity) getActivity()).getActionBar()
-            .setTitle(R.string.app_name);
-        ((FragmentActivity) getActivity()).getActionBar()
-            .setSubtitle(null);
     }
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.analytics_fragment, menu);

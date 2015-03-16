@@ -18,6 +18,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.PagerAdapter;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,10 +30,11 @@ import android.widget.Toast;
 import net.bradmont.openmpd.fragments.*;
 import net.bradmont.openmpd.views.*;
 
-public class BaseActivity extends FragmentActivity {
+public class BaseActivity extends ActionBarActivity {
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
+    private SlidingTabLayout mSlidingTabLayout;
 
 	private int mTitleRes;
     private static BaseActivity instance = null;
@@ -54,29 +57,8 @@ public class BaseActivity extends FragmentActivity {
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new HomePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-
-        // set up tabs
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        ActionBar.TabListener tabListener = new HomeTabListener();
-        actionBar.addTab(
-            actionBar.newTab().setText(R.string.analytics).setTabListener(tabListener));
-        actionBar.addTab(
-            actionBar.newTab().setText(R.string.contacts).setTabListener(tabListener));
-        actionBar.addTab(
-            actionBar.newTab().setText(R.string.notifications).setTabListener(tabListener));
-
-        mPager.setOnPageChangeListener(
-            new ViewPager.SimpleOnPageChangeListener() {
-                @Override
-                public void onPageSelected(int position) {
-                    // swipe handler
-                    getActionBar().setSelectedNavigationItem(position);
-                }
-            }
-        );
-
-        
+        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setViewPager(mPager);
 
 	}
 
@@ -135,6 +117,20 @@ public class BaseActivity extends FragmentActivity {
         public int getCount() {
             return 3;
         }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            switch(position){
+                case 0:
+                    return getResources().getString(R.string.analytics);
+                case 1:
+                    return getResources().getString(R.string.contacts);
+                case 2:
+                    return getResources().getString(R.string.notifications);
+            }
+            return null;
+        }
+
 
 
     }
