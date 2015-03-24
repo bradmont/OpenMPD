@@ -59,6 +59,7 @@ public class BaseActivity extends ActionBarActivity {
         mPager.setAdapter(mPagerAdapter);
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mPager);
+        getSupportActionBar().setElevation(0);
 
 	}
 
