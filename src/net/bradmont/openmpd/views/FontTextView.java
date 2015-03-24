@@ -17,11 +17,13 @@ public class FontTextView extends TextView {
     public static final String DEFAULT_FONT="Roboto-Light.ttf";
     public static final String ICONS1_FONT="Android-Dev-Icons-1.ttf";
     public static final String ICONS2_FONT="Android-Dev-Icons-2.ttf";
+    public static final String MATERIAL_ICONS_FONT="material-icon-font.ttf";
 
     // since these are used repeatedly, cache them
     private static Typeface mDefaultTypeFace = null;
     private static Typeface mIcons1TypeFace = null;
     private static Typeface mIcons2TypeFace = null;
+    private static Typeface mMaterialTypeFace = null;
 
     public FontTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -49,6 +51,8 @@ public class FontTextView extends TextView {
                  fontName = ICONS1_FONT;
              } else if (fontName.equals("icons2")){
                  fontName = ICONS2_FONT;
+             } else if (fontName.equals("material")){
+                 fontName = MATERIAL_ICONS_FONT;
              }
 
              if (fontName.equals(DEFAULT_FONT)){
@@ -60,6 +64,9 @@ public class FontTextView extends TextView {
              } else if (fontName.equals(ICONS2_FONT)){
                  loadDefaults();
                  setTypeface(mIcons2TypeFace);
+             } else if (fontName.equals(MATERIAL_ICONS_FONT)){
+                 loadDefaults();
+                 setTypeface(mMaterialTypeFace);
              } else {
                  Typeface myTypeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/"+fontName);
                  setTypeface(myTypeface);
@@ -77,6 +84,9 @@ public class FontTextView extends TextView {
         }
         if (mIcons2TypeFace == null){
              mIcons2TypeFace = Typeface.createFromAsset(getContext().getAssets(), "fonts/"+ICONS2_FONT);
+        }
+        if (mMaterialTypeFace == null){
+             mMaterialTypeFace = Typeface.createFromAsset(getContext().getAssets(), "fonts/"+MATERIAL_ICONS_FONT);
         }
     }
 
