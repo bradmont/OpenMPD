@@ -54,7 +54,8 @@ import net.bradmont.openmpd.controllers.TntImporter;
 
 public class WelcomeFragment extends Fragment implements View.OnClickListener {
 
-    StringPicker mPicker;
+    private StringPicker mPicker;
+    private int mSelectedService = -1;
     private static String [] service_defs = null;
     private static String [] service_names = null;
     private static String [] service_urls = null;
@@ -83,7 +84,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
                 service_urls[i] = parts[1];
             }
         }
-        StringPicker mPicker = (StringPicker) view.findViewById(R.id.string_picker);
+        mPicker = (StringPicker) view.findViewById(R.id.string_picker);
         mPicker.setValues(service_names);
 
         return view;
@@ -99,6 +100,20 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.action_welcome_next:
+                // get selected org
+                mSelectedService = mPicker.getCurrent();
+                // set R.id.org_name
+                ((TextView) getView().findViewById(R.id.org_name))
+                    .setText(service_names[mSelectedService]);
+                // set R.id.org_url
+                try {
+                ((TextView) getView().findViewById(R.id.org_url))
+                    .setText( new URL( service_urls[mSelectedService])
+                                .getHost()) ;
+                } catch (Exception e){
+                ((TextView) getView().findViewById(R.id.org_url))
+                    .setText( service_urls[mSelectedService]);
+                }
             case R.id.action_login_next:
                 ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
                 break;
