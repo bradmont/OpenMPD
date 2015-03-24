@@ -34,6 +34,7 @@ import net.bradmont.holograph.BarGraph;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -47,14 +48,16 @@ import java.util.ArrayList;
 
 
 
-import net.bradmont.openmpd.views.StringPicker;
+import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.TntImporter;
 
 
 
 public class WelcomeFragment extends Fragment implements View.OnClickListener {
 
-    private StringPicker mPicker;
+    private StringPicker mPicker = null;
+    private NoScrollListView mAccountList = null;
+    private SimpleCursorAdapter mAdapter = null;
     private int mSelectedService = -1;
     private static String [] service_defs = null;
     private static String [] service_names = null;
@@ -71,6 +74,10 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             .setOnClickListener(this);
         ((TextView) view.findViewById(R.id.action_login_next))
             .setOnClickListener(this);
+        ((TextView) view.findViewById(R.id.action_accounts_add))
+            .setOnClickListener(this);
+        ((TextView) view.findViewById(R.id.action_accounts_done))
+            .setOnClickListener(this);
 
         if (service_defs == null){
             service_defs = readServicesList(R.raw.tnt_organisations);
@@ -86,6 +93,32 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
         }
         mPicker = (StringPicker) view.findViewById(R.id.string_picker);
         mPicker.setValues(service_names);
+
+        mAccountList = (NoScrollListView) view.findViewById(R.id.account_list);
+        // populate account list
+        Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery("select service_account._id, name, balance_url, username from service_account join tnt_service on tnt_service_id=tnt_service._id", null);
+         String [] columns = {"name", "username", "balance_url"};
+         int [] fields = {R.id.name, R.id.username, R.id.url};
+
+        mAdapter = new SimpleCursorAdapter(getActivity(),
+                R.layout.service_account_list_item, cursor, columns, fields);
+        mAdapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+               TextView tv = (TextView) view;
+                 switch(columnIndex){
+                     case 2:
+                         try {
+                             tv.setText(new URL(cursor.getString(2)).getHost());
+                             return true;
+                         } catch (Exception e){
+                         }
+                     return false;
+               }
+               return false;
+            }
+        });
+        mAccountList.setAdapter(mAdapter);
+
 
         return view;
     }
@@ -115,6 +148,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
                     .setText( service_urls[mSelectedService]);
                 }
             case R.id.action_login_next:
+            case R.id.action_accounts_add:
                 ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
                 break;
         }

@@ -66,6 +66,8 @@
     <string name="login">Log in</string>
     <string name="importing">Importing</string>
     <string name="please_select_your_organisation">Please Select Your Organisation</string>
+    <string name="accounts">Accounts</string>
+    <string name="add_another_or_finish">You can add another account, or finish now.</string>
 
 
     <!-- partner types -->
