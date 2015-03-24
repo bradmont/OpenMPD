@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent" 
+        android:background="@color/app_primary"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            />
+        <net.bradmont.openmpd.views.FontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/huge_text"
+            android:text="@string/app_name"
+            android:layout_marginBottom="@dimen/card_spacing"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+        <net.bradmont.openmpd.views.FontTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/small_text"
+            android:text="@string/please_select_your_organisation"
+            android:layout_marginBottom="@dimen/card_spacing"
+            android:layout_marginLeft="@dimen/slidingmenu_offset"
+            android:layout_marginRight="@dimen/slidingmenu_offset"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            />
+        <net.bradmont.openmpd.views.StringPicker
+            android:id="@+id/string_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:paddingBottom="@dimen/card_extra_padding"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/button_background"
+                android:src="@drawable/onboard_button_circle"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true" />
+
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/action_welcome_next"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/icon_text_size"
+                android:text="&#xe014;"
+                android:gravity="center"
+                custom:fontName="material"
+                />
+        </FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            />
+
+</LinearLayout>
+

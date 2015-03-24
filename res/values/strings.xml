@@ -61,6 +61,13 @@
     <string name="whats_new">What\'s new?</string>
     <string name="thank_you_swipe_away">Thank You! (You can swipe this card away now)</string>
 
+    <!-- onboarding -->
+    <string name="welcome">Welcome</string>
+    <string name="login">Log in</string>
+    <string name="importing">Importing</string>
+    <string name="please_select_your_organisation">Please Select Your Organisation</string>
+
+
     <!-- partner types -->
     <string name="unknown">Unknown</string>
     <string name="none">None</string>

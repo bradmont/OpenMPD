@@ -22,6 +22,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ContactDetailActivity" />
+        <activity android:name=".activities.OnboardActivity" 
+            android:theme="@style/MyTheme.Onboard"
+            />
         <activity android:name="AccountListActivity" />
         <activity android:name="DebugActivity" />
 

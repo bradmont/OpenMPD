@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent" 
+    android:background="@color/app_primary"
+    android:gravity="center">
+        <ViewFlipper
+            android:id="@+id/onboard_flipper"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" 
+            android:outAnimation="@anim/left_out"
+            android:inAnimation="@anim/right_in" 
+            >
+            <include android:id="@+id/page1" layout="@layout/onboard_welcome" />
+            <include android:id="@+id/page2" layout="@layout/onboard_login" />
+        </ViewFlipper>
+
+</LinearLayout>

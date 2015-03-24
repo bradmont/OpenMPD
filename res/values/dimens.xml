@@ -22,6 +22,7 @@
     <dimen name="card_padding">12dp</dimen>
     <dimen name="shadow_width">15dp</dimen>
     <dimen name="menu_width">40mm</dimen>
+    <dimen name="huge_text">56dp</dimen>
     <dimen name="big_text">36dp</dimen>
     <dimen name="medium_text">26dp</dimen>
     <dimen name="small_text">16dp</dimen>
