@@ -34,6 +34,7 @@ import java.lang.Runnable;
 
 import net.bradmont.openmpd.BaseActivity;
 import net.bradmont.openmpd.fragments.*;
+import net.bradmont.openmpd.activities.OnboardActivity;
 import net.bradmont.openmpd.R;
 
 public class HomeActivity extends BaseActivity {
@@ -49,6 +50,10 @@ public class HomeActivity extends BaseActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         Intent intent = getIntent();
+        // TODO: only launch this on new install
+        Intent switchIntent = new Intent(this, OnboardActivity.class);
+        startActivity(switchIntent);
+
         
 
 		

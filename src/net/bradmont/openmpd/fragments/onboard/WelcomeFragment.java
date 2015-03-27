@@ -35,6 +35,7 @@ import net.bradmont.holograph.BarGraph;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -46,7 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.ArrayList;
 
-
+import mbanje.kurt.fabbutton.FabButton;
 
 import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.TntImporter;
@@ -78,6 +79,12 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             .setOnClickListener(this);
         ((TextView) view.findViewById(R.id.action_accounts_done))
             .setOnClickListener(this);
+        view.findViewById(R.id.account_fab_verify)
+            .setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                        ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(true);
+                }
+            });
 
         if (service_defs == null){
             service_defs = readServicesList(R.raw.tnt_organisations);
