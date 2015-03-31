@@ -3,12 +3,16 @@ package net.bradmont.openmpd.fragments.onboard;
 import android.app.AlertDialog;
 
 import android.content.Context;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.ServiceConnection;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -20,17 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
 
-import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.R;
-import net.bradmont.openmpd.views.HelpDialog;
-import net.bradmont.openmpd.helpers.Analytics;
-import net.bradmont.holograph.BarGraph;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
@@ -49,8 +49,16 @@ import java.util.ArrayList;
 
 import mbanje.kurt.fabbutton.FabButton;
 
+import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.activities.OnboardActivity;
+import net.bradmont.openmpd.R;
+import net.bradmont.openmpd.views.HelpDialog;
+import net.bradmont.openmpd.helpers.Analytics;
+import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.views.*;
+import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.controllers.TntImporter;
+import net.bradmont.openmpd.controllers.AccountVerifyService;
 
 
 
@@ -63,6 +71,8 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
     private static String [] service_defs = null;
     private static String [] service_names = null;
     private static String [] service_urls = null;
+    private AccountVerifyService mAccountVerifyService = null;
+    private boolean mServiceBound = false;
 
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +92,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
         view.findViewById(R.id.account_fab_verify)
             .setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
-                        ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(true);
+                        verify_add_account();
                 }
             });
 
@@ -134,9 +144,78 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
 		super.onActivityCreated(savedInstanceState);
     }
     @Override
+    public void onStart(){
+        super.onStart();
+        Intent intent = new Intent(getActivity(), AccountVerifyService.class);
+        getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        Log.i("net.bradmont.openmpd", "called bindService");
+    }
+    public void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mServiceBound) {
+            getActivity().unbindService(mServiceConnection);
+            mServiceBound = false;
+        }
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
     }
+    private void verify_add_account(){
+        if (mAccountVerifyService.isRunning() || mServiceBound == false){
+            return;
+        }
+        // set indeterminate on progress button
+        ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(true);
+        final ServiceAccount account = new ServiceAccount();
+        // get values from form fields
+        account.setValue("username",
+            ((EditText) getView().findViewById(R.id.username)).getText().toString());
+        account.setValue("password",
+            ((EditText) getView().findViewById(R.id.password)).getText().toString());
+        // get selected service
+        mSelectedService = mPicker.getCurrent();
+
+        // if service not already in DB
+        if (getServiceid(service_names[mSelectedService]) == -1){
+            TntService service = new TntService();
+            service.setValue("name", service_names[mSelectedService]);
+            service.setValue("query_ini_url", service_urls[mSelectedService]);
+            service.dirtySave();
+            account.setValue("tnt_service_id", service.getID());
+        } else {
+            account.setValue("tnt_service_id", getServiceid(service_names[mSelectedService]));
+        }
+        mAccountVerifyService.setOnFinishHandler(new AccountVerifyService.OnFinishHandler(){
+            @Override
+            public void onFinish(boolean success){
+                if (success == true){
+                    account.dirtySave();
+                    ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(false);
+                    ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
+                } else {
+                    ((OnboardActivity) getActivity()).userMessage(R.string.login_error);
+                    ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(false);
+                }
+            }
+        });
+
+        mAccountVerifyService.verifyAccount((OnboardActivity) getActivity(), account);
+
+    }
+
+    private int getServiceid(String name){
+        SQLiteDatabase db = OpenMPD.getDB().getReadableDatabase();
+        Cursor c = db.rawQuery("select _id from tnt_service where name=?", new String[]{ name });
+        if (c.getCount() == 0){
+            return -1;
+        }
+        c.moveToFirst();
+        return c.getInt(0);
+    }
+
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.action_welcome_next:
@@ -182,5 +261,22 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
         return lines.toArray(new String[lines.size()]);
 
     }
+
+    private ServiceConnection mServiceConnection = new ServiceConnection(){
+        @Override
+        public void onServiceConnected(ComponentName className,
+                IBinder service) {
+            AccountVerifyService.AccountVerifyBinder binder = (AccountVerifyService.AccountVerifyBinder) service;
+            mAccountVerifyService = binder.getService();
+            mServiceBound = true;
+            Log.i("net.bradmont.openmpd", "service bound.");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mServiceBound = false;
+        }
+
+    };
 
 }

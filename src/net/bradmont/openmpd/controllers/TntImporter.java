@@ -177,7 +177,12 @@ public class TntImporter {
         // import, so it doesn't really cause much of a slow-down.
         arguments.add(new BasicNameValuePair( "DateFrom", EPOCH_DATE));
 
-        ArrayList<String> content = getStringsFromUrl(service.getString("base_url") + service.getString("addresses_url"), arguments);
+        ArrayList<String> content = null;
+        try {
+            content = getStringsFromUrl(service.getString("base_url") + service.getString("addresses_url"), arguments);
+        } catch (ServerException e){
+            return false;
+        }
         if (content == null){
             return false;
         }
@@ -253,7 +258,12 @@ public class TntImporter {
 
         arguments.add(new BasicNameValuePair( "DateTo", stupidDateFormat(getTodaysDate())));
 
-        ArrayList<String> content = getStringsFromUrl(service.getString("base_url") + service.getString("donations_url"), arguments);
+        ArrayList<String> content = null;
+        try {
+            content = getStringsFromUrl(service.getString("base_url") + service.getString("donations_url"), arguments);
+        } catch (ServerException e){
+            return false;
+        }
         if (content == null){
             return false;
         }
@@ -509,11 +519,11 @@ public class TntImporter {
         return return_value;
     }
 
-    public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments){
+    public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments) throws ServerException{
         return getStringsFromUrl(url, arguments, true);
     }
 
-    public ArrayList<String> getStringsFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
+    public ArrayList<String> getStringsFromUrl(String url_raw, ArrayList arguments, boolean handleCertError) throws ServerException{
 
         URL url = null;
         try {
@@ -548,7 +558,68 @@ public class TntImporter {
             Log.i("net.bradmont.openmpd.controllers.TntImporter",sw.toString());
         }
         Log.i("net.bradmont.openmpd", String.format("returning %d lines", lines.size()));
+        if (lines == null ||
+                 lines.get(0).contains("ERROR") ||
+                 lines.get(0).contains("BAD_PASSWORD")){
+            // TODO: we may need to detect other errors here....
+            String error = "";
+            for (String s : lines){
+                error += s;
+            }
+            throw new ServerException(error);
+         }
         return lines;
+    }
+
+    public class ServerException extends Exception{
+        public ServerException() { super(); }
+        public ServerException(String message) { super(message); }
+        public ServerException(String message, Throwable cause) { super(message, cause); }
+        public ServerException(Throwable cause) { super(cause); }
+    }
+
+    /**
+     * Check if the account login is valid
+     */
+    public boolean verifyAccount(){
+        try {
+            getBalance();
+        } catch (ServerException e){
+            return false;
+        } catch (RuntimeException e){
+            URL u = null;
+            try { u = new URL(service.getString("base_url") + service.getString("balance_url")); } catch (Exception f){}
+            if (u.getHost().contains("focus.powertochange.org")){
+                SharedPreferences.Editor prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
+                prefs.putBoolean("ignore_ssl_" + u.getHost(), true);
+                prefs.commit();
+                try {
+                    getBalance();
+                } catch (Exception f){
+                    return false;
+                }
+            } else {
+                throw e;
+            }
+        }
+        return true;
+    }
+
+    public float getBalance() throws ServerException{
+        ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
+        arguments.add(new BasicNameValuePair( "Action", service.getBalanceAction()));
+        arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
+        arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
+        ArrayList<String> content = null;
+        content = getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments, false);
+        String [] headers = csvLineSplit(content.get(0));
+        String [] values = csvLineSplit(content.get(1));
+        for (int i = 0; i < headers.length; i++){
+            if (headers[i].equals("BALANCE")){
+                return Float.parseFloat(values[i]);
+            }
+        }
+        return 0.0f;
     }
 
     private static StringReader getCleanedStringReaderFromUrl(String url){
@@ -573,6 +644,9 @@ public class TntImporter {
             return new StringReader(sb.toString());
 
         } catch (IOException e){
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            Log.i("net.bradmont.openmpd",sw.toString());
             return null;
         }
     }
@@ -670,7 +744,7 @@ public class TntImporter {
         } catch (Exception e){
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
-            Log.i("net.bradmont.openmpd.controllers.TntImporter",sw.toString());
+            Log.i("net.bradmont.openmpd",sw.toString());
         }
         return content;
     }
@@ -681,12 +755,16 @@ public class TntImporter {
         try {
             URL u = new URL(service.getString("query_ini_url"));
         } catch (Exception e){
+            Log.i("net.bradmont.openmpd", "malformed query.ini url");
             return false;
         }
         try {
             //ini = new Ini(getStreamFromUrl(service.getString("query_ini_url"), null, false));
             reader = getCleanedStringReaderFromUrl(service.getString("query_ini_url"));
-            if (reader == null){ return false;}
+            if (reader == null){ 
+                Log.i("net.bradmont.openmpd", "StringReader is null");
+                return false;
+            }
             ini = new Ini(reader);
         } catch (IOException e){
             Log.i("net.bradmont.openmpd", "IOException");
@@ -707,6 +785,7 @@ public class TntImporter {
                     character = reader.read();
                 }
             } catch (Exception e){}
+            Log.i("net.bradmont.openmpd", "No ORGANIZATION section in query.ini");
             return false;
         }
         Ini.Section org = ini.get("ORGANIZATION");
@@ -729,6 +808,7 @@ public class TntImporter {
                 !ini.containsKey("DONATIONS") ||
                 !ini.containsKey("ADDRESSES") ||
                 !ini.containsKey("ADDRESSES_BY_PERSONIDS") ){
+            Log.i("net.bradmont.openmpd", "query.ini missing section(s)");
             return false;
 
         }
@@ -742,6 +822,7 @@ public class TntImporter {
                 !donations.containsKey("Url") || !donations.containsKey("Post") ||
                 !addresses.containsKey("Url") || !addresses.containsKey("Post") ||
                 !addresses_by_personids.containsKey("Url") || !addresses_by_personids.containsKey("Post") ){
+            Log.i("net.bradmont.openmpd", "query.ini missing url");
             return false;
         }
 
@@ -756,6 +837,7 @@ public class TntImporter {
 
         service.setValue("addresses_by_personids_url", addresses_by_personids.get("Url"));
         service.setValue("addresses_by_personids_formdata", addresses_by_personids.get("Post"));
+        service.dirtySave();
 
         return true; 
     }
@@ -783,8 +865,6 @@ public class TntImporter {
             return new DefaultHttpClient();
         }
     }
-
-
 
     public static class MySSLSocketFactory extends SSLSocketFactory {
         SSLContext sslContext = SSLContext.getInstance("TLS");

@@ -29,6 +29,7 @@
         <activity android:name="DebugActivity" />
 
         <service android:name=".controllers.TntImportService" />
+        <service android:name=".controllers.AccountVerifyService" />
         <receiver android:name="OnBootScheduler">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
