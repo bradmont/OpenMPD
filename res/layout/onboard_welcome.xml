@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="match_parent" 
@@ -48,30 +49,24 @@
             android:layout_height="0dp"
             android:layout_weight="3"
             />
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:paddingBottom="@dimen/card_extra_padding"
-            android:layout_height="wrap_content">
+        <mbanje.kurt.fabbutton.FabButton
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:id="@+id/action_welcome_next"
+            android:layout_gravity="center"
+            android:color="#ff6e9cff"
+            android:src="@drawable/ic_fab_complete"
+            android:visibility="visible"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:max="100"
+            app:fbb_autoStart="true"
+            app:fbb_progressColor="#ff170aff"
+            app:fbb_progressWidthRatio="0.1"
+            app:fbb_endBitmap="@drawable/ic_fab_complete"
+            app:fbb_showEndBitmap="true"
+            />
 
-            <ImageView
-                android:id="@+id/button_background"
-                android:src="@drawable/onboard_button_circle"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true" />
-
-            <net.bradmont.openmpd.views.FontTextView
-                android:id="@+id/action_welcome_next"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:textColor="@color/white"
-                android:textSize="@dimen/icon_text_size"
-                android:text="&#xe014;"
-                android:gravity="center"
-                custom:fontName="material"
-                />
-        </FrameLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
