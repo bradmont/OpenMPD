@@ -15,6 +15,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -122,6 +125,20 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             .setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
                         verify_add_account();
+                }
+            });
+
+        ((EditText) view.findViewById(R.id.password)).setOnEditorActionListener(
+            new EditText.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE){
+                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        verify_add_account();
+                        return true;
+                    }
+                    return false;
                 }
             });
 

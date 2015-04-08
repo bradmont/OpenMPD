@@ -51,18 +51,11 @@
             android:layout_height="0dp"
             android:layout_weight="5"
             />
-        <net.bradmont.openmpd.views.FontTextView
-            android:text="@string/username"
-            android:inputType="text|textEmailAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="@dimen/medium_small_text"
-            android:layout_marginLeft="@dimen/slidingmenu_offset"
-            android:layout_marginRight="@dimen/slidingmenu_offset"
-            />
         <EditText
             android:id="@+id/username"
+            android:hint="@string/username"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/slidingmenu_offset"
@@ -73,17 +66,11 @@
             android:layout_height="0dp"
             android:layout_weight="2"
             />
-        <net.bradmont.openmpd.views.FontTextView
-            android:text="@string/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="@dimen/medium_small_text"
-            android:layout_marginLeft="@dimen/slidingmenu_offset"
-            android:layout_marginRight="@dimen/slidingmenu_offset"
-            />
         <EditText
             android:id="@+id/password"
+            android:hint="@string/password"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
