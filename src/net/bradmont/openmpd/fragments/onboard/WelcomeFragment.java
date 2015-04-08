@@ -106,9 +106,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
                 }
             });
 
-        // these two just advance the viewFlipper
-        view.findViewById(R.id.action_login_next)
-            .setOnClickListener(this);
+        // just advance the viewFlipper
         view.findViewById(R.id.action_accounts_add)
             .setOnClickListener(this);
 
@@ -256,6 +254,33 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
 
     public void onClick(View v) {
         ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
+    }
+
+    public boolean onBackPressed(){
+        switch (((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).getDisplayedChild()){
+            case 0:
+                if (mAdapter.getCursor().getCount() > 0){
+                    showPrevious();
+                } else {
+                    return false;
+                }
+                return true;
+            case 1:
+                showPrevious();
+                return true;
+            case 2:
+                return false;
+        };
+        return false; // signal default back press
+    }
+
+    private void showPrevious(){
+        ViewFlipper f = (ViewFlipper) getView().findViewById(R.id.onboard_flipper);
+        f.setOutAnimation(getActivity(), R.anim.right_out);
+        f.setInAnimation(getActivity(), R.anim.left_in);
+        f.showPrevious();
+        f.setOutAnimation(getActivity(), R.anim.left_out);
+        f.setInAnimation(getActivity(), R.anim.right_in);
     }
 
     public String [] readServicesList(int resource_id){

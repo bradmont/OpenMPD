@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Binder;
@@ -35,14 +34,9 @@ import net.bradmont.openmpd.R;
 
 public class OnboardActivity extends FragmentActivity {
 
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-    private SlidingTabLayout mSlidingTabLayout;
-
 	private int mTitleRes = R.string.app_name;
 
     final static ExecutorService workExecutor = Executors.newSingleThreadExecutor();
-    protected ProgressDialog waitDialog = null;
 
 	public OnboardActivity() {
 	}
@@ -60,10 +54,18 @@ public class OnboardActivity extends FragmentActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
+    @Override
+    public void onBackPressed() {
+        if (((WelcomeFragment) getSupportFragmentManager().findFragmentById(R.id.welcome_fragment)).onBackPressed() == false){
+            super.onBackPressed();
+        }
+
+    }
+
 
     public void onClick(View view){
-        // retrieve the fragment in R.id.content_frame (the visible main fragment)
-        ((OnClickListener) getSupportFragmentManager().findFragmentById(R.id.content_frame)).onClick(view);
+        // retrieve the fragment in R.id.welcome_fragment (the visible main fragment)
+        ((OnClickListener) getSupportFragmentManager().findFragmentById(R.id.welcome_fragment)).onClick(view);
     }	
     public void queueTask(Runnable r){
         // r.run(); // for debugging thread crashes
