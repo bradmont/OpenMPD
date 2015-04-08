@@ -73,6 +73,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
     private static String [] service_urls = null;
     private AccountVerifyService mAccountVerifyService = null;
     private boolean mServiceBound = false;
+    private static final String ACCOUNT_QUERY = "select service_account._id, name, balance_url, username from service_account join tnt_service on tnt_service_id=tnt_service._id" ;
 
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,14 +82,44 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.onboard_flipper, null);
 
-        ((TextView) view.findViewById(R.id.action_welcome_next))
+        view.findViewById(R.id.action_welcome_next)
+            .setOnClickListener(new View.OnClickListener(){
+                // set the server details on the login screen according to
+                // the selection in the Picker, then advance to the next
+                // screen
+                public void onClick(View v){
+                    // get selected org
+                    mSelectedService = mPicker.getCurrent();
+                    // set R.id.org_name
+                    ((TextView) getView().findViewById(R.id.org_name))
+                        .setText(service_names[mSelectedService]);
+                    // set R.id.org_url
+                    try {
+                    ((TextView) getView().findViewById(R.id.org_url))
+                        .setText( new URL( service_urls[mSelectedService])
+                                    .getHost()) ;
+                    } catch (Exception e){
+                    ((TextView) getView().findViewById(R.id.org_url))
+                        .setText( service_urls[mSelectedService]);
+                    }
+                    ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
+                }
+            });
+
+        // these two just advance the viewFlipper
+        view.findViewById(R.id.action_login_next)
             .setOnClickListener(this);
-        ((TextView) view.findViewById(R.id.action_login_next))
+        view.findViewById(R.id.action_accounts_add)
             .setOnClickListener(this);
-        ((TextView) view.findViewById(R.id.action_accounts_add))
-            .setOnClickListener(this);
-        ((TextView) view.findViewById(R.id.action_accounts_done))
-            .setOnClickListener(this);
+
+        view.findViewById(R.id.action_accounts_done)
+            .setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    // TODO: set onboarding progress
+                    // launch importing activity
+                }
+            });
+
         view.findViewById(R.id.account_fab_verify)
             .setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
@@ -113,9 +144,9 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
 
         mAccountList = (NoScrollListView) view.findViewById(R.id.account_list);
         // populate account list
-        Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery("select service_account._id, name, balance_url, username from service_account join tnt_service on tnt_service_id=tnt_service._id", null);
-         String [] columns = {"name", "username", "balance_url"};
-         int [] fields = {R.id.name, R.id.username, R.id.url};
+        Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery(ACCOUNT_QUERY, null);
+        String [] columns = {"name", "username", "balance_url"};
+        int [] fields = {R.id.name, R.id.username, R.id.url};
 
         mAdapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.service_account_list_item, cursor, columns, fields);
@@ -135,6 +166,9 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             }
         });
         mAccountList.setAdapter(mAdapter);
+        if (cursor.getCount() > 0){
+            ((ViewFlipper) view.findViewById(R.id.onboard_flipper)).setDisplayedChild(2);
+        }
 
 
         return view;
@@ -195,6 +229,10 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
                     account.dirtySave();
                     ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(false);
                     ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
+                    Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery(ACCOUNT_QUERY, null);
+                    mAdapter.changeCursor(cursor);
+                    ((EditText) getView().findViewById(R.id.username)).setText("");
+                    ((EditText) getView().findViewById(R.id.password)).setText("");
                 } else {
                     ((OnboardActivity) getActivity()).userMessage(R.string.login_error);
                     ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(false);
@@ -217,28 +255,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.action_welcome_next:
-                // get selected org
-                mSelectedService = mPicker.getCurrent();
-                // set R.id.org_name
-                ((TextView) getView().findViewById(R.id.org_name))
-                    .setText(service_names[mSelectedService]);
-                // set R.id.org_url
-                try {
-                ((TextView) getView().findViewById(R.id.org_url))
-                    .setText( new URL( service_urls[mSelectedService])
-                                .getHost()) ;
-                } catch (Exception e){
-                ((TextView) getView().findViewById(R.id.org_url))
-                    .setText( service_urls[mSelectedService]);
-                }
-            case R.id.action_login_next:
-            case R.id.action_accounts_add:
-                ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
-                break;
-        }
-
+        ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
     }
 
     public String [] readServicesList(int resource_id){
@@ -270,6 +287,10 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             mAccountVerifyService = binder.getService();
             mServiceBound = true;
             Log.i("net.bradmont.openmpd", "service bound.");
+            if (mAccountVerifyService.isRunning()){
+                ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).setDisplayedChild(1);
+                ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(true);
+            }
         }
 
         @Override
