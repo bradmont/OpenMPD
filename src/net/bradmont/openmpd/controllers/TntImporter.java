@@ -23,6 +23,7 @@ import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
@@ -65,6 +66,7 @@ import java.lang.Thread;
 
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -558,6 +560,9 @@ public class TntImporter {
             Log.i("net.bradmont.openmpd.controllers.TntImporter",sw.toString());
         }
         Log.i("net.bradmont.openmpd", String.format("returning %d lines", lines.size()));
+        /*for (String l : lines){
+            Log.i("net.bradmont.openmpd", l);
+        }*/
         if (lines == null ||
                  lines.get(0).contains("ERROR") ||
                  lines.get(0).contains("BAD_PASSWORD")){
@@ -585,8 +590,10 @@ public class TntImporter {
         try {
             getBalance();
         } catch (ServerException e){
+            Log.i("net.bradmont.openmpd", "server error");
             return false;
         } catch (RuntimeException e){
+            Log.i("net.bradmont.openmpd", "runtime exception");
             URL u = null;
             try { u = new URL(service.getString("base_url") + service.getString("balance_url")); } catch (Exception f){}
             if (u.getHost().contains("focus.powertochange.org")){
@@ -605,7 +612,10 @@ public class TntImporter {
         return true;
     }
 
-    public float getBalance() throws ServerException{
+    /**
+     * returns account balance in cents
+     */
+    public int getBalance() throws ServerException{
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
         arguments.add(new BasicNameValuePair( "Action", service.getBalanceAction()));
         arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
@@ -616,10 +626,21 @@ public class TntImporter {
         String [] values = csvLineSplit(content.get(1));
         for (int i = 0; i < headers.length; i++){
             if (headers[i].equals("BALANCE")){
-                return Float.parseFloat(values[i]);
+                DecimalFormat format = new DecimalFormat();
+                format.setParseBigDecimal(true);
+                BigDecimal balance = null;
+                try {
+                    balance = (BigDecimal) format.parse(values[i]);
+                } catch (Exception e){
+                    Log.i("net.bradmont.openmpd", "Invalid balance format: " + values[i]);
+                    return 0;
+                }
+                balance = balance.multiply(new BigDecimal(100));
+
+                return balance.intValue();
             }
         }
-        return 0.0f;
+        return 0;
     }
 
     private static StringReader getCleanedStringReaderFromUrl(String url){
