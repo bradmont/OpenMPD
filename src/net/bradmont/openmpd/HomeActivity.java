@@ -49,10 +49,25 @@ public class HomeActivity extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        // TODO: only launch this on new install
-        Intent switchIntent = new Intent(this, OnboardActivity.class);
-        startActivity(switchIntent);
+
+        SharedPreferences prefs = getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+        switch (prefs.getInt("onboardState", OpenMPD.ONBOARD_FIRST_RUN)){
+            case OpenMPD.ONBOARD_FINISHED:
+                break;
+            case OpenMPD.ONBOARD_FIRST_RUN:
+            case OpenMPD.ONBOARD_ACCOUNT_ADDED:
+                Intent intent = getIntent();
+                Intent switchIntent = new Intent(this, OnboardActivity.class);
+                startActivity(switchIntent);
+                // todo: stop this activity
+                break;
+            case OpenMPD.ONBOARD_IMPORTING:
+                // TODO
+                /*Intent intent = getIntent();
+                Intent switchIntent = new Intent(this, ImportingActivity.class);
+                startActivity(switchIntent);*/
+                // todo: stop this activity
+        }
 
         
 

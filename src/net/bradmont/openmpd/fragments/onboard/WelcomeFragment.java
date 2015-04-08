@@ -117,6 +117,13 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             .setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
                     // TODO: set onboarding progress
+                    /*
+                    getSharedPreferences("openmpd", Context.MODE_PRIVATE)
+                        .edit()
+                        .putInt("onboardState", OpenMPD.ONBOARD_FINISHED)
+                        .apply(); // Onboarding done
+
+                    */
                     // launch importing activity
                 }
             });

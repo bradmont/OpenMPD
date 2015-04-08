@@ -118,10 +118,10 @@ public class TntImportService extends IntentService {
                 .setContentText(" ");
             evaluator.run();
 
-            /*getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
+            getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
                 .edit()
-                .putInt("onboardState", HomeFragment.ONBOARD_FINISHED)
-                .apply();*/ // TODO: Onboarding done
+                .putInt("onboardState", OpenMPD.ONBOARD_FINISHED)
+                .apply(); // Onboarding done
 
 
 
