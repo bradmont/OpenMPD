@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import mbanje.kurt.fabbutton.FabButton;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.activities.OnboardActivity;
+import net.bradmont.openmpd.activities.*;
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.views.HelpDialog;
 import net.bradmont.openmpd.helpers.Analytics;
@@ -117,14 +117,16 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             .setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
                     // TODO: set onboarding progress
-                    /*
-                    getSharedPreferences("openmpd", Context.MODE_PRIVATE)
+                    getActivity().getSharedPreferences("openmpd", Context.MODE_PRIVATE)
                         .edit()
-                        .putInt("onboardState", OpenMPD.ONBOARD_FINISHED)
+                        .putInt("onboardState", OpenMPD.ONBOARD_IMPORTING)
                         .apply(); // Onboarding done
 
-                    */
                     // launch importing activity
+                    Intent switchIntent = new Intent(getActivity(), ImportActivity.class);
+                    getActivity().startActivity(switchIntent);
+                    getActivity().finish();
+
                 }
             });
 

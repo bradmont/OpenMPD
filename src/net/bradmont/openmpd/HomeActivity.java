@@ -34,7 +34,7 @@ import java.lang.Runnable;
 
 import net.bradmont.openmpd.BaseActivity;
 import net.bradmont.openmpd.fragments.*;
-import net.bradmont.openmpd.activities.OnboardActivity;
+import net.bradmont.openmpd.activities.*;
 import net.bradmont.openmpd.R;
 
 public class HomeActivity extends BaseActivity {
@@ -56,21 +56,17 @@ public class HomeActivity extends BaseActivity {
                 break;
             case OpenMPD.ONBOARD_FIRST_RUN:
             case OpenMPD.ONBOARD_ACCOUNT_ADDED:
-                Intent intent = getIntent();
                 Intent switchIntent = new Intent(this, OnboardActivity.class);
                 startActivity(switchIntent);
-                // todo: stop this activity
+                finish();
                 break;
             case OpenMPD.ONBOARD_IMPORTING:
                 // TODO
-                /*Intent intent = getIntent();
-                Intent switchIntent = new Intent(this, ImportingActivity.class);
-                startActivity(switchIntent);*/
+                switchIntent = new Intent(this, ImportActivity.class);
+                startActivity(switchIntent);
+                finish();
                 // todo: stop this activity
         }
-
-        
-
 		
         // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
