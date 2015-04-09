@@ -21,6 +21,8 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ClientConnectionManager;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
+import java.lang.StackTraceElement;
+import java.lang.Thread;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -81,6 +83,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.BufferedReader;
 
+import net.bradmont.openmpd.activities.ImportActivity;
+
 import org.ini4j.Ini;
 
 /** Controller to connect to and import data from TntDataServer instances.
@@ -133,6 +137,16 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, true);
             notifyManager.notify(notification_id, builder.build());
         }
+        try {
+            Thread.sleep(500);
+            // we tend to get to this point before the accounts listview 
+            // on the importing screen gets populated, so the progress bar
+            // for the first account doesn't get set to indeterminate, 
+            // leaving the user thinking the app has hung. Hackish workaround,
+            // but it does the job.
+        } catch(Exception ex) { }
+
+        ImportActivity.setProgress(account.getID(), progressmax, progress, true);
 
         // upgrade from legacy tnt_service to using query.ini properly
         if (service.getUsernameKey() == null || service.getUsernameKey().length() < 2){
@@ -150,6 +164,7 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
+        ImportActivity.setProgress(account.getID(), progressmax, progress, false);
         if (getGifts() == false){
             return false;
         }
@@ -166,6 +181,8 @@ public class TntImporter {
             builder.setProgress(2, 3, true);
             notifyManager.notify(notification_id, builder.build());
         }
+        ImportActivity.setProgress(account.getID(), 2, 3, true);
+        ImportActivity.setStatus(account.getID(), R.string.importing_contacts);
         arguments.add(new BasicNameValuePair( "Action", service.getAddressesAction()));
         arguments.add(new BasicNameValuePair( service.getUsernameKey(), account.getString("username")));
         arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
@@ -207,10 +224,12 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
+        ImportActivity.setProgress(account.getID(), progressmax, progress, false);
         Contact temp = new Contact();
         Contact.beginTransaction();
         for(String s:content){
             //Log.i(Config.PACKAGE, s);
+            progress++;
             try{
                 parseAddressLine(headers, s);
             } catch (Exception e){
@@ -220,7 +239,6 @@ public class TntImporter {
                 progressbar.incrementProgressBy(1);
             }
             if (builder != null){
-                progress++;
                 builder.setProgress(progressmax, progress, false);
                 notifyManager.notify(notification_id, builder.build());
                 if (progress % 1000 == 0){
@@ -228,6 +246,7 @@ public class TntImporter {
                     Contact.beginTransaction();
                 }
             }
+            ImportActivity.setProgress(account.getID(), progressmax, progress, false);
         }
         Contact.endTransaction();
         return true;
@@ -239,6 +258,8 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, true);
             notifyManager.notify(notification_id, builder.build());
         }
+        ImportActivity.setProgress(account.getID(), progressmax, progress, true);
+        ImportActivity.setStatus(account.getID(), R.string.importing_gifts);
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
 
         arguments.add(new BasicNameValuePair( "Action", service.getDonationsAction()));
@@ -282,12 +303,13 @@ public class TntImporter {
         if (progressbar != null){
             progressbar.setMax((progressbar.getMax()/2) + content.size());
         }
+        progressmax = content.size();
+        progress = 0;
         if (builder != null){
-            progressmax = content.size();
-            progress = 0;
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
+        ImportActivity.setProgress(account.getID(), progressmax, progress, false);
         Gift temp = new Gift();
         Gift.beginTransaction();
         for(String s:content){
@@ -303,12 +325,14 @@ public class TntImporter {
                 builder.setProgress(progressmax, ++progress, false);
                 notifyManager.notify(notification_id, builder.build());
             }
+            ImportActivity.setProgress(account.getID(), progressmax, progress, false);
             if (progress % 1000 == 0){
                 Gift.endTransaction();
                 Gift.beginTransaction();
             }
         }
         Gift.endTransaction();
+        ImportActivity.setStatus(account.getID(), R.string.done);
         return true;
     }
 
@@ -538,7 +562,7 @@ public class TntImporter {
             builder.setContentText(url.getHost());
             notifyManager.notify(notification_id, builder.build());
         }
-        InputStream stream = getStreamFromUrl(url_raw, arguments, handleCertError, builder, notifyManager);
+        InputStream stream = getStreamFromUrl(url_raw, arguments, handleCertError, builder, notifyManager, account.getID());
         if (stream == null){
             return null;
         }
@@ -587,6 +611,7 @@ public class TntImporter {
      * Check if the account login is valid
      */
     public boolean verifyAccount(){
+        processQueryIni(service);
         try {
             getBalance();
         } catch (ServerException e){
@@ -595,17 +620,28 @@ public class TntImporter {
         } catch (RuntimeException e){
             Log.i("net.bradmont.openmpd", "runtime exception");
             URL u = null;
-            try { u = new URL(service.getString("base_url") + service.getString("balance_url")); } catch (Exception f){}
-            if (u.getHost().contains("focus.powertochange.org")){
+            Log.i("net.bradmont.openmpd", "url");
+            try { u = new URL(service.getString("base_url") + service.getString("balance_url")); } catch (Exception f){
+                Log.i("net.bradmont.openmpd", "url exception");
+                Log.i("net.bradmont.openmpd", f.toString());
+            }
+            if (u.getHost().contains("focus.powertochange.org") ||
+                u.getHost().contains("tntmpd.powertochange.org")){
+                Log.i("net.bradmont.openmpd", "setting ignore ssl for p2c");
                 SharedPreferences.Editor prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE).edit();
                 prefs.putBoolean("ignore_ssl_" + u.getHost(), true);
                 prefs.commit();
                 try {
+                    Log.i("net.bradmont.openmpd", "recalling getBalance");
                     getBalance();
                 } catch (Exception f){
                     return false;
                 }
             } else {
+                Log.i("net.bradmont.openmpd", "unexpected RuntimeException");
+                for (StackTraceElement l : e.getStackTrace()){
+                    Log.i("net.bradmont.openmpd", l.toString());
+                }
                 throw e;
             }
         }
@@ -622,6 +658,12 @@ public class TntImporter {
         arguments.add(new BasicNameValuePair( service.getPasswordKey(), account.getString("password")));
         ArrayList<String> content = null;
         content = getStringsFromUrl(service.getString("base_url") + service.getString("balance_url"), arguments, false);
+        if (content.size() == 1){
+            // Query was succesful, but no result returned
+            // this happens, eg, for CRU US accounts that redirect funds to
+            // an international ministry
+            return 0;
+        }
         String [] headers = csvLineSplit(content.get(0));
         String [] values = csvLineSplit(content.get(1));
         for (int i = 0; i < headers.length; i++){
@@ -673,10 +715,10 @@ public class TntImporter {
     }
 
     public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
-        return getStreamFromUrl(url_raw, arguments, handleCertError, null, null);
+        return getStreamFromUrl(url_raw, arguments, handleCertError, null, null, -1);
     }
 
-    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError, NotificationCompat.Builder builder, NotificationManager notifyManager){
+    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError, NotificationCompat.Builder builder, NotificationManager notifyManager, int accountId){
         InputStream content = null;
         
         URL url = null;
@@ -731,6 +773,8 @@ public class TntImporter {
                 builder.setContentTitle("Error connecting to server.");
                 notifyManager.notify(notification_id, builder.build());
             }
+            ImportActivity.setProgress(accountId, 0, 0, false);
+            ImportActivity.setStatus(accountId, R.string.error_connecting_to_server);
         } catch (javax.net.ssl.SSLPeerUnverifiedException e){
             // SSL certs on the server are not accepted
             if (handleCertError == false){
@@ -745,6 +789,7 @@ public class TntImporter {
 
             nBuilder.setContentTitle("SSL Certificate Error");
             nBuilder.setContentText(url.getHost());
+            ImportActivity.setStatus(accountId, R.string.ssl_certificate_error);
 
             Intent sslCertIntent = new Intent(OpenMPD.get(), HomeActivity.class);
             sslCertIntent.putExtra("net.bradmont.openmpd.SSLErrorServer", url.getHost());

@@ -26,7 +26,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyTheme.Onboard"
             />
-        <activity android:name="AccountListActivity" />
+        <activity android:name=".activities.ImportActivity" 
+            android:screenOrientation="portrait"
+            android:theme="@style/MyTheme.Onboard"
+            />
         <activity android:name="DebugActivity" />
 
         <service android:name=".controllers.TntImportService" />

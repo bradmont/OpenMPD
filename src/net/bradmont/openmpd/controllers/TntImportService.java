@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.activities.ImportActivity;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.fragments.AnalyticsFragment;
 import net.bradmont.openmpd.controllers.TntImporter;
@@ -116,6 +117,7 @@ public class TntImportService extends IntentService {
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
+            ImportActivity.setStatus(-1, R.string.evaluating_contacts);
             evaluator.run();
 
             getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
@@ -133,6 +135,7 @@ public class TntImportService extends IntentService {
         }
         MPDDBHelper.get().close();
 
+        ImportActivity.onFinish();
         stopForeground(true);
     }
     protected void notifyError(NotificationManager notificationManager, String message, Exception e){
