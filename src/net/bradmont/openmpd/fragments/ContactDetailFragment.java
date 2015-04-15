@@ -91,10 +91,15 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         if (contact != null){
             populateView();
         }
+        setRetainInstance(true);
+        if (contact != null){
+            populateView();
+        }
         return layout;
     }
     private void populateView(){
         View layout = getView();
+        if (layout == null) return;
 
         if (contact.getString("fname") == null && contact.getString("lname") == null){
             // ugly hack to move around a bug in the import routines when
