@@ -45,8 +45,8 @@ public class ContactStatus extends DBModel{
     public static final int [] STATUS_COLORS = {
         0xFF707070,  // none
         0xFFA0A0A0,  // dropped
-        0xFFFF4444,  // lapsed
-        0xFFFFBB33,  // late
+        0xFF607d8b,  // lapsed
+        0xFF795548,  // late
         0xFF99CC00,  // new
         0xFF33B5E5  // current
     };
@@ -153,6 +153,27 @@ public class ContactStatus extends DBModel{
             case 30:
                 return R.string.occasional;
             case 35:
+                return R.string.per_month_average;
+            case 40:
+                return R.string.per_year;
+            case 50:
+                return R.string.per_n_months;
+            case 60:
+                return R.string.per_month ;
+        }
+        return 0;
+    }
+    public static int getTypeStringRes(int p){
+        switch (p){
+            case 0:
+                return R.string.unknown;
+            case 10:
+                return R.string.none;
+            case 20:
+                return R.string.onetime;
+            case 30:
+                return R.string.occasional;
+            case 35:
                 return R.string.frequent;
             case 40:
                 return R.string.annual;
@@ -161,7 +182,25 @@ public class ContactStatus extends DBModel{
             case 60:
                 return R.string.monthly ;
         }
-        return 0;
+        return R.string.unknown;
+    }
+    public static int getTypeColorRes(int p){
+        switch (p){
+            case PARTNER_MONTHLY:
+                return R.color.monthly_partner;
+            case PARTNER_REGULAR:
+            case PARTNER_ANNUAL:
+                return R.color.regular_partner;
+            case PARTNER_FREQUENT:
+                return R.color.frequent_partner;
+            case PARTNER_OCCASIONAL:
+            case PARTNER_ONETIME:
+                return R.color.special_partner;
+            case PARTNER_NONE:
+            case PARTNER_UNKNOWN:
+                return R.color.text_medium;
+        }
+        return R.color.black;
     }
     public static int getStatusStringRes(int p){
         switch(p){

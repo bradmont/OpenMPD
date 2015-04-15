@@ -68,27 +68,19 @@ public class TntService extends DBModel{
 
         // balance
         addField(new StringField("balance_url"));
-        getField("balance_url").setDefault("account_balance.php");
         addField(new StringField("balance_formdata"));
-        getField("balance_formdata").setDefault("Action=TntBalance&Username=%s&Password=%s");
 
         // donations
         addField(new StringField("donations_url"));
-        getField("donations_url").setDefault("donordata.php");
         addField(new StringField("donations_formdata"));
-        getField("donations_formdata").setDefault("Action=TntDonList&Username=%s&Password=%s&DateFrom=%s&DateTo=%s");
 
         // addresses
         addField(new StringField("addresses_url"));
-        getField("addresses_url").setDefault("donordata.php");
         addField(new StringField("addresses_formdata"));
-        getField("addresses_formdata").setDefault("Action=TntAddrList&Username=%s&Password=%s&DateFrom=%s");
 
         // addresses_by_personids
         addField(new StringField("addresses_by_personids_url"));
-        getField("addresses_by_personids_url").setDefault("donordata.php");
         addField(new StringField("addresses_by_personids_formdata"));
-        getField("addresses_by_personids_formdata").setDefault("Action=TntAddrList&Username=%s&Password=%s&PID=%s");
 
         addField(new StringField("query_ini_url"));
         addField(new BooleanField("untested_service"));

@@ -6,6 +6,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 
 public class OpenMPD extends Application {
 
+    // public constants
+    public static final int ONBOARD_FIRST_RUN=0;
+    public static final int ONBOARD_ACCOUNT_ADDED=1; // not used, legacy value
+    public static final int ONBOARD_IMPORTING=2;
+    public static final int ONBOARD_FINISHED = 3;
+
     private static OpenMPD instance;
     private static MPDDBHelper db;
 

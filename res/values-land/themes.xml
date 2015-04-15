@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the theme applied to the application or activity -->
+    <style name="OpenMPD"
+           parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabs</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="ActionBar"
+           parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@color/app_primary</item>
+        <item name="android:backgroundStacked">@color/app_background</item>
+    </style>
+    <!-- ActionBar tab styles -->
+    <style name="ActionBarTabs"
+           parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <!-- <item name="android:background">@color/app_background</item>-->
+        <item name="android:background">@drawable/tab_indicator_ab_land</item>
+    </style>
+</resources>

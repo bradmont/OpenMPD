@@ -52,10 +52,13 @@ public class BarGraph extends View {
     protected float maxValue = 0;
     protected float tickSpacing = 0;
     protected float tickWidth = 0;
+    protected int labelZeros = -1;
 
     // swipe related:
     protected float mTranslationX = 0;
     protected float mDownX = 0;
+
+    private static final String [] suffixes = {"", "0", "00", "k", "0k", "00k", "M", "0M", "00M", "G" };
 
 
     protected Object [][] values = new Integer [0][0];
@@ -117,7 +120,7 @@ public class BarGraph extends View {
         canvas_right = getPaddingLeft()+width;
         canvas_top = getPaddingTop();
 
-        String sampleLabel = Integer.toString( ticks * (int)tickSpacing);
+        String sampleLabel = makeBiggestLabel(ticks, (int)tickSpacing);
         float label_width = linePaint.measureText( sampleLabel);
 
 
@@ -200,7 +203,7 @@ public class BarGraph extends View {
                     String group = groups[index];
                     Rect r = new Rect();
                     linePaint.getTextBounds(group, 0, group.length() - 1, r);
-                    float y = data_bottom - ((ticks-1) * tickSpacing*barHeightFactor) - r.centerY();
+                    float y = data_bottom - ((ticks-1) * tickSpacing*barHeightFactor) + r.height();
 
                     if (groupLabelOffset[index] == 0){
                         float x = right -barWidth ;
@@ -260,14 +263,14 @@ public class BarGraph extends View {
                 // number of ticks, else start at first non-zero tick
                 // this way the top tick always has a label
                 canvas.drawLine(data_left, y, data_left - tickWidth, y, linePaint);
-                String label = Integer.toString (tick* (int)tickSpacing);
+                String label = makeLabel (tick* (int)tickSpacing);
                 linePaint.getTextBounds(label, 0, label.length() - 1, r);
-                if (tick == 0){
-                    canvas.drawText(label , canvas_left, y, linePaint);
-                } else {
+                if (tick == ticks - 1) {
+                    y = y + r.height();
+                } else if (tick != 0) {
                     y = y - r.centerY();
-                    canvas.drawText(label , canvas_left, y, linePaint);
                 }
+                canvas.drawText(label , canvas_left, y, linePaint);
             } else {
                 canvas.drawLine(data_left, y, data_left - (tickWidth/2), y, linePaint);
             }
@@ -509,4 +512,52 @@ public class BarGraph extends View {
         invalidate();
         requestLayout();
     }
+
+    private String makeLabel(int label){
+        String result = Integer.toString(label);
+        if (result.length() <= labelZeros){
+            return result;
+        }
+        try {
+            result = result.substring(0, result.length() - labelZeros);
+        } catch (java.lang.StringIndexOutOfBoundsException e){
+            return result;
+        }
+        return result + suffixes[labelZeros];
+    }
+
+    private String makeBiggestLabel(int ticks, int tickSpacing){
+        labelZeros = countZeros(Integer.toString( tickSpacing * (ticks - 1)));
+
+        int biggest_label = ticks;
+        float label_width = linePaint.measureText(Integer.toString( tickSpacing * ticks));
+
+        for (int i = 1; i < ticks; i++){
+            if (ticks % 2 != i % 2 ){
+                if (countZeros(Integer.toString( tickSpacing * i)) < labelZeros){
+                    labelZeros = countZeros(Integer.toString( tickSpacing * i));
+                }
+                if (linePaint.measureText(Integer.toString( tickSpacing * i)) > label_width){
+                    biggest_label = i;
+                    label_width = linePaint.measureText(Integer.toString( tickSpacing * i));
+                }
+            }
+        }
+        if (labelZeros >= suffixes.length){
+            labelZeros = suffixes.length - 1;
+        }
+        return makeLabel(biggest_label * tickSpacing);
+    }
+
+    /* counts the 0s at the end of a string
+     */
+    private int countZeros(String number){
+        int result = 0;
+        while (number.endsWith("0")){
+            result++;
+            number = number.substring(0, number.length()-1);
+        }
+        return result;
+    }
+
 }

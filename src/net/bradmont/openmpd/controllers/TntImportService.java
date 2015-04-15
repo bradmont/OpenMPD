@@ -23,9 +23,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.fragments.HomeFragment;
+import net.bradmont.openmpd.activities.ImportActivity;
 import net.bradmont.openmpd.models.*;
-import net.bradmont.openmpd.views.cards.GraphCard;
+import net.bradmont.openmpd.fragments.AnalyticsFragment;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.supergreen.models.*;
@@ -117,23 +117,25 @@ public class TntImportService extends IntentService {
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");
+            ImportActivity.setStatus(-1, R.string.evaluating_contacts);
             evaluator.run();
 
             getSharedPreferences("openmpd", Context.MODE_PRIVATE)  
                 .edit()
-                .putInt("onboardState", HomeFragment.ONBOARD_FINISHED)
-                .apply();
+                .putInt("onboardState", OpenMPD.ONBOARD_FINISHED)
+                .apply(); // Onboarding done
 
 
 
             // clear the cache on our summary graph
-            GraphCard.clearCache();
-            GraphCard.createCache();
+            AnalyticsFragment.clearCache();
+            AnalyticsFragment.createCache();
 
             notifyUser(builder, notificationManager);
         }
         MPDDBHelper.get().close();
 
+        ImportActivity.onFinish();
         stopForeground(true);
     }
     protected void notifyError(NotificationManager notificationManager, String message, Exception e){
@@ -186,7 +188,7 @@ public class TntImportService extends IntentService {
             switch (n.getInt("type")){
                 case Notification.CHANGE_PARTNER_TYPE:
                     int partnership = status.partnership(status.getInt("partner_type"));
-                    if (partnership == R.string.monthly || partnership == R.string.regular){
+                    if (partnership == R.string.per_month || partnership == R.string.per_n_months){
                         new_partners++;
                     }
                     break;
@@ -250,6 +252,7 @@ public class TntImportService extends IntentService {
             builder.setProgress(0, 0, false); // remove progress bar
 
             Intent homeIntent = new Intent(this, HomeActivity.class);
+            homeIntent.putExtra("net.bradmont.openmpd.notifications", true);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(homeIntent);

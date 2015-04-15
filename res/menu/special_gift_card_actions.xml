@@ -3,6 +3,9 @@
     <item android:id="@+id/menu_make_monthly" 
         android:title="@string/make_monthly" 
         android:visible="true"></item>
+    <item android:id="@+id/menu_make_quarterly" 
+        android:title="@string/make_quarterly" 
+        android:visible="true"></item>
     <item android:id="@+id/menu_make_annual" 
         android:title="@string/make_annual" 
         android:visible="true"></item>

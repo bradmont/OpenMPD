@@ -1,5 +1,6 @@
 package net.bradmont.openmpd.controllers;
 
+import net.bradmont.openmpd.activities.ImportActivity;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.*;
 import net.bradmont.supergreen.models.*;
@@ -96,6 +97,7 @@ public class ContactsEvaluator implements Runnable{
                     builder.setProgress(total_contacts, progress, false);
                     notifyManager.notify(NOTIFICATION_ID, builder.build());
                 }
+                ImportActivity.setProgress(-1, total_contacts, progress, false);
             }
         }
         ContactStatus.endTransaction();

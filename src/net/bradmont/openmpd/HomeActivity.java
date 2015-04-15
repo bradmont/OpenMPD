@@ -23,6 +23,7 @@ import android.database.sqlite.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -33,17 +34,11 @@ import java.lang.Runnable;
 
 import net.bradmont.openmpd.BaseActivity;
 import net.bradmont.openmpd.fragments.*;
+import net.bradmont.openmpd.activities.*;
 import net.bradmont.openmpd.R;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class HomeActivity extends BaseActivity {
 	
-    public static HomeFragment homeFragment = null;
-    public static DebugFragment debugFragment = null;
-    public static ContactList contactList = null;
-    public static GiftList giftList = null;
-    public static ServiceAccountList serviceAccountList = null;
-
 
 	public HomeActivity() {
 		super(R.string.app_name);
@@ -54,43 +49,25 @@ public class HomeActivity extends BaseActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        
 
-		// set the Above View
-		if (savedInstanceState != null)
-			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-		if (mContent == null){
-            homeFragment = new HomeFragment();
-            if (intent.hasExtra("net.bradmont.openmpd.SSLErrorServer")){
-                Log.i("net.bradmont.openmpd", "processing SSLError");
-                String host = intent.getStringExtra("net.bradmont.openmpd.SSLErrorServer");
-                homeFragment.setAskSSLIgnore(host);
-            }
-			mContent = homeFragment;
+        SharedPreferences prefs = getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+        switch (prefs.getInt("onboardState", OpenMPD.ONBOARD_FIRST_RUN)){
+            case OpenMPD.ONBOARD_FINISHED:
+                break;
+            case OpenMPD.ONBOARD_FIRST_RUN:
+            case OpenMPD.ONBOARD_ACCOUNT_ADDED:
+                Intent switchIntent = new Intent(this, OnboardActivity.class);
+                startActivity(switchIntent);
+                finish();
+                break;
+            case OpenMPD.ONBOARD_IMPORTING:
+                // TODO
+                switchIntent = new Intent(this, ImportActivity.class);
+                startActivity(switchIntent);
+                finish();
+                // todo: stop this activity
         }
-
 		
-		// set the Above View
-		setContentView(R.layout.content_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame, mContent)
-		.commit();
-		
-		// set the Behind View
-		setBehindContentView(R.layout.menu_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.menu_frame, new MenuFragment())
-		.commit();
-		
-		// customize the SlidingMenu
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-		getSlidingMenu().setBehindWidthRes(R.dimen.menu_width);
-		getSlidingMenu().setBehindScrollScale(0);
-        setSlidingActionBarEnabled(false);
-
         // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
         ModelList messages = q.getAll(); 
