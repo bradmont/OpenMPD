@@ -282,8 +282,7 @@ public class ContactListFragment extends ListFragment {
         menu.findItem(R.id.menu_search)
                 .setActionView(searchView)
                 .setShowAsAction(
-                        MenuItem.SHOW_AS_ACTION_IF_ROOM
-                                | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+                        MenuItem.SHOW_AS_ACTION_IF_ROOM);
         MenuItemCompat.setOnActionExpandListener(
                 menu.findItem(R.id.menu_search),
                 new MenuItemCompat.OnActionExpandListener(){
