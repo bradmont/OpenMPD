@@ -191,6 +191,12 @@ public class DebugFragment extends Fragment implements OnClickListener{
                         address.dirtySave();
                     } catch (Exception e){}
                 }
+                // randomize gift amounts
+                MPDDBHelper.get().getWritableDatabase()
+                    .execSQL(String.format("update gift set amount = round(amount * ( .75 + (abs(random()) % 50)/100.));"));
+                MPDDBHelper.get().getWritableDatabase()
+                    .execSQL(String.format("update contact_status set giving_amount = round(giving_amount * ( .75 + (abs(random()) % 50)/100.));"));
+                AnalyticsFragment.clearCache();
                 break;
             case R.id.report_error_button:
                 int position = (Integer) view.getTag();
