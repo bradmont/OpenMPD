@@ -11,14 +11,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 
+import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -48,8 +51,8 @@ public class QuickMessenger {
     }
     public void showQuickMessageDialog(){
 
-        SharedPreferences prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
-        if (!prefs.getBoolean("messageTemplatesEnabled", false)){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OpenMPD.get());
+        if (!prefs.getBoolean("pref_message_templates_enabled", false)){
             sendMessage(null, "", "");
             return;
         }

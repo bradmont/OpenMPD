@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -187,6 +188,12 @@ public class AnalyticsFragment extends Fragment {
     }
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.analytics_fragment, menu);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OpenMPD.get());
+        // if debug disabled
+        if (!prefs.getBoolean("pref_debug_enabled", false)){
+            menu.findItem(R.id.menu_debug).setVisible(false);
+        }
+
     }
     @Override
     public boolean onOptionsItemSelected (MenuItem item){

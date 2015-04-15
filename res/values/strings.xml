@@ -4,6 +4,7 @@
     <string name="fragment_name">Main Fragment</string>
     <string name="help">Help</string>
     <string name="download">Download</string>
+    <string name="debug">Debug</string>
     <string name="evaluate">Evaluate</string>
     <string name="contacts">Contacts</string>
     <string name="analytics">Analytics</string>
@@ -121,7 +122,6 @@
     <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. You may ignore it, but this could be dangerous.\n\nNote that the P2C server currently has a known error, so you should be safe to ignore it for focus.powertochange.org.</string>
     <string name="ignore_certificate">Ignore error</string>
     <string name="ignoring_ssl">SSL errors on this server will be ignored in the future.</string>
-    <string name="debug_enabled">Debug enabled. Please close and reopen the app to access debug.</string>
     <string name="report_success">Successful data import</string>
     <string name="report_success_body">It looks like you\'re using an untested service, which successfully imported your donor data. Please help us make OpenMPD better by sending us a login report. It\'ll take about 20 seconds.</string>
 
