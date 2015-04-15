@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.PorterDuff.Mode;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,8 +32,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import net.bradmont.openmpd.models.Notification;
-import net.bradmont.openmpd.models.ContactStatus;
+import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
 import net.bradmont.openmpd.helpers.TextTools;
 import net.bradmont.openmpd.*;
@@ -46,7 +46,7 @@ public class NotificationsFragment extends ListFragment{
     private OnClickListener mOnClickListener = null;
 
     private final static String NOTIFICATIONS_QUERY = 
-        "select notification.*, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency, spouse.fname as spouse_fname, spouse.lname as spouse_lname from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id left outer join contact as spouse on contact.spouse_id=spouse._id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
+        "select notification._id, notification.contact_id, notification.type, notification.status, notification.message, notification.date, notification.last_gift, notification.giving_amount, notification.partner_type, notification.partner_status, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency, spouse.fname as spouse_fname, spouse.lname as spouse_lname from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id left outer join contact as spouse on contact.spouse_id=spouse._id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
     // and not (type = 2 and contact_status = 5 and manual_set_expires > date) 
     // filters out  "Continued" notifications for donors set as regular by 
     // the user
@@ -255,6 +255,8 @@ public class NotificationsFragment extends ListFragment{
                         return false;
                     }
                 case R.id.quickactions:
+                    view.findViewById(R.id.action_icon).setOnClickListener(mOnClickListener);
+                    view.findViewById(R.id.action_icon).setTag(cursor.getInt(1)); // contact ID
                     if (cursor.getInt(columnIndex) == Notification.SPECIAL_GIFT){
                         TextView phone = (TextView) view.findViewById(R.id.action_icon);
                         phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, 
@@ -405,7 +407,20 @@ public class NotificationsFragment extends ListFragment{
                     popup.show();
                     break;
                 case R.id.action_icon:
-                    ((BaseActivity) getActivity()).userMessage("quick call");
+                    PhoneNumber phone = (PhoneNumber) MPDDBHelper
+                            .getModelByField("phone_number", "contact_id", (Integer)v.getTag());
+                    Log.i("net.bradmont.openmpd", "Calling contact " + v.getTag());
+
+                    String number = phone.getString("number");
+                    if (number.length() < 3){
+                        ((BaseActivity) getActivity()).userMessage(R.string.no_phone_number);
+                    } else {
+                        number = "tel:" + number;
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse(number));
+                        getActivity().startActivity(intent);
+                    }
+
             }
         }
         public boolean onMenuItemClick(MenuItem item){
