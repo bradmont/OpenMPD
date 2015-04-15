@@ -200,12 +200,15 @@ public class AnalyticsFragment extends Fragment {
         switch (item.getItemId() ){
             case R.id.menu_help:
                 HelpDialog.showHelp(getActivity(), R.string.help_main_title, R.string.help_main);
-            return true;
+                return true;
             case R.id.menu_settings:
                 Intent switchIntent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(switchIntent);
-
-            return true;
+                return true;
+            case R.id.menu_debug:
+                switchIntent = new Intent(getActivity(), DebugActivity.class);
+                startActivity(switchIntent);
+                return true;
         }
         return false;
     }

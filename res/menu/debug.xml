@@ -3,7 +3,7 @@
     <item android:id="@+id/menu_refresh" 
         android:icon="@drawable/ic_menu_refresh" 
         android:showAsAction="always" 
-        android:title="@string/add" 
+        android:title="@string/force_import" 
         android:visible="true"></item>
     
 

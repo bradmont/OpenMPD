@@ -6,6 +6,7 @@
     <string name="download">Download</string>
     <string name="debug">Debug</string>
     <string name="evaluate">Evaluate</string>
+    <string name="force_import">Force Import</string>
     <string name="contacts">Contacts</string>
     <string name="analytics">Analytics</string>
     <string name="settings">Settings</string>
@@ -191,7 +192,7 @@
     <string name="pref_update_frequency">Update Frequency</string>
     <string name="pref_update_frequency_summary">Update every # days (todo)</string>
     <string name="pref_debug_enabled">Debug Enabled</string>
-    <string name="pref_debug_enabled_summary">Enables access to debugging options (expert only)</string>
+    <string name="pref_debug_enabled_summary">Enables access to debugging options (WARNING: HERE BE DRAGONS)</string>
     <string name="pref_message_templates_enabled">Message Templates</string>
     <string name="pref_message_templates_enabled_summary">Allows the user to create a library of template emails to make communications faster</string>
 
