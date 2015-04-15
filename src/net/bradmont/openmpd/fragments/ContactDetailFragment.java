@@ -298,7 +298,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
                 ad.setTitle(R.string.gift_history);
                 ListView gift_list = (ListView) ((LayoutInflater) getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                    .inflate(R.layout.list, null);
+                    .inflate(R.layout.dialog_list, null);
 
                 String [] args = new String[1]; args[0] = contact.getString("tnt_people_id");
                 Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
