@@ -28,6 +28,7 @@ import android.widget.ViewSwitcher;
 
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.R;
+import net.bradmont.openmpd.activities.*;
 import net.bradmont.openmpd.views.HelpDialog;
 import net.bradmont.openmpd.helpers.Analytics;
 import net.bradmont.holograph.BarGraph;
@@ -192,6 +193,11 @@ public class AnalyticsFragment extends Fragment {
         switch (item.getItemId() ){
             case R.id.menu_help:
                 HelpDialog.showHelp(getActivity(), R.string.help_main_title, R.string.help_main);
+            return true;
+            case R.id.menu_settings:
+                Intent switchIntent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(switchIntent);
+
             return true;
         }
         return false;

@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory 
+        android:title="@string/pref_updating"
+        android:key="pref_key_storage_settings">
+        <SwitchPreference
+            android:key="pref_notify_office_hours"
+            android:summary="@string/pref_notify_office_hours_summary"
+            android:title="@string/pref_notify_office_hours"
+            android:defaultValue="false"/>
+        <Preference 
+            android:key="pref_update_frequency"
+            android:summary="@string/pref_update_frequency_summary"
+            android:title="@string/pref_update_frequency" />
+    </PreferenceCategory>
+    <PreferenceCategory 
+        android:title="@string/pref_experimental"
+        android:key="pref_experimental">
+        <SwitchPreference
+            android:key="pref_debug_enabled"
+            android:summary="@string/pref_debug_enabled_summary"
+            android:title="@string/pref_debug_enabled"
+            android:defaultValue="false"/>
+        <SwitchPreference 
+            android:key="pref_message_templates_enabled"
+            android:summary="@string/pref_message_templates_enabled_summary"
+            android:title="@string/pref_message_templates_enabled"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

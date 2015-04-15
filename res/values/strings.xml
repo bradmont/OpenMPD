@@ -181,6 +181,18 @@
     <string name="help_settings_title">Settings</string>
     <string name="help_settings">This page allows you to manage (add, delete, or edit) accounts to download your donor data online.\n\nYour organisation should be able to provide you with the login details you need (this is the same username and password you use to download donor data in TntMPD).</string>
 
-    <string name="update_news">This release fixes a number of bugs preparing for 1.0, and adds support for a numbr of new organisations.</string>
+    <string name="update_news">I have done a total visual redesign of OpenMPD. You are seeing this because you are a part of our Google Play beta channel. If you find any bugs, please report them.</string>
+
+    <!-- preferences -->
+    <string name="pref_updating">Updating and notifications</string>
+    <string name="pref_experimental">Experimental features and settings</string>
+    <string name="pref_notify_office_hours">Notifications during office hours</string>
+    <string name="pref_notify_office_hours_summary">Only notify of changes from 9 to 5 on weekdays (todo)</string>
+    <string name="pref_update_frequency">Update Frequency</string>
+    <string name="pref_update_frequency_summary">Update every # days (todo)</string>
+    <string name="pref_debug_enabled">Debug Enabled</string>
+    <string name="pref_debug_enabled_summary">Enables access to debugging options (expert only)</string>
+    <string name="pref_message_templates_enabled">Message Templates</string>
+    <string name="pref_message_templates_enabled_summary">Allows the user to create a library of template emails to make communications faster</string>
 
 </resources>
