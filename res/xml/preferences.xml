@@ -24,10 +24,10 @@
             android:summary="@string/pref_message_templates_enabled_summary"
             android:title="@string/pref_message_templates_enabled"
             android:defaultValue="false"/>
-        <SwitchPreference
+        <!-- <SwitchPreference
             android:key="pref_debug_enabled"
             android:summary="@string/pref_debug_enabled_summary"
             android:title="@string/pref_debug_enabled"
-            android:defaultValue="false"/>
+            android:defaultValue="false"/> -->
     </PreferenceCategory>
 </PreferenceScreen>

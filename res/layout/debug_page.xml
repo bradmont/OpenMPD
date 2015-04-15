@@ -9,6 +9,19 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
+        <TextView
+            android:text="DANGER"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/huge_text"
+            android:textColor="@color/red"
+            />
+        <TextView
+            android:text="These options can irreversibly destroy your donor data. Unless you know what you are doing, please disable debug options."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            />
 
         <Button
             android:id="@+id/clear_data_button"
