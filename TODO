@@ -1,12 +1,14 @@
-- Libraries of quick messages for different users
-    - eg, p2c-s single, p2c-s couple, aia single, aia couple, cru campus single, etc.
 
-Quick contact buttons on notifications
-Settings Activity
+Hide Quick contact buttons on notifications when phone number is not available.
 (test) notification click direct to notifications fragment
 Log account balances on update
 Allow override SSL errors
 
 Settings:
+Settings Activity
 - option to notify only in business hours
 - changeable update frequency
+- enable/disable email libraries
+
+- Libraries of quick messages for different users
+    - eg, p2c-s single, p2c-s couple, aia single, aia couple, cru campus single, etc.
