@@ -1,14 +1,9 @@
---- before beta 1 ---
-- hide debug screen
 - Libraries of quick messages for different users
     - eg, p2c-s single, p2c-s couple, aia single, aia couple, cru campus single, etc.
 
---- post beta1 point releases ---
-Polish/tweaks:
-- regenerate BarGraph cache (instead of just invalidating it) on data download
- to improve startup performance
-
-- bug: editing accounts doesn't set spinner properly
+Settings Activity
+rotation change crashes
+notification click direct to notifications fragment
 
 Settings:
 - option to notify only in business hours
