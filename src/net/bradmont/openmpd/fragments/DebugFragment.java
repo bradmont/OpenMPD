@@ -137,6 +137,7 @@ public class DebugFragment extends Fragment implements OnClickListener{
                     .execSQL(String.format("update service_account set last_import = null;"));
                 break;
             case R.id.randomise_data_button:
+                Log.i("net.bradmont.openmpd", "Randomising contact personal info");
                 // Replace all contact info with fake data, for public
                 // screenshots and such.
 
@@ -191,11 +192,12 @@ public class DebugFragment extends Fragment implements OnClickListener{
                         address.dirtySave();
                     } catch (Exception e){}
                 }
+                Log.i("net.bradmont.openmpd", "Randomising giving info");
                 // randomize gift amounts
+                /*MPDDBHelper.get().getWritableDatabase()
+                    .execSQL("update gift set amount = round(amount * ( .75 + (abs(random()) % 50)/100.));");
                 MPDDBHelper.get().getWritableDatabase()
-                    .execSQL(String.format("update gift set amount = round(amount * ( .75 + (abs(random()) % 50)/100.));"));
-                MPDDBHelper.get().getWritableDatabase()
-                    .execSQL(String.format("update contact_status set giving_amount = round(giving_amount * ( .75 + (abs(random()) % 50)/100.));"));
+                    .execSQL("update contact_status set giving_amount = round(giving_amount * ( .75 + (abs(random()) % 50)/100.));");*/
                 AnalyticsFragment.clearCache();
                 break;
             case R.id.report_error_button:

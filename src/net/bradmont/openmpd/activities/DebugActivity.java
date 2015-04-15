@@ -37,6 +37,10 @@ public class DebugActivity extends ActionBarActivity {
         //DebugFragment debugFragment = (DebugFragment) getSupportFragmentManager().findFragmentById(R.id.debug_fragment);
     }
 
+    public void onClick(View v){
+        ((DebugFragment) getSupportFragmentManager().findFragmentById(R.id.debug_fragment))
+            .onClick(v);
+    }
     private void toast(int message){
         Toast.makeText(this, message, Toast.LENGTH_SHORT)
             .show();
