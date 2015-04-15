@@ -1,9 +1,9 @@
 - Libraries of quick messages for different users
     - eg, p2c-s single, p2c-s couple, aia single, aia couple, cru campus single, etc.
 
+Quick contact buttons on notifications
 Settings Activity
-rotation change crashes
-notification click direct to notifications fragment
+(test) notification click direct to notifications fragment
 Log account balances on update
 Allow override SSL errors
 
