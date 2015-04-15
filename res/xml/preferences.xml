@@ -7,10 +7,14 @@
             android:summary="@string/pref_notify_office_hours_summary"
             android:title="@string/pref_notify_office_hours"
             android:defaultValue="false"/>
-        <Preference 
+        <ListPreference 
             android:key="pref_update_frequency"
             android:summary="@string/pref_update_frequency_summary"
-            android:title="@string/pref_update_frequency" />
+            android:dialogTitle="@string/pref_update_frequency"
+            android:title="@string/pref_update_frequency" 
+            android:entryValues="@array/pref_update_frequencies"
+            android:entries="@array/pref_update_frequency_labels"
+            android:defaultValue="3"/>
     </PreferenceCategory>
     <PreferenceCategory 
         android:title="@string/pref_experimental"

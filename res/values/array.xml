@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="menu_items">
-        <item>Main</item>
-        <item>Contacts</item>
-        <!-- <item>Gifts</item>
-        <item>Analysis</item>
-        <item>Prayer</item>
-        <item>Interactions</item>
-        <item>Next Steps</item>
-        <item>MPD</item> -->
-        <item>Settings</item>
+    <string-array name="pref_update_frequency_labels">
+        <item>Daily</item>
+        <item>Every three days (recommended)</item>
+        <item>Weekly</item>
+        <item>Every two weeks</item>
+        <item>Monthly</item>
     </string-array>
-    <string-array name="menu_items_debug">
-        <item>Main</item>
-        <item>Contacts</item>
-        <!-- <item>Gifts</item>
-        <item>Analysis</item>
-        <item>Prayer</item>
-        <item>Interactions</item>
-        <item>Next Steps</item>
-        <item>MPD</item> -->
-        <item>Settings</item>
-        <item>Debug</item>
+    <string-array name="pref_update_frequencies">
+        <item>1</item>
+        <item>3</item>
+        <item>7</item>
+        <item>14</item>
+        <item>28</item>
     </string-array>
     
 </resources>

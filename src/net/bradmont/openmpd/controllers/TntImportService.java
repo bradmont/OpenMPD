@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import android.support.v4.app.NotificationCompat;
@@ -32,7 +33,7 @@ import net.bradmont.supergreen.models.*;
 
 
 public class TntImportService extends IntentService {
-    static final int UPDATE_FREQUENCY = 3; // import values every 3 days
+    static final String UPDATE_FREQUENCY = "3"; // import values every 3 days
 
     public TntImportService(){
         super("TntImportService");
@@ -285,7 +286,23 @@ public class TntImportService extends IntentService {
             Integer.parseInt(parts[2])
             );
 
-        next_update.add(Calendar.DAY_OF_MONTH, UPDATE_FREQUENCY);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OpenMPD.get());
+
+        // check if set for office hours only
+        if (prefs.getBoolean("pref_notify_office_hours", false)){
+            // is it beween 9 and 5 on a weekday?
+            if  ((now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || now.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ||
+            
+            (now.get(Calendar.HOUR_OF_DAY) < 9  || now.get(Calendar.HOUR_OF_DAY) > 17)){
+                Log.i("net.bradmont.openmpd", "Configured to import only during business hours, aborting.");
+                return false;
+            } else {
+                Log.i("net.bradmont.openmpd", "Currently business hours, continuing");
+            }
+        }
+
+        int update_frequency = Integer.parseInt(prefs.getString("pref_update_frequency", UPDATE_FREQUENCY));
+        next_update.add(Calendar.DAY_OF_MONTH, update_frequency);
         // if next_update is before current time, we need to update, so return true:
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String nx = dateFormat.format(next_update.getTime());

@@ -188,9 +188,9 @@
     <string name="pref_updating">Updating and notifications</string>
     <string name="pref_experimental">Experimental features and settings</string>
     <string name="pref_notify_office_hours">Notifications during office hours</string>
-    <string name="pref_notify_office_hours_summary">Only notify of changes from 9 to 5 on weekdays (todo)</string>
+    <string name="pref_notify_office_hours_summary">Only notify of changes from 9 to 5 on weekdays</string>
     <string name="pref_update_frequency">Update Frequency</string>
-    <string name="pref_update_frequency_summary">Update every # days (todo)</string>
+    <string name="pref_update_frequency_summary">How many days between updates?</string>
     <string name="pref_debug_enabled">Debug Enabled</string>
     <string name="pref_debug_enabled_summary">Enables access to debugging options (WARNING: HERE BE DRAGONS)</string>
     <string name="pref_message_templates_enabled">Message Templates</string>
