@@ -252,6 +252,7 @@ public class TntImportService extends IntentService {
             builder.setProgress(0, 0, false); // remove progress bar
 
             Intent homeIntent = new Intent(this, HomeActivity.class);
+            homeIntent.putExtra("net.bradmont.openmpd.notifications", true);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             stackBuilder.addParentStack(HomeActivity.class);
             stackBuilder.addNextIntent(homeIntent);

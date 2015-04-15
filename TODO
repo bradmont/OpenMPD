@@ -4,6 +4,8 @@
 Settings Activity
 rotation change crashes
 notification click direct to notifications fragment
+Log account balances on update
+Allow override SSL errors
 
 Settings:
 - option to notify only in business hours

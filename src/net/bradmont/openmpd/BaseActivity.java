@@ -10,6 +10,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -60,6 +61,11 @@ public class BaseActivity extends ActionBarActivity {
         mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mPager);
         getSupportActionBar().setElevation(0);
+
+        Intent intent = getIntent();
+        if (intent.getBooleanExtra("net.bradmont.openmpd.notifications", false) == true){
+            mPager.setCurrentItem(2);
+        }
 
 	}
 
