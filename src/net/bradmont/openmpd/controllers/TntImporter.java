@@ -54,6 +54,7 @@ import android.app.PendingIntent;
 import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.widget.ProgressBar;
 import android.util.Log;
 
@@ -247,6 +248,18 @@ public class TntImporter {
                 }
             }
             ImportActivity.setProgress(account.getID(), progressmax, progress, false);
+        }
+        // clean up orphaned contacts
+        Cursor cc = MPDDBHelper.get().getWritableDatabase().rawQuery(
+                "select * from contact a left outer join contact b "+
+                "on a.spouse_id = b._id where a.spouse_id > 0 and b._id is null", null);
+        cc.moveToFirst();
+        while (!cc.isAfterLast()){
+            int id = cc.getInt(0);
+            MPDDBHelper.get().getWritableDatabase().delete("contact",
+                    "_id = ?", new String [] { Integer.toString(id) });
+
+            cc.moveToNext();
         }
         Contact.endTransaction();
         return true;
@@ -443,10 +456,14 @@ public class TntImporter {
             spouse.setValue("primary_contact", false);
             spouse.setValue("spouse", contact);
             spouse.setValue("account", account);
-            if (spouse.getString("fname") != "" || spouse.getString("lname") != ""){
+            if ((spouse.getString("fname") != "" && spouse.getString("fname") != null )
+                    || (spouse.getString("lname") != "" && spouse.getString("lname") != null)){
                 spouse.dirtySave();
+                contact.setValue("spouse", spouse);
+            } else {
+                contact.setValue("spouse_id", 0);
+                spouse.delete();
             }
-            contact.setValue("spouse", spouse);
             if (contact.getString("fname") != "" || contact.getString("lname") != ""){
                 contact.dirtySave();
             }
