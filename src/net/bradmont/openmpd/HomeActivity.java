@@ -22,7 +22,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;

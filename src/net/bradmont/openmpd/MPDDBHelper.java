@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 20;
+    private static int DATABASE_VERSION = 21;
 
     @Override
     protected void registerModels(){
@@ -219,6 +219,9 @@ public class MPDDBHelper extends DBHelper{
         }
         if (oldVersion < 20){
             db.execSQL("alter table tnt_service add untested_service int default 0;");
+        }
+        if (oldVersion < 21){
+            db.execSQL("alter table log add timestamp string;");
         }
     }
 

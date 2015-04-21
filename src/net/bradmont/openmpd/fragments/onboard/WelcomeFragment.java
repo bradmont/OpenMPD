@@ -38,7 +38,7 @@ import android.widget.ViewFlipper;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

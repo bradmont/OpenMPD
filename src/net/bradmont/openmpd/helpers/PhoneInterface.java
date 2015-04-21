@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.provider.Contacts;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 
 public class PhoneInterface {

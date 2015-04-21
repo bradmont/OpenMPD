@@ -12,7 +12,7 @@ import android.app.Activity;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 import android.view.View;
 import android.widget.*;
 import android.widget.SimpleCursorAdapter;

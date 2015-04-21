@@ -10,7 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.*;
 import android.app.Activity;
 
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 import android.widget.SimpleCursorAdapter;
 
 

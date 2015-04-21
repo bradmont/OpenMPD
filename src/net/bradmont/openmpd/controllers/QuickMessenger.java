@@ -15,7 +15,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import android.view.LayoutInflater;
 import android.view.View;

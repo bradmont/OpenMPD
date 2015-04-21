@@ -26,7 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 
 import android.util.TypedValue;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

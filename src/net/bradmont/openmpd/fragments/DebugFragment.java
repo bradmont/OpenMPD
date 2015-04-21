@@ -16,7 +16,7 @@ import android.database.Cursor;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,8 +46,8 @@ import java.util.ArrayList;
 
 public class DebugFragment extends Fragment implements OnClickListener{
 
-    public static final String [] columns = {"msg1", "msg2", "msg3"};
-    public static final int [] fields = {R.id.msg1, R.id.msg2, R.id.msg3};
+    public static final String [] columns = {"timestamp", "msg1", "msg2", "msg3"};
+    public static final int [] fields = {R.id.timestamp, R.id.msg1, R.id.msg2, R.id.msg3};
 
     private Cursor cursor = null;
 

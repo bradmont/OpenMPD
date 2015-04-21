@@ -19,7 +19,7 @@ import android.widget.*;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.DialogFragment;
 
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import net.bradmont.openmpd.fragments.*;
 import net.bradmont.openmpd.models.*;

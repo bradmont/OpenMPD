@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.activities.*;

@@ -54,6 +54,7 @@ public class LogItem extends DBModel{
         addField(new StringField("msg1"));
         addField(new StringField("msg2"));
         addField(new StringField("msg3"));
+        addField(new StringField("timestamp"));
 
         TABLE_NAME=TABLE;
         super.init();
@@ -68,11 +69,21 @@ public class LogItem extends DBModel{
         stackTrace = e.toString() + "\n" + stackTrace;
         logError(a, b, stackTrace);
     }
+    public static void logError(String a){
+        _logError(a, null, null);
+    }
+    public static void logError(String a, String b){
+        _logError(a, b, null);
+    }
     public static void logError(String a, String b, String c){
+        _logError(a, b, c);
+    }
+    public static void _logError(String a, String b, String c){
         LogItem i = new LogItem();
         i.setValue("msg1", a);
         i.setValue("msg2", b);
         i.setValue("msg3", c);
+        i.setValue("timestamp", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
         i.dirtySave();
     }
     public String [] generateUpdateSQL(int oldversion){

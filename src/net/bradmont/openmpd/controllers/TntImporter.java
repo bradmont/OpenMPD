@@ -56,7 +56,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.widget.ProgressBar;
-import android.util.Log;
+import net.bradmont.openmpd.helpers.Log;
 
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
