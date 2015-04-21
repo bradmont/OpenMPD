@@ -2,6 +2,7 @@ package net.bradmont.openmpd.helpers;
 
 import net.bradmont.openmpd.models.LogItem;
 import java.lang.System;
+import net.bradmont.openmpd.BuildConfig;
 
 /**
  * Android Log wrapper class that can use {@link String#format(String, Object...)} in logging message
@@ -118,7 +119,7 @@ public class Log {
         saveLog(tag, getStackTraceString(tr));
     }
     private static void saveLog(String tag, String msg){
-        if (DEBUGGING == true){
+        if (DEBUGGING == true && BuildConfig.DEBUG == true){
             LogItem.logError(tag, msg);
         }
     }
