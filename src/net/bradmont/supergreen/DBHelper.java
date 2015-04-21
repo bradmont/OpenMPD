@@ -32,18 +32,18 @@ public abstract class DBHelper extends SQLiteOpenHelper {
      */
     public void registerModel(DBModel model){
         models.put(model.getTableName(), model);
-        Log.i("net.bradmont.supergreen.DBHelper", "Reistering model " + model.getTableName());
+        Log.d("net.bradmont.supergreen.DBHelper", "Reistering model " + model.getTableName());
     }
 
     /**
      *  Creates tables for each registered model
      */
     public void createDatabase(SQLiteDatabase db){
-        Log.i("net.bradmont.supergreen.DBHelper", "Creating Database");
-        Log.i("net.bradmont.supergreen.DBHelper", "" + models.size() + " models" );
+        Log.d("net.bradmont.supergreen.DBHelper", "Creating Database");
+        Log.d("net.bradmont.supergreen.DBHelper", "" + models.size() + " models" );
         for (Map.Entry<String, DBModel> entry: models.entrySet()){
             DBModel model = entry.getValue();
-            Log.i("net.bradmont.supergreen.DBHelper", "Executing SQL:" + model.generateCreateSQL());
+            Log.d("net.bradmont.supergreen.DBHelper", "Executing SQL:" + model.generateCreateSQL());
             db.execSQL(model.generateCreateSQL());
             String [] queries = model.generateInitializeSQL();
             for (int i=0; queries != null && i < queries.length; i++){
