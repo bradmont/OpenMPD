@@ -78,7 +78,6 @@ public class HomeActivity extends BaseActivity {
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Calendar cal = new GregorianCalendar();
-        cal.set(Calendar.HOUR_OF_DAY, 23);
         
 
         ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
@@ -88,7 +87,7 @@ public class HomeActivity extends BaseActivity {
         }
         alarmManager.setInexactRepeating(AlarmManager.RTC, 
             cal.getTimeInMillis(), 
-            AlarmManager.INTERVAL_HALF_DAY, 
+            AlarmManager.INTERVAL_HOUR, 
             PendingIntent.getService(this, 0, 
                 new Intent(this, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
             PendingIntent.FLAG_UPDATE_CURRENT)
