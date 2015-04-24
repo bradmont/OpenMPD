@@ -10,7 +10,7 @@ import net.bradmont.openmpd.BuildConfig;
 public class Log {
 
     private static long mLastTimeStamp = 0;
-    private static boolean DEBUGGING = true;
+    private static boolean DEBUGGING = false;
 
 
     public static int     d(String tag, String msg) {

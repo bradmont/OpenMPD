@@ -17,6 +17,7 @@
     <color name="app_foreground">#ffffff</color>
     <color name="text_dark">#000000</color>
     <color name="text_medium">#888888</color>
+    <color name="divider">#cccccc</color>
     <color name="shadow">#e0e0e0</color>
 
     <color name="late_partner">#795548</color>

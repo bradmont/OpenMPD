@@ -18,27 +18,21 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
-            <TextView
+            <net.bradmont.openmpd.views.FontTextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/giving_summary"
-                android:textColor="@color/blue"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
+                android:textColor="@color/text_dark"
+                android:textSize="@dimen/title_text_size"
                 android:padding="8dp"
-                android:textAllCaps="true"
                 />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/blue"/>
              <net.bradmont.holograph.BarGraph 
                 android:id="@+id/gifts_graph"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
                 android:padding="8dp"
-                custom:colors="#33b5e5,#ffbb33,#ff4444"
+                custom:colors="#5677fc,#ffc107,#e51c23"
                 custom:lineColor="#707070"
                 custom:labelTextSize="9dp"
                 custom:barWeight="1"

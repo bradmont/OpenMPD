@@ -3,29 +3,27 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
-    <TextView
+    <net.bradmont.openmpd.views.FontTextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/blue"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="bold"
-        android:padding="8dp"
-        android:textAllCaps="true"
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/title_text_size"
+        android:paddingTop="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/blue"/>
-    <TextView
+    <net.bradmont.openmpd.views.FontTextView
         android:id="@+id/value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#303030"
+        android:textColor="@color/text_medium"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:padding="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp"
         />
-    <TextView
+    <net.bradmont.openmpd.views.FontTextView
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +32,7 @@
         android:textStyle="bold"
         android:padding="8dp"
         android:textAllCaps="true"
+        android:visibility="gone"
         />
 
 </LinearLayout>

@@ -118,7 +118,7 @@
     <string name="getting_started_body">Welcome to OpenMPD. We\'re here to help decode your financial partnership. The first step is to add your organisation\'s account(s) to import your donor and donation data. Tap \"Add\" to add an account.</string>
     <string name="getting_started_body_2">You can set up multiple accounts. Press \"Add\" to add another, or \"Done\" when you\'re done. You can add more accounts later from the \"Settings\" panel on the left menu.</string>
     <string name="importing_data">Importing Data</string>
-    <string name="importing_data_body">Importing and processing your parner data. This can take a few minutes.</string>
+    <string name="importing_data_body">Importing and processing your partner data. This can take a few minutes.</string>
     <string name="ssl_cert_error">Bad SSL certicate.</string>
     <string name="ask_add_ssl_exception">This server provided an untrusted SSL certificate. You may ignore it, but this could be dangerous.\n\nNote that the P2C server currently has a known error, so you should be safe to ignore it for focus.powertochange.org.</string>
     <string name="ignore_certificate">Ignore error</string>
