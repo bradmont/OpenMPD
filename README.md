@@ -10,8 +10,8 @@ OpenMPD is a [Free Software](https://en.wikipedia.org/wiki/Free_software) Minist
 
 The goal of OpenMPD is to automate as much of the data management involved in
 MPD and MPM (Ministry Partner Maintenance) as possible, and to mine your donor
-data to help you more deeply understand, and serve, your partnership base. For 
-releases 1 and 2, we are primarily targeting MPM use cases, but hope to expand 
+data to help you more deeply understand, and serve, your partnership base. For
+the time being, we are primarily targeting MPM use cases, but may eventually expand 
 to a full MPD toolkit as development continues.
 
 Our design philosophy is ***"Zero User Input."*** The time we spend
