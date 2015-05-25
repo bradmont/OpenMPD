@@ -5,7 +5,7 @@ OpenMPD is a [Free Software](https://en.wikipedia.org/wiki/Free_software) Minist
 
 [Download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd)
 
-![The Home Screen](https://lh3.ggpht.com/2dLOo8IgWtc4VrOYCldjVn0crxTP9cMn-RLv3p-x7qCnsoTIV1hkp3kGxDAwFYsqtA=h900)
+![The Home Screen](http://i.imgur.com/QnmSgALl.png)
 
 The goal of OpenMPD is to automate as much of the data management involved in
 MPD and MPM (Ministry Partner Maintenance) as possible, and to mine your donor
@@ -13,48 +13,22 @@ data to help you more deeply understand, and serve, your partnership base. For
 releases 1 and 2, we are primarily targeting MPM use cases, but hope to expand 
 to a full MPD toolkit as development continues.
 
-For release 1, our design philosophy is ***"Zero User Input."*** The time we spend
+Our design philosophy is ***"Zero User Input."*** The time we spend
 anaysing donor data is much better done by a computer, so OpenMPD aims to
 eliminate as much of this work as possible. The only exception is to configure the 
 user's account(s) with TntMPD.DataServer instances provided by his missions 
 organisations.
 
 
-Milestone Goals
----------------
-If you have suggestions or requests that would help you raise support or
-manage your donor base, please feel free to let us know.
 
 ### Current Status:
-- **We are now in open Beta**. There are still a few bugs I know of, but none are showstoppers. You can [download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd).
+- **Version 1.1 is released!** You can [download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd).
 
-#### Beta 1:
-If you are interested in helping with OpenMPD, please contact me. Twitter is probably the easiest way (@bradmont). If you use other organisations besides Power to Change and CCC, I would appreciate your help as well, as I can't test on other organisations' servers.
+As it stands, OpenMPD is fully functional as an MPM tool. We may eventually add more MPD features, but there is some significant refactoring to do beforehand, such as:
+- [ ] Switching to a better (not homebrewed) DAO library
+- [ ] Using Bayesing matching for partner evaluation
 
-#### Left to do before Release 1:
-- [/] Design: Contact List View (I'd like this to be prettier, but can't think of how)
-- [x] Design: Contact Detail View
-- [/] Design/UI: Accounts configuration/add view (Ok for now, would like to improve)
-- [x] Searching & filtering contacts (by name, partner type, giving amount, etc).
-- [x] Verification of service accounts when you first add them
-- [x] Build label support into BarGraph
-- [x] Build swipe support into BarGraph to view past history
-- [x] Help screens & cleaner onboarding
-
-### Milestone 1 Goals
-- **"Zero User Input" data analysis release**
-- [x] Import donor data and donation histories from TntMPD.DataServer
-- [x] Support for multiple data sources (p2c & Cru working; adding others should be fairly easy)
-- [x] Classify partners into monthly, regular (quarterly, semiannual, etc), annual, occasional or one-time
-- [x] Evaluate monthly giving divided into monthly, regular, and special gifts
-- [x] Intelligently display donor statuses
-- [x] Automatic background updating of gifts & donor statuses
-- [x] Notifications of changes in donor status (for new, late, delinquent, dropped)
-- [x] Notifications of special gifts
-- [x] Simple Onboarding walkthrough
-- [x] Beautiful, Holo-themed user interface
-- [x] Simple, discoverable UI
-
+Below, you can see some of the ideas we have had for future development. If you'd like to lend a hand, please get in touch!
 
 ### Milestone 2 Goals
 - [ ] **"MPM/Partner communications" release**
@@ -86,11 +60,3 @@ License
 -------
 OpenMPD is licensed under the Gnu GPL version 3. See LICENSE.txt for details. 
 
-Depends
--------
-
-- ActionBarSherlock (actionbarsherlock.com) - Apache License 2.0
-- SlidingMenu ( https://github.com/jfeinstein10/SlidingMenu ) - Apache License 2.0 
-- CardsUI (https://github.com/Androguide/cardsui-for-android) 
-- Android support library v4 - Apache License 2.0
-- ini4j - http://ini4j.sourceforge.net/ - Apache License 2.0
