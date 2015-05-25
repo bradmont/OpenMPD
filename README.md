@@ -6,6 +6,7 @@ OpenMPD is a [Free Software](https://en.wikipedia.org/wiki/Free_software) Minist
 [Download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd)
 
 ![The Home Screen](http://i.imgur.com/QnmSgALl.png)
+![The Notifications Screen](http://i.imgur.com/Eh2PUmwl.png)
 
 The goal of OpenMPD is to automate as much of the data management involved in
 MPD and MPM (Ministry Partner Maintenance) as possible, and to mine your donor
