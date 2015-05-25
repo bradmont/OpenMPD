@@ -55,7 +55,7 @@ interested, please contact @Brad. Here's how you can help:
 - Code
 - Graphics assets/UI design work
 - User testing
-- Financial support (I'm a missionary too!)
+- [Financial support[(http://p2c.com/bcstewart) (I'm a missionary too!)
 
 License
 -------
