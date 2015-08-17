@@ -262,6 +262,7 @@ public class TntImporter {
             cc.moveToNext();
         }
         Contact.endTransaction();
+        cc.close();
         return true;
     }
     public boolean getGifts(){
