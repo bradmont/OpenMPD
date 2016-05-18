@@ -224,7 +224,7 @@ public class MPDDBHelper extends DBHelper{
             db.execSQL("alter table log add timestamp string;");
         }
         if (oldVersion < 22){
-            db.execSQL("create table contact_sublist (contact_id int, list_name varchar(255));");
+            db.execSQL("create table contact_sublist (contact_id int, list_name varchar(255), primary key (contact_id, list_name) on conflict ignore);");
         }
     }
 

@@ -22,7 +22,7 @@
         android:id="@+id/add_contacts"
         android:layout_gravity="center"
         android:color="#ff6e9cff"
-        android:src="@drawable/ic_fab_complete"
+        android:src="@drawable/ic_action_new"
         android:visibility="visible"
         android:layout_centerInParent="true"
         android:indeterminate="true"
@@ -30,11 +30,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="30dp"
         app:fbb_autoStart="true"
         app:fbb_progressColor="#ff170aff"
         app:fbb_progressWidthRatio="0.1"
-        app:fbb_endBitmap="@drawable/ic_fab_complete"
+        app:fbb_endBitmap="@drawable/ic_action_new"
         app:fbb_showEndBitmap="true"
         />
 

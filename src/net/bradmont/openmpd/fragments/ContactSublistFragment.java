@@ -37,9 +37,11 @@ import android.view.MenuItem;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.SearchView;
+import android.widget.PopupMenu;
 
 
 import java.lang.Runnable;
+import java.util.Arrays;
 
 public class ContactSublistFragment extends ListFragment {
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift", "fname", "fname", "s_fname", "partner_type"};
@@ -59,18 +61,21 @@ public class ContactSublistFragment extends ListFragment {
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
                 "and A._id in (select contact_id from contact_sublist where list_name = ?) "+
                 "order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
-    /*private static final String STATUS_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and C.status=? order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
-    private static final String OCCASIONAL_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (C.partner_type=30 or C.partner_type=20) order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
 
-    private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
+    private static final String ALL_CONTACTS_QUERY =
+                "SELECT _id, ? FROM contact WHERE primary_contact = 1";
+
+    private static final String STATUS_QUERY =
+                "SELECT contact._id, ? from contact left outer join contact_status " +
+                "on contact._id = contact_status.contact_id " +
+                "where contact.primary_contact = 1 and contact_status.status = ?" ;
+        
+    private static final String OCCASIONAL_QUERY = 
+                "SELECT contact._id, ? FROM contact LEFT OUTER JOIN contact_status " +
+                "ON contact._id = contact_status.contact_id " +
+                "WHERE contact.primary_contact = 1 AND (partner_type = 30 OR partner_type = 20)" ;
+        
+    /*private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
                 "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
@@ -316,5 +321,48 @@ public class ContactSublistFragment extends ListFragment {
 
     public String getListName(){
         return mListName;
+    }
+
+    public void addContacts(View v){
+          PopupMenu popup = new PopupMenu(getActivity(), v);
+          MenuInflater inflater = popup.getMenuInflater();
+          inflater.inflate(R.menu.sublist_add_contacts, popup.getMenu());
+          popup.setOnMenuItemClickListener( new PopupMenu.OnMenuItemClickListener(){
+              @Override
+              public boolean   onMenuItemClick(MenuItem item) {
+                  String [] args = new String [] { mListName };
+                  String query = STATUS_QUERY;
+                  switch (item.getItemId()){
+                      case R.id.menu_filter_all:
+                          query = ALL_CONTACTS_QUERY ;
+                          break;
+                      case R.id.menu_filter_new:
+                          args = new String [] { mListName , Integer.toString(ContactStatus.STATUS_NEW)};
+                          break;
+                      case R.id.menu_filter_current:
+                          args = new String [] { mListName , Integer.toString(ContactStatus.STATUS_CURRENT)};
+                          break;
+                      case R.id.menu_filter_late:
+                          args = new String [] { mListName , Integer.toString(ContactStatus.STATUS_LATE)};
+                          break;
+                      case R.id.menu_filter_lapsed:
+                          args = new String [] { mListName , Integer.toString(ContactStatus.STATUS_LAPSED)};
+                          break;
+                      case R.id.menu_filter_dropped:
+                          args = new String [] { mListName , Integer.toString(ContactStatus.STATUS_DROPPED)};
+                          break;
+                      case R.id.menu_filter_occasional:
+                          query = OCCASIONAL_QUERY;
+                          break;
+                  }
+                  query = "insert into contact_sublist " + query;
+                  MPDDBHelper.get().getWritableDatabase().execSQL(query, args);
+                  cursor.requery();
+                  return true;
+              }
+              });
+          popup.show();
+
+
     }
 }

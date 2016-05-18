@@ -29,6 +29,7 @@ import net.bradmont.openmpd.R;
 public class ContactSublistActivity extends ActionBarActivity {
 
     private String mListName = "";
+    private ContactSublistFragment mContactSublistFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +39,14 @@ public class ContactSublistActivity extends ActionBarActivity {
 
         setContentView(R.layout.container_contact_sublist);
 
-        ContactSublistFragment contactSublistFragment = (ContactSublistFragment) getSupportFragmentManager().findFragmentById(R.id.contact_sublist_fragment);
-        contactSublistFragment.setListName(mListName);
+        mContactSublistFragment = (ContactSublistFragment) getSupportFragmentManager().findFragmentById(R.id.contact_sublist_fragment);
+        mContactSublistFragment.setListName(mListName);
+
+        findViewById(R.id.add_contacts).setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                mContactSublistFragment.addContacts(v);
+            }
+        });
 
     }
 
