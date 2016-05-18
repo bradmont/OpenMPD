@@ -39,6 +39,9 @@ import android.view.MenuInflater;
 import android.widget.SearchView;
 import android.widget.PopupMenu;
 
+import net.bradmont.openmpd.views.EnhancedListView;
+
+
 
 import java.lang.Runnable;
 import java.util.Arrays;
@@ -50,10 +53,11 @@ public class ContactSublistFragment extends ListFragment {
     private SQLiteDatabase db_read = MPDDBHelper.get().getReadableDatabase();
     private Cursor cursor = null;
 
-    private ListView mListView = null;
+    private EnhancedListView mListView = null;
+    private EnhancedListAdapter mAdapter;
     private String mListName = "";
 
-    private SimpleCursorAdapter adapter = null;
+    //private SimpleCursorAdapter adapter = null;
     private static int[] icon_colors = null;
     private static final String BASE_QUERY = "select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
@@ -89,9 +93,7 @@ public class ContactSublistFragment extends ListFragment {
             Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
-        mListView = (ListView)  inflater.inflate(R.layout.list, null);
-        LayoutInflater layoutInflater = (LayoutInflater)getActivity()
-                .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        mListView = (EnhancedListView)  inflater.inflate(R.layout.enhancedlist, null);
 
         return mListView;
     }
@@ -105,9 +107,9 @@ public class ContactSublistFragment extends ListFragment {
         String [] args = new String[1]; args[0] = mListName;
         //cursor = db_read.rawQuery(BASE_QUERY, new String[] {mListName});
         cursor = db_read.rawQuery(BASE_QUERY, args);
-        adapter = new SimpleCursorAdapter(getActivity(),
+        mAdapter = new EnhancedListAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
-        adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
+        mAdapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 TextView tv = null;
                 String value = "";
@@ -262,10 +264,55 @@ public class ContactSublistFragment extends ListFragment {
             }
         });
 
-        setListAdapter(adapter);
+        //setListAdapter(adapter);
+        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ContactListClickListener());
+        mListView.setSwipingLayout(R.id.card);
+        mListView.setDismissCallback(new ContactDismissCallback());
+
+        mListView.enableSwipeToDismiss();
+        mListView.setSwipeDirection(EnhancedListView.SwipeDirection.BOTH);
+
 
     }
+
+    private class ContactDismissCallback implements EnhancedListView.OnDismissCallback{
+        @Override
+        public EnhancedListView.Undoable onDismiss(EnhancedListView listView, final int position) {
+            final int deleted_id = mAdapter.remove(position);
+            return new EnhancedListView.Undoable(){
+                @Override
+                public void undo(){
+                    mAdapter.insert(deleted_id);
+                }
+            };
+        }
+    }
+    private class EnhancedListAdapter extends SimpleCursorAdapter{
+        public EnhancedListAdapter(Context context, int layout, Cursor c, String[] from, int[] to){
+            super(context, layout, c, from, to);
+        }
+
+        public int remove(int position){
+            getCursor().moveToPosition(position);
+            int contactId = getCursor().getInt(3);
+            MPDDBHelper.get().getWritableDatabase().execSQL(
+                    "DELETE FROM contact_sublist WHERE contact_id = ? AND list_name = ?",
+                    new String [] {Integer.toString(contactId), mListName});
+
+            cursor.requery();
+            return contactId;
+        }
+
+        public void insert(int deleted_id){
+            MPDDBHelper.get().getWritableDatabase().execSQL(
+                    "INSERT INTO contact_sublist VALUES (?, ?)" , 
+                    new String [] { Integer.toString(deleted_id), mListName });
+            cursor.requery();
+        }
+    }
+
+
     @Override
     public void onResume(){
         super.onResume();
@@ -311,9 +358,9 @@ public class ContactSublistFragment extends ListFragment {
     public void setListName(String listName){
         mListName = listName;
         ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(listName);
-        if (adapter != null){
+        if (mAdapter != null){
             Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName});
-            adapter.changeCursor(newCursor);
+            mAdapter.changeCursor(newCursor);
             cursor.close();
             cursor = newCursor;
         }
