@@ -17,6 +17,8 @@
     <string name="ongoing_total">Ongoing Total</string>
     <string name="Lists">Lists</string>
     <string name="Show">Show</string>
+    <string name="custom_list_title">Custom List: </string>
+    <string name="name_list">Name your list</string>
 
     <string name="monthly">Monthly</string>
     <string name="quarterly_and_annual">Quarterly &amp; Annual</string>

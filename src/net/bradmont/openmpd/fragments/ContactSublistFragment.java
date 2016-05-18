@@ -357,7 +357,9 @@ public class ContactSublistFragment extends ListFragment {
 
     public void setListName(String listName){
         mListName = listName;
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(listName);
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(
+        getActivity().getResources().getString(R.string.custom_list_title) + listName);
+        // TODO: proper resource
         if (mAdapter != null){
             Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName});
             mAdapter.changeCursor(newCursor);

@@ -10,7 +10,9 @@ import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.views.*;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.database.sqlite.*;
@@ -376,12 +378,38 @@ public class ContactListFragment extends ListFragment {
                 HelpDialog.showHelp(getActivity(), R.string.help_contact_list_title, R.string.help_contact_list);
             return true;
             case R.id.menu_list_new:
-                // ### tests...
-                MPDDBHelper.get().getWritableDatabase().execSQL("insert into contact_sublist values(19, 'test')");
-                getActivity().invalidateOptionsMenu();
+                makeNewList();
             return true;
         }
         return false;
+    }
+
+    private void makeNewList(){
+        // ask for name for new list
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.name_list);
+        final EditText input = new EditText(getActivity());
+        builder.setView(input);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String new_list = input.getText().toString();
+                // launch list
+                Intent intent = new Intent(getActivity(), ContactSublistActivity.class);
+                intent.putExtra("listName", new_list);
+                startActivity(intent);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+        
     }
 
 
