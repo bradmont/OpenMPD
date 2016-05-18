@@ -31,6 +31,7 @@ import android.widget.*;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.app.ActionBar;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -304,10 +305,9 @@ public class ContactSublistFragment extends ListFragment {
 
     public void setListName(String listName){
         mListName = listName;
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(listName);
         if (adapter != null){
-            String [] args = new String[1];
-            args[0] = mListName;
-            Cursor newCursor = db_read.rawQuery(BASE_QUERY, args);
+            Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName});
             adapter.changeCursor(newCursor);
             cursor.close();
             cursor = newCursor;
