@@ -260,6 +260,10 @@ public class ContactListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
 
+        if (!db_read.isOpen()){
+            db_read = MPDDBHelper.get().getReadableDatabase();
+        }
+
         Cursor cur = db_read.rawQuery("select distinct list_name from contact_sublist", null);
         cur.moveToFirst();
         while (!cur.isAfterLast()){
