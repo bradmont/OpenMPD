@@ -258,10 +258,29 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
+
+        Cursor cur = db_read.rawQuery("select distinct list_name from contact_sublist", null);
+        cur.moveToFirst();
+        while (!cur.isAfterLast()){
+            String subListName = cur.getString(0);
+            Menu subm = menu.findItem(R.id.menu_lists).getSubMenu();
+            MenuItem item = subm.add(subListName);
+            item.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener(){
+                @Override
+                public boolean onMenuItemClick (MenuItem item){
+                    ((BaseActivity) getActivity()).userMessage(item.getTitle().toString());
+                    return true;
+                }
+
+            });
+            cur.moveToNext();
+        }
+        cur.close();
+
+        // set up search
         SearchView searchView = new
                 SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
             public boolean onQueryTextChange(String newText){
                 String [] args = new String[1];
@@ -348,6 +367,11 @@ public class ContactListFragment extends ListFragment {
                 return true;
             case R.id.menu_help:
                 HelpDialog.showHelp(getActivity(), R.string.help_contact_list_title, R.string.help_contact_list);
+            return true;
+            case R.id.menu_list_new:
+                // ### tests...
+                MPDDBHelper.get().getWritableDatabase().execSQL("insert into contact_sublist values(19, 'test')");
+                getActivity().invalidateOptionsMenu();
             return true;
         }
         return false;

@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class MPDDBHelper extends DBHelper{
     private static MPDDBHelper instance = null;
-    private static int DATABASE_VERSION = 21;
+    private static int DATABASE_VERSION = 22;
 
     @Override
     protected void registerModels(){
@@ -222,6 +222,9 @@ public class MPDDBHelper extends DBHelper{
         }
         if (oldVersion < 21){
             db.execSQL("alter table log add timestamp string;");
+        }
+        if (oldVersion < 22){
+            db.execSQL("create table contact_sublist (contact_id int, list_name varchar(255));");
         }
     }
 
