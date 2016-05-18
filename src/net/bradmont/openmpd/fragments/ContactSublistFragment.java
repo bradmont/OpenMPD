@@ -9,8 +9,10 @@ import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.views.*;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.DialogInterface;
 
 import android.database.sqlite.*;
 import android.database.Cursor;
@@ -273,7 +275,34 @@ public class ContactSublistFragment extends ListFragment {
         mListView.enableSwipeToDismiss();
         mListView.setSwipeDirection(EnhancedListView.SwipeDirection.BOTH);
 
+    }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.sublist, menu);
+        
+    }
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item){
+        switch (item.getItemId() ){
+            case R.id.delete:
+			new AlertDialog.Builder(getActivity())
+				   .setMessage(R.string.are_you_sure)
+				   .setCancelable(false)
+				   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+					   public void onClick(DialogInterface dialog, int id) {
+							MPDDBHelper.get().getWritableDatabase().execSQL(
+									"DELETE FROM contact_sublist WHERE list_name = ?",
+									new String [] {mListName});
+							getActivity().finish();
+					   }
+				   })
+				   .setNegativeButton(R.string.cancel, null)
+				   .show();
+
+			return true;
+        }
+        return false;
     }
 
     private class ContactDismissCallback implements EnhancedListView.OnDismissCallback{
