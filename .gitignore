@@ -27,3 +27,6 @@ PRIVATE_*
 logcat_package
 
 screenshots
+
+# pulled DBs
+supergreen.*

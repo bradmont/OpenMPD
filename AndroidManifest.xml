@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.bradmont.openmpd"
-      android:versionCode="27"
-      android:versionName="1.1rc1">
+      android:versionCode="28"
+      android:versionName="1.1">
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="21"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ContactDetailActivity" />
+        <activity android:name=".activities.ContactSublistActivity" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.DebugActivity" />
         <activity android:name=".activities.OnboardActivity" 
