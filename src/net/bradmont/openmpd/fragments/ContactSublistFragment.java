@@ -3,7 +3,6 @@ package net.bradmont.openmpd.fragments;
 import net.bradmont.supergreen.models.*;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
-import net.bradmont.openmpd.activities.ContactSublistActivity;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.TntImportService;
@@ -41,7 +40,7 @@ import android.widget.SearchView;
 
 import java.lang.Runnable;
 
-public class ContactListFragment extends ListFragment {
+public class ContactSublistFragment extends ListFragment {
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift", "fname", "fname", "s_fname", "partner_type"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
@@ -49,6 +48,7 @@ public class ContactListFragment extends ListFragment {
     private Cursor cursor = null;
 
     private ListView mListView = null;
+    private String mListName = "";
 
     private SimpleCursorAdapter adapter = null;
     private static int[] icon_colors = null;
@@ -56,8 +56,9 @@ public class ContactListFragment extends ListFragment {
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and A._id in (select contact_id from contact_sublist where list_name = ?) "+
                 "order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
-    private static final String STATUS_QUERY = "select A.fname as fname, A.lname as lname, " +
+    /*private static final String STATUS_QUERY = "select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
@@ -74,6 +75,7 @@ public class ContactListFragment extends ListFragment {
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
                 "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
+                */
 
     @Override
     public View onCreateView(
@@ -94,7 +96,9 @@ public class ContactListFragment extends ListFragment {
         icon_colors = getActivity().getResources().getIntArray(R.array.user_icon_colors);
 
         // set up adapter
-        cursor = db_read.rawQuery(BASE_QUERY, null);
+        String [] args = new String[1]; args[0] = mListName;
+        //cursor = db_read.rawQuery(BASE_QUERY, new String[] {mListName});
+        cursor = db_read.rawQuery(BASE_QUERY, args);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
@@ -257,131 +261,6 @@ public class ContactListFragment extends ListFragment {
 
     }
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.contact_list, menu);
-
-        Cursor cur = db_read.rawQuery("select distinct list_name from contact_sublist", null);
-        cur.moveToFirst();
-        while (!cur.isAfterLast()){
-            String subListName = cur.getString(0);
-            Menu subm = menu.findItem(R.id.menu_lists).getSubMenu();
-            MenuItem item = subm.add(subListName);
-            item.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener(){
-                @Override
-                public boolean onMenuItemClick (MenuItem item){
-                    Intent intent = new Intent(getActivity(), ContactSublistActivity.class);
-                    intent.putExtra("listName", item.getTitle().toString());
-                    startActivity(intent);
-                    return true;
-                }
-
-            });
-            cur.moveToNext();
-        }
-        cur.close();
-
-        // set up search
-        SearchView searchView = new
-                SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
-        //searchView.setQueryHint(getString(R.string.hint_search_bar));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
-            public boolean onQueryTextChange(String newText){
-                String [] args = new String[1];
-                args[0] = newText;
-                // filter on a concatenation of contacts's names, to avoid really complex SQL...
-                if (!db_read.isOpen()){
-                    db_read = MPDDBHelper.get().getReadableDatabase();
-                }
-                Cursor newCursor = db_read.rawQuery(SEARCH_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            }
-            public boolean  onQueryTextSubmit(String query){
-                return false;
-            }
-        });
-        menu.findItem(R.id.menu_search)
-                .setActionView(searchView)
-                .setShowAsAction(
-                        MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setOnActionExpandListener(
-                menu.findItem(R.id.menu_search),
-                new MenuItemCompat.OnActionExpandListener(){
-                // so we can reset the search when the searchView is closed
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem item) {
-                    return true;
-                }
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem item) {
-                    Cursor newCursor = db_read.rawQuery(BASE_QUERY, null);
-                    adapter.changeCursor(newCursor);
-                    cursor = newCursor;
-                    return true;
-                }
-            });
-        
-    }
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item){
-        String [] args = new String[1];
-        Cursor newCursor = null;
-        switch (item.getItemId() ){
-            case R.id.menu_filter_all:
-                newCursor = db_read.rawQuery(BASE_QUERY, null);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_new:
-                args[0] = Integer.toString(ContactStatus.STATUS_NEW);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_current:
-                args[0] = Integer.toString(ContactStatus.STATUS_CURRENT);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_late:
-                args[0] = Integer.toString(ContactStatus.STATUS_LATE);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_lapsed:
-                args[0] = Integer.toString(ContactStatus.STATUS_LAPSED);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_dropped:
-                args[0] = Integer.toString(ContactStatus.STATUS_DROPPED);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_filter_occasional:
-                newCursor = db_read.rawQuery(OCCASIONAL_QUERY, null);
-                adapter.changeCursor(newCursor);
-                cursor = newCursor;
-                return true;
-            case R.id.menu_help:
-                HelpDialog.showHelp(getActivity(), R.string.help_contact_list_title, R.string.help_contact_list);
-            return true;
-            case R.id.menu_list_new:
-                // ### tests...
-                MPDDBHelper.get().getWritableDatabase().execSQL("insert into contact_sublist values(19, 'test')");
-                getActivity().invalidateOptionsMenu();
-            return true;
-        }
-        return false;
-    }
-
-
-    @Override
     public void onResume(){
         super.onResume();
         // set title
@@ -421,5 +300,21 @@ public class ContactListFragment extends ListFragment {
             intent.putExtra("contactId", (int) id);
             startActivity(intent);
         }
+    }
+
+    public void setListName(String listName){
+        mListName = listName;
+        if (adapter != null){
+            String [] args = new String[1];
+            args[0] = mListName;
+            Cursor newCursor = db_read.rawQuery(BASE_QUERY, args);
+            adapter.changeCursor(newCursor);
+            cursor.close();
+            cursor = newCursor;
+        }
+    }
+
+    public String getListName(){
+        return mListName;
     }
 }
