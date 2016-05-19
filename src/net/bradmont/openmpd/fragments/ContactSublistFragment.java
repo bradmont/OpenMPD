@@ -80,13 +80,23 @@ public class ContactSublistFragment extends ListFragment {
                 "SELECT contact._id, ? FROM contact LEFT OUTER JOIN contact_status " +
                 "ON contact._id = contact_status.contact_id " +
                 "WHERE contact.primary_contact = 1 AND (partner_type = 30 OR partner_type = 20)" ;
+
+    private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
+                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
+                "C.last_gift , A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name " +
+                "from contact A left outer join contact B on A._id = B.spouse_id " +
+                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
+                "and A._id in (select contact_id from contact_sublist where list_name = ?) "+
+                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') "+
+                "order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
         
     /*private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
                 "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
                 "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
                 "contact A left outer join contact B on A._id = B.spouse_id " +
                 "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
+                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') "+
+                "order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
                 */
 
     @Override
@@ -281,6 +291,50 @@ public class ContactSublistFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.sublist, menu);
         
+        // set up search
+        SearchView searchView = new
+                SearchView( ((ActionBarActivity)getActivity()).getSupportActionBar().getThemedContext());
+        //searchView.setQueryHint(getString(R.string.hint_search_bar));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+            public boolean onQueryTextChange(String newText){
+                String [] args = new String[2];
+                args[0] = mListName;
+                args[1] = newText;
+                // filter on a concatenation of contacts's names, to avoid really complex SQL...
+                if (!db_read.isOpen()){
+                    db_read = MPDDBHelper.get().getReadableDatabase();
+                }
+                Cursor newCursor = db_read.rawQuery(SEARCH_QUERY, args);
+                mAdapter.changeCursor(newCursor);
+                cursor.close();
+                cursor = newCursor;
+                return true;
+            }
+            public boolean  onQueryTextSubmit(String query){
+                return false;
+            }
+        });
+        menu.findItem(R.id.menu_search)
+                .setActionView(searchView)
+                .setShowAsAction(
+                        MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setOnActionExpandListener(
+                menu.findItem(R.id.menu_search),
+                new MenuItemCompat.OnActionExpandListener(){
+                // so we can reset the search when the searchView is closed
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    return true;
+                }
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName} );
+                    mAdapter.changeCursor(newCursor);
+                    cursor.close();
+                    cursor = newCursor;
+                    return true;
+                }
+            });
     }
     @Override
     public boolean onOptionsItemSelected (MenuItem item){
