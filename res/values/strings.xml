@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OpenMPD</string>
+    <string name="app_name">OpenMPDDev</string>
     <string name="fragment_name">Main Fragment</string>
     <string name="help">Help</string>
     <string name="download">Download</string>
