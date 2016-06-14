@@ -17,7 +17,7 @@ public class OpenMPDDaoGenerator {
     private static final int SCHEMA_VERSION = 2;
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(SCHEMA_VERSION, "net.bradmont.openmpd.models");
+        Schema schema = new Schema(SCHEMA_VERSION, "net.bradmont.openmpd.dao");
 
         Entity contact = addContact(schema);
         contact.setHasKeepSections(true);
