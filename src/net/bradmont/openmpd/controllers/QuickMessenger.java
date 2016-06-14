@@ -81,7 +81,7 @@ public class QuickMessenger {
         ListView message_list = (ListView) ((LayoutInflater) activity
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.dialog_list, null);
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(sql, null);
+        Cursor cur = OpenMPD.getDB().rawQuery(sql, null);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(activity,
             R.layout.quick_message_list_item, cur,
             new String [] {"name"},

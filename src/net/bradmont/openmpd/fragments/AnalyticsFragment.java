@@ -133,7 +133,7 @@ public class AnalyticsFragment extends Fragment {
         if (!verifyCache()){
             createCache();
         }
-        Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(
+        Cursor cur1 = OpenMPD.getDB().rawQuery(
             GIVING_SQL, null);
 
         vals = new Float[cur1.getCount()][4];
@@ -230,16 +230,16 @@ public class AnalyticsFragment extends Fragment {
 
     }
     public boolean verifyCache(){
-        Cursor cur1 = MPDDBHelper.get().getReadableDatabase().rawQuery(VERIFY_CACHE_SQL, null);
+        Cursor cur1 = OpenMPD.getDB().rawQuery(VERIFY_CACHE_SQL, null);
         boolean result = (cur1.getCount() == 1);
         cur1.close();
         return result;
     }
     public static void createCache(){
-        MPDDBHelper.get().getWritableDatabase().execSQL(CACHE_SQL);
+        OpenMPD.getDB().execSQL(CACHE_SQL);
     }
     public static void clearCache(){
-        MPDDBHelper.get().getWritableDatabase().execSQL(CLEAR_CACHE_SQL);
+        OpenMPD.getDB().execSQL(CLEAR_CACHE_SQL);
     }
 
 

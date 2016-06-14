@@ -24,8 +24,6 @@ public class GiftList extends ListFragment {
     public static final String [] columns = {"fname", "lname", "date", "amount"};
     public static final int [] fields = {R.id.fname, R.id.lname, R.id.date, R.id.amount};
 
-    private SQLiteDatabase db_read = MPDDBHelper.get()
-            .getReadableDatabase();
     private Cursor cursor = null;
 
     private LinearLayout header = null;
@@ -49,7 +47,7 @@ public class GiftList extends ListFragment {
                 .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 
         // set up adapter
-        cursor = db_read.rawQuery("select fname, lname, date, amount, gift._id from " + 
+        cursor = OpenMPD.getDB().rawQuery("select fname, lname, date, amount, gift._id from " + 
                 "contact join gift on contact.tnt_people_id=gift.tnt_people_id;", null);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.gift_list_item, cursor, columns, fields);

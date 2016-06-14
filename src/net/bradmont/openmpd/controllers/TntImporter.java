@@ -250,13 +250,13 @@ public class TntImporter {
             ImportActivity.setProgress(account.getID(), progressmax, progress, false);
         }
         // clean up orphaned contacts
-        Cursor cc = MPDDBHelper.get().getWritableDatabase().rawQuery(
+        Cursor cc = OpenMPD.getDB().rawQuery(
                 "select * from contact a left outer join contact b "+
                 "on a.spouse_id = b._id where a.spouse_id > 0 and b._id is null", null);
         cc.moveToFirst();
         while (!cc.isAfterLast()){
             int id = cc.getInt(0);
-            MPDDBHelper.get().getWritableDatabase().delete("contact",
+            OpenMPD.getDB().delete("contact",
                     "_id = ?", new String [] { Integer.toString(id) });
 
             cc.moveToNext();

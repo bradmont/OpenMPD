@@ -1,7 +1,6 @@
 package net.bradmont.openmpd.helpers;
 
 import net.bradmont.openmpd.OpenMPD;
-import net.bradmont.openmpd.MPDDBHelper;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -154,7 +153,7 @@ public class Analytics {
       * Helper to get a one-value int result from an SQL statement
       */
     private static int getSqlInt(String SQL, String [] args){
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(SQL, args);
+        Cursor cur = OpenMPD.getDB().rawQuery(SQL, args);
         cur.moveToFirst();
         int result = cur.getInt(0);
         cur.close();

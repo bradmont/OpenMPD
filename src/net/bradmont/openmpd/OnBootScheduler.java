@@ -23,12 +23,11 @@ import net.bradmont.supergreen.models.ModelList;
 public class OnBootScheduler extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d("net.bradmont.openmpd", "received boot broadcast");
-        MPDDBHelper helper = MPDDBHelper.get();
         // set up our alarms for automatic background updating
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar cal = new GregorianCalendar();
 
-        ModelList accounts = helper.getReferenceModel("service_account").getAll();
+        ModelList accounts = MPDDBHelper.get().getReferenceModel("service_account").getAll();
         if  (accounts.size() == 0){
             Log.d("net.bradmont.openmpd", "no accounts, not setting alarm");
             return;

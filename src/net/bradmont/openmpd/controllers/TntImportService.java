@@ -49,12 +49,13 @@ public class TntImportService extends IntentService {
         Bundle b = intent.getExtras();
         ArrayList<Integer> newdata = new ArrayList<Integer>();
         ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
+        /*
         if (MPDDBHelper.rawGet() == null){
             MPDDBHelper dbh = new MPDDBHelper(this);
         } else if (MPDDBHelper.get().getContext() != this){
             MPDDBHelper.get().close();
             MPDDBHelper dbh = new MPDDBHelper(this);
-        }
+        }*/ // DEPRECATED? 
         NotificationCompat.Builder builder =
             new NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.notification_icon)
@@ -134,7 +135,6 @@ public class TntImportService extends IntentService {
 
             notifyUser(builder, notificationManager);
         }
-        MPDDBHelper.get().close();
 
         ImportActivity.onFinish();
         stopForeground(true);

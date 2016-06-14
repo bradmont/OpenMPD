@@ -47,7 +47,6 @@ public class ContactListFragment extends ListFragment {
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift", "fname", "fname", "s_fname", "partner_type"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
-    private SQLiteDatabase db_read = MPDDBHelper.get().getReadableDatabase();
     private Cursor cursor = null;
 
     private ListView mListView = null;
@@ -96,7 +95,7 @@ public class ContactListFragment extends ListFragment {
         icon_colors = getActivity().getResources().getIntArray(R.array.user_icon_colors);
 
         // set up adapter
-        cursor = db_read.rawQuery(BASE_QUERY, null);
+        cursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
@@ -262,11 +261,7 @@ public class ContactListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.contact_list, menu);
 
-        if (!db_read.isOpen()){
-            db_read = MPDDBHelper.get().getReadableDatabase();
-        }
-
-        Cursor cur = db_read.rawQuery("select distinct list_name from contact_sublist", null);
+        Cursor cur = OpenMPD.getDB().rawQuery("select distinct list_name from contact_sublist", null);
         cur.moveToFirst();
         while (!cur.isAfterLast()){
             String subListName = cur.getString(0);
@@ -295,10 +290,7 @@ public class ContactListFragment extends ListFragment {
                 String [] args = new String[1];
                 args[0] = newText;
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
-                if (!db_read.isOpen()){
-                    db_read = MPDDBHelper.get().getReadableDatabase();
-                }
-                Cursor newCursor = db_read.rawQuery(SEARCH_QUERY, args);
+                Cursor newCursor = OpenMPD.getDB().rawQuery(SEARCH_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
@@ -321,7 +313,7 @@ public class ContactListFragment extends ListFragment {
                 }
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    Cursor newCursor = db_read.rawQuery(BASE_QUERY, null);
+                    Cursor newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
                     adapter.changeCursor(newCursor);
                     cursor = newCursor;
                     return true;
@@ -335,42 +327,42 @@ public class ContactListFragment extends ListFragment {
         Cursor newCursor = null;
         switch (item.getItemId() ){
             case R.id.menu_filter_all:
-                newCursor = db_read.rawQuery(BASE_QUERY, null);
+                newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_new:
                 args[0] = Integer.toString(ContactStatus.STATUS_NEW);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_current:
                 args[0] = Integer.toString(ContactStatus.STATUS_CURRENT);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_late:
                 args[0] = Integer.toString(ContactStatus.STATUS_LATE);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_lapsed:
                 args[0] = Integer.toString(ContactStatus.STATUS_LAPSED);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_dropped:
                 args[0] = Integer.toString(ContactStatus.STATUS_DROPPED);
-                newCursor = db_read.rawQuery(STATUS_QUERY, args);
+                newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_occasional:
-                newCursor = db_read.rawQuery(OCCASIONAL_QUERY, null);
+                newCursor = OpenMPD.getDB().rawQuery(OCCASIONAL_QUERY, null);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;

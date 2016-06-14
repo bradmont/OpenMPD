@@ -301,7 +301,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
                     .inflate(R.layout.dialog_list, null);
 
                 String [] args = new String[1]; args[0] = contact.getString("tnt_people_id");
-                Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+                Cursor cur = OpenMPD.getDB().rawQuery(
                     "select _id, date, amount as amount from gift where tnt_people_id=? order by date desc; " , args);
 
                 SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
@@ -347,7 +347,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             return false;
         }
 
-        Cursor cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+        Cursor cur = OpenMPD.getDB().rawQuery(
             "select sum(amount) from (select amount, a.month from (select distinct month from gift order by month desc limit 13) a join gift b on a.month=b.month where tnt_people_id=?);", args);
         cur.moveToFirst();
         if (cur.getInt(0) == 0){
@@ -355,7 +355,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             return false;
         }
 
-        cur = MPDDBHelper.get().getReadableDatabase().rawQuery(
+        cur = OpenMPD.getDB().rawQuery(
             "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
         Float [][] values = new Float[cur.getCount()][];
         String [] labels = new String[cur.getCount()];

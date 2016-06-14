@@ -70,7 +70,7 @@ public class NotificationsFragment extends ListFragment{
 
         icon_colors = getActivity().getResources().getIntArray(R.array.user_icon_colors);
 
-        Cursor cursor = MPDDBHelper.get().getReadableDatabase()
+        Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
                 new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
 
@@ -350,10 +350,10 @@ public class NotificationsFragment extends ListFragment{
         public int remove(int position){
             getCursor().moveToPosition(position);
             int notificationId = getCursor().getInt(0);
-            MPDDBHelper.get().getWritableDatabase().execSQL(
+            OpenMPD.getDB().execSQL(
                     "update notification set status = ? where _id = ?",
                     new String [] {Integer.toString(Notification.STATUS_ACKNOWLEDGED), Integer.toString(notificationId)});
-            Cursor cursor = MPDDBHelper.get().getReadableDatabase()
+            Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
                 new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
             swapCursor(cursor);
@@ -361,10 +361,10 @@ public class NotificationsFragment extends ListFragment{
         }
 
         public void insert(int archived_id){
-            MPDDBHelper.get().getWritableDatabase().execSQL(
+            OpenMPD.getDB().execSQL(
                     "update notification set status = ? where _id = ?",
                     new String [] {Integer.toString(Notification.STATUS_NOTIFIED), Integer.toString(archived_id)});
-            Cursor cursor = MPDDBHelper.get().getReadableDatabase()
+            Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
                 new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
             swapCursor(cursor);

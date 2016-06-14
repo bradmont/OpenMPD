@@ -63,8 +63,7 @@ public class DebugFragment extends Fragment implements OnClickListener{
 
         View view = inflater.inflate(R.layout.debug_page, null);
         setHasOptionsMenu(true);
-        cursor = MPDDBHelper.get()
-                   .getReadableDatabase()
+        cursor = OpenMPD.getDB()
                    .rawQuery("select * from log order by _id desc;", null);
         SimpleCursorAdapter adapter = new MyAdapter(getActivity(),
                     R.layout.error_list_item, cursor, columns, fields);
@@ -130,10 +129,10 @@ public class DebugFragment extends Fragment implements OnClickListener{
             case R.id.clear_data_button:
                 String [] tables = { "address", "contact_status", "email_address", "gift", "notification", "phone_number", "contact" };
                 for (String table : tables){
-                    MPDDBHelper.get().getWritableDatabase()
+                    OpenMPD.getDB()
                         .execSQL(String.format("delete from %s;", table));
                 }
-                MPDDBHelper.get().getWritableDatabase()
+                OpenMPD.getDB()
                     .execSQL(String.format("update service_account set last_import = null;"));
                 break;
             case R.id.randomise_data_button:
@@ -193,11 +192,6 @@ public class DebugFragment extends Fragment implements OnClickListener{
                     } catch (Exception e){}
                 }
                 Log.i("net.bradmont.openmpd", "Randomising giving info");
-                // randomize gift amounts
-                /*MPDDBHelper.get().getWritableDatabase()
-                    .execSQL("update gift set amount = round(amount * ( .75 + (abs(random()) % 50)/100.));");
-                MPDDBHelper.get().getWritableDatabase()
-                    .execSQL("update contact_status set giving_amount = round(giving_amount * ( .75 + (abs(random()) % 50)/100.));");*/
                 AnalyticsFragment.clearCache();
                 break;
             case R.id.report_error_button:

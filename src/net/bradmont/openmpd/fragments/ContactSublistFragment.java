@@ -52,7 +52,6 @@ public class ContactSublistFragment extends ListFragment {
     public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift", "fname", "fname", "s_fname", "partner_type"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
-    private SQLiteDatabase db_read = MPDDBHelper.get().getReadableDatabase();
     private Cursor cursor = null;
 
     private EnhancedListView mListView = null;
@@ -117,8 +116,7 @@ public class ContactSublistFragment extends ListFragment {
 
         // set up adapter
         String [] args = new String[1]; args[0] = mListName;
-        //cursor = db_read.rawQuery(BASE_QUERY, new String[] {mListName});
-        cursor = db_read.rawQuery(BASE_QUERY, args);
+        cursor = OpenMPD.getDB().rawQuery(BASE_QUERY, args);
         mAdapter = new EnhancedListAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
         mAdapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
@@ -301,10 +299,8 @@ public class ContactSublistFragment extends ListFragment {
                 args[0] = mListName;
                 args[1] = newText;
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
-                if (!db_read.isOpen()){
-                    db_read = MPDDBHelper.get().getReadableDatabase();
-                }
-                Cursor newCursor = db_read.rawQuery(SEARCH_QUERY, args);
+                OpenMPD.getDB() = MPDDBHelper.get().getReadableDatabase();
+                Cursor newCursor = OpenMPD.getDB().rawQuery(SEARCH_QUERY, args);
                 mAdapter.changeCursor(newCursor);
                 cursor.close();
                 cursor = newCursor;
@@ -328,7 +324,7 @@ public class ContactSublistFragment extends ListFragment {
                 }
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName} );
+                    Cursor newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, new String [] {mListName} );
                     mAdapter.changeCursor(newCursor);
                     cursor.close();
                     cursor = newCursor;
@@ -444,7 +440,7 @@ public class ContactSublistFragment extends ListFragment {
         getActivity().getResources().getString(R.string.custom_list_title) + listName);
         // TODO: proper resource
         if (mAdapter != null){
-            Cursor newCursor = db_read.rawQuery(BASE_QUERY, new String [] {mListName});
+            Cursor newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, new String [] {mListName});
             mAdapter.changeCursor(newCursor);
             cursor.close();
             cursor = newCursor;
