@@ -1,7 +1,7 @@
 package net.bradmont.openmpd;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.*;
 
@@ -29,6 +29,7 @@ import android.view.View.OnClickListener;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import java.lang.Runnable;
 
@@ -70,9 +71,11 @@ public class HomeActivity extends BaseActivity {
 		
         // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
-        ModelList messages = q.getAll(); 
+        List<QuickMessage> messages = OpenMPD.getDaoMaster().newSession().getQuickMessageDao().queryBuilder().list(); // TODO: encapsulate...
         if (messages.size() == 0){
-            q.createDefaults();
+            //q.createDefaults();
+            // DEPRECATED
+            // TODO: MOVE ELSEWHERE
         }
 
         // set up our alarms for automatic background updating
@@ -80,10 +83,11 @@ public class HomeActivity extends BaseActivity {
         Calendar cal = new GregorianCalendar();
         
 
-        ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
+        //ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
+        List<ServiceAccount> accounts = OpenMPD.getDaoMaster().newSession().getServiceAccountDao().queryBuilder().list(); // TODO: encapsulate...
         int [] account_ids = new int [accounts.size()];
         for (int i = 0; i < accounts.size(); i++){
-            account_ids[i] = accounts.get(i).getID();
+            account_ids[i] = accounts.get(i).getId().intValue();
         }
         alarmManager.setInexactRepeating(AlarmManager.RTC, 
             cal.getTimeInMillis(), 

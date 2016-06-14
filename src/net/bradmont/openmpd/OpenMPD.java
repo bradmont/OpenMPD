@@ -3,6 +3,8 @@ package net.bradmont.openmpd;
 import android.app.Application;
 import android.content.pm.PackageManager.NameNotFoundException;
 import net.bradmont.openmpd.dao.DaoMaster;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 
 public class OpenMPD extends Application {
@@ -15,6 +17,7 @@ public class OpenMPD extends Application {
 
     private static OpenMPD instance;
 
+    private static SQLiteDatabase mDatabase = null;
     private static DaoMaster mDaoMaster = null;
 
     public OpenMPD(){
@@ -22,18 +25,23 @@ public class OpenMPD extends Application {
         instance = this;
     }
     public void onCreate(){
-        mDaoMaster = new DaoMaster(new DaoMaster.OpenHelper(this, "openmpd.sqlite", null));
+        mDatabase = new DaoMaster.DevOpenHelper(this, "openmpd.sqlite", null).getWritableDatabase();
+        mDaoMaster = new DaoMaster(mDatabase);
     }
 
     public static OpenMPD get() {
         return instance;
     }
 
-    public static SQLiteOpenHelper getDB(){
-        /*if (db == null){
-            db = new MPDDBHelper(instance);
+    public static DaoMaster getDaoMaster(){
+        return mDaoMaster;
+    }
+
+    public static SQLiteDatabase getDB(){
+        /*if (mDaoMaster == null){
+            mDaoMaster = new DaoMaster(new DaoMaster.OpenHelper(this, "openmpd.sqlite", null));
         }*/ // DEPRECATED
-        return mDaoMaster.getDatabase();;
+        return mDatabase;
     }
 
     public static int getVersion() {

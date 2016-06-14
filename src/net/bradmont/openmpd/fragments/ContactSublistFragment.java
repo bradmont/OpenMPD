@@ -299,7 +299,6 @@ public class ContactSublistFragment extends ListFragment {
                 args[0] = mListName;
                 args[1] = newText;
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
-                OpenMPD.getDB() = MPDDBHelper.get().getReadableDatabase();
                 Cursor newCursor = OpenMPD.getDB().rawQuery(SEARCH_QUERY, args);
                 mAdapter.changeCursor(newCursor);
                 cursor.close();
