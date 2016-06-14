@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity {
 		
         // if it hasn't been done, populate our QuickMessage table
         QuickMessage q = new QuickMessage();
-        List<QuickMessage> messages = OpenMPD.getDaoMaster().newSession().getQuickMessageDao().queryBuilder().list(); // TODO: encapsulate...
+        List<QuickMessage> messages = OpenMPD.getDaoSession().getQuickMessageDao().queryBuilder().list(); // TODO: encapsulate...
         if (messages.size() == 0){
             //q.createDefaults();
             // DEPRECATED
@@ -84,7 +84,7 @@ public class HomeActivity extends BaseActivity {
         
 
         //ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
-        List<ServiceAccount> accounts = OpenMPD.getDaoMaster().newSession().getServiceAccountDao().queryBuilder().list(); // TODO: encapsulate...
+        List<ServiceAccount> accounts = OpenMPD.getDaoSession().getServiceAccountDao().queryBuilder().list(); // TODO: encapsulate...
         int [] account_ids = new int [accounts.size()];
         for (int i = 0; i < accounts.size(); i++){
             account_ids[i] = accounts.get(i).getId().intValue();

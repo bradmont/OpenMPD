@@ -3,6 +3,7 @@ package net.bradmont.openmpd;
 import android.app.Application;
 import android.content.pm.PackageManager.NameNotFoundException;
 import net.bradmont.openmpd.dao.DaoMaster;
+import net.bradmont.openmpd.dao.DaoSession;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -19,6 +20,7 @@ public class OpenMPD extends Application {
 
     private static SQLiteDatabase mDatabase = null;
     private static DaoMaster mDaoMaster = null;
+    private static DaoSession mDaoSession = null;
 
     public OpenMPD(){
         super();
@@ -27,6 +29,7 @@ public class OpenMPD extends Application {
     public void onCreate(){
         mDatabase = new DaoMaster.DevOpenHelper(this, "openmpd.sqlite", null).getWritableDatabase();
         mDaoMaster = new DaoMaster(mDatabase);
+        mDaoSession = mDaoMaster.newSession();
     }
 
     public static OpenMPD get() {
@@ -35,6 +38,9 @@ public class OpenMPD extends Application {
 
     public static DaoMaster getDaoMaster(){
         return mDaoMaster;
+    }
+    public static DaoSession getDaoSession(){
+        return mDaoSession;
     }
 
     public static SQLiteDatabase getDB(){
