@@ -28,7 +28,9 @@ public class OpenMPDDaoGenerator {
         Entity gift = addGift(schema);
         Entity notification = addNotification(schema);
         Entity tnt_service = addTntService(schema);
+        tnt_service.setHasKeepSections(true) ;
         Entity service_account = addServiceAccount(schema);
+        service_account.setHasKeepSections(true) ;
 
         Entity quick_message = addQuickMessage(schema);
         Entity giving_summary_cache = addGivingSummaryCache(schema);
