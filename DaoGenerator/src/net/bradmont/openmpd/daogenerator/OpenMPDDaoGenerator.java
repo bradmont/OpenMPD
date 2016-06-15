@@ -29,7 +29,7 @@ public class OpenMPDDaoGenerator {
         Entity notification = addNotification(schema);
         Entity tnt_service = addTntService(schema);
         tnt_service.setHasKeepSections(true) ;
-        Entity service_account = addServiceAccount(schema);
+        Entity service_account = addServiceAccount(schema, tnt_service);
         service_account.setHasKeepSections(true) ;
 
         Entity quick_message = addQuickMessage(schema);
@@ -129,7 +129,11 @@ public class OpenMPDDaoGenerator {
         gift.addStringProperty("month");
         gift.addLongProperty("amount");
         gift.addStringProperty("motivationCode");
-        gift.addStringProperty("tntDonationId"); 
+        Property tntDonationId = gift.addStringProperty("tntDonationId").getProperty();
+        Index unique = new Index();
+        unique.addProperty(tntDonationId);
+        unique.makeUnique();
+        gift.addIndex(unique);
         return gift;
     }
     /* Notifications of partner activity
@@ -152,7 +156,7 @@ public class OpenMPDDaoGenerator {
         Entity service = schema.addEntity("TntService");
         service.addIdProperty();
         service.addStringProperty("name");
-        service.addStringProperty("name_short");
+        service.addStringProperty("nameShort");
         service.addStringProperty("domain");
         service.addBooleanProperty("httpAuth");
         service.addStringProperty("balanceUrl");
@@ -171,15 +175,16 @@ public class OpenMPDDaoGenerator {
      * identity is in format username@domain, used to make a unique key for
      * tntPeopleId fields, in case a people_id is repeated from two accounts
      */
-    private static Entity addServiceAccount(Schema schema){
-        Entity notification = schema.addEntity("ServiceAccount");
-        notification.addIdProperty();
-        notification.addStringProperty("tntServiceName");
-        notification.addStringProperty("username");
-        notification.addStringProperty("password");
-        notification.addDateProperty("lastImport");
-        notification.addStringProperty("identity"); // username@domain@domain
-        return notification;
+    private static Entity addServiceAccount(Schema schema, Entity tnt_service){
+        Entity service_account = schema.addEntity("ServiceAccount");
+        service_account.addIdProperty();
+        Property tntServiceId = service_account.addLongProperty("tntServiceId").getProperty();
+        service_account.addStringProperty("username");
+        service_account.addStringProperty("password");
+        service_account.addDateProperty("lastImport");
+        service_account.addStringProperty("identity"); // username@domain@domain
+        service_account.addToOne(tnt_service, tntServiceId);
+        return service_account;
     }
     private static Entity addQuickMessage(Schema schema) {
         Entity quick_message = schema.addEntity("QuickMessage");
