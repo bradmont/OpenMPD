@@ -10,9 +10,10 @@ import android.util.Log;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.ServiceAccount;
+import net.bradmont.openmpd.dao.ServiceAccount;
 import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.supergreen.models.ModelList;
 
@@ -27,17 +28,16 @@ public class OnBootScheduler extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar cal = new GregorianCalendar();
 
-        ModelList accounts = MPDDBHelper.get().getReferenceModel("service_account").getAll();
+        List<ServiceAccount> accounts = OpenMPD.getDaoSession().getServiceAccountDao().queryBuilder().list(); // TODO: encapsulate...
         if  (accounts.size() == 0){
             Log.d("net.bradmont.openmpd", "no accounts, not setting alarm");
             return;
         }
         int [] account_ids = new int [accounts.size()];
         for (int i = 0; i < accounts.size(); i++){
-            account_ids[i] = accounts.get(i).getID();
+            account_ids[i] = accounts.get(i).getId().intValue();
         }
         alarmManager.setInexactRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HOUR,
-        //alarmManager.setInexactRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, 
             PendingIntent.getService(context, 0, new Intent(context, TntImportService.class).putExtra("net.bradmont.openmpd.account_ids", account_ids),
             PendingIntent.FLAG_UPDATE_CURRENT)
             );

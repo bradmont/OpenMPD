@@ -2,7 +2,7 @@ package net.bradmont.openmpd.fragments;
 
 import net.bradmont.supergreen.models.*;
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.controllers.TntImportService;
 import net.bradmont.openmpd.controllers.TntImporter;
 
@@ -41,6 +41,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -103,13 +104,10 @@ public class DebugFragment extends Fragment implements OnClickListener{
         switch (item.getItemId() ){
             case R.id.menu_refresh:
                 Log.i("net.bradmont.openmpd", "menu_refresh");
-                ModelList accounts = MPDDBHelper
-                    .get()
-                    .getReferenceModel("service_account")
-                    .getAll();
+                List<ServiceAccount> accounts = OpenMPD.getDaoSession().getServiceAccountDao().queryBuilder().list();
                 int [] account_ids = new int [accounts.size()];
                 for (int i = 0; i < accounts.size(); i++){
-                    account_ids[i] = accounts.get(i).getID();
+                    account_ids[i] = accounts.get(i).getId().intValue();
                 }
 
                 getActivity().startService(
@@ -136,6 +134,7 @@ public class DebugFragment extends Fragment implements OnClickListener{
                     .execSQL(String.format("update service_account set last_import = null;"));
                 break;
             case R.id.randomise_data_button:
+                /* TODO: rewrite this...
                 Log.i("net.bradmont.openmpd", "Randomising contact personal info");
                 // Replace all contact info with fake data, for public
                 // screenshots and such.
@@ -157,7 +156,7 @@ public class DebugFragment extends Fragment implements OnClickListener{
 
 
                 // get all contacts
-                ModelList contacts = MPDDBHelper.getReferenceModel("contact").getAll();
+                List<contact> contacts = OpenMPD.getDaoSession().getContactDao().queryBuilder().list();
                 for (int i = 0; i < contacts.size(); i++){
                     int index = i % fake_data.size();
                     String [] info = TntImporter.csvLineSplit(fake_data.get(index));
@@ -193,6 +192,8 @@ public class DebugFragment extends Fragment implements OnClickListener{
                 }
                 Log.i("net.bradmont.openmpd", "Randomising giving info");
                 AnalyticsFragment.clearCache();
+                break;
+                */
                 break;
             case R.id.report_error_button:
                 int position = (Integer) view.getTag();

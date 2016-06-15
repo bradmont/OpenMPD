@@ -83,7 +83,6 @@ public class HomeActivity extends BaseActivity {
         Calendar cal = new GregorianCalendar();
         
 
-        //ModelList accounts = MPDDBHelper.getReferenceModel("service_account").getAll();
         List<ServiceAccount> accounts = OpenMPD.getDaoSession().getServiceAccountDao().queryBuilder().list(); // TODO: encapsulate...
         int [] account_ids = new int [accounts.size()];
         for (int i = 0; i < accounts.size(); i++){

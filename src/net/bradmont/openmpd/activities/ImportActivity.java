@@ -1,6 +1,7 @@
 package net.bradmont.openmpd.activities;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +32,7 @@ import net.bradmont.openmpd.controllers.*;
 import net.bradmont.openmpd.fragments.onboard.*;
 import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.*;
-import net.bradmont.supergreen.models.*;
+import net.bradmont.openmpd.dao.*;
 
 public class ImportActivity extends Activity {
 
@@ -56,7 +57,7 @@ public class ImportActivity extends Activity {
         setContentView(R.layout.onboard_import);
 
         mAccountList = (NoScrollListView) findViewById(R.id.account_list);
-        Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery(ACCOUNT_QUERY, null);
+        Cursor cursor = OpenMPD.getDB().rawQuery(ACCOUNT_QUERY, null);
         String [] columns = {"name", "username", "balance_url"};
         int [] fields = {R.id.name, R.id.username, R.id.url};
 
@@ -96,16 +97,13 @@ public class ImportActivity extends Activity {
         super.onStart();
         mInstance = this;
         // launch TntImportService
-        ModelList accounts = MPDDBHelper
-            .get()
-            .getReferenceModel("service_account")
-            .getAll();
+        List<ServiceAccount> accounts = OpenMPD.getDaoSession().getServiceAccountDao().queryBuilder().list();
         int [] account_ids = new int [accounts.size()];
         for (int i = 0; i < accounts.size(); i++){
             if (i == 0){
                 // set indeterminate on first bar, as it doesn't seem to happen all the time
             }
-            account_ids[i] = accounts.get(i).getID();
+            account_ids[i] = accounts.get(i).getId().intValue();
         }
 
         startService(

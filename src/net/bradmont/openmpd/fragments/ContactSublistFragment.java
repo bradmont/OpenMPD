@@ -340,7 +340,7 @@ public class ContactSublistFragment extends ListFragment {
 				   .setCancelable(false)
 				   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 					   public void onClick(DialogInterface dialog, int id) {
-							MPDDBHelper.get().getWritableDatabase().execSQL(
+							OpenMPD.getDB().execSQL(
 									"DELETE FROM contact_sublist WHERE list_name = ?",
 									new String [] {mListName});
 							getActivity().finish();
@@ -374,7 +374,7 @@ public class ContactSublistFragment extends ListFragment {
         public int remove(int position){
             getCursor().moveToPosition(position);
             int contactId = getCursor().getInt(3);
-            MPDDBHelper.get().getWritableDatabase().execSQL(
+            OpenMPD.getDB().execSQL(
                     "DELETE FROM contact_sublist WHERE contact_id = ? AND list_name = ?",
                     new String [] {Integer.toString(contactId), mListName});
 
@@ -383,7 +383,7 @@ public class ContactSublistFragment extends ListFragment {
         }
 
         public void insert(int deleted_id){
-            MPDDBHelper.get().getWritableDatabase().execSQL(
+            OpenMPD.getDB().execSQL(
                     "INSERT INTO contact_sublist VALUES (?, ?)" , 
                     new String [] { Integer.toString(deleted_id), mListName });
             cursor.requery();
@@ -483,7 +483,7 @@ public class ContactSublistFragment extends ListFragment {
                           break;
                   }
                   query = "insert into contact_sublist " + query;
-                  MPDDBHelper.get().getWritableDatabase().execSQL(query, args);
+                  OpenMPD.getDB().execSQL(query, args);
                   cursor.requery();
                   return true;
               }
