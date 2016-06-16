@@ -20,13 +20,14 @@ public class OpenMPDDaoGenerator {
         Schema schema = new Schema(SCHEMA_VERSION, "net.bradmont.openmpd.dao");
 
         Entity contact = addContact(schema);
-        contact.setHasKeepSections(true);
+        Entity person = addPerson(schema, contact);
 
         Entity contact_detail = addContactDetail(schema, contact);
-        Entity contact_interacton = addContactInteraction(schema);
-        Entity contact_status = addContactStatus(schema);
-        Entity gift = addGift(schema);
-        Entity notification = addNotification(schema);
+        Entity contact_interacton = addContactInteraction(schema, contact);
+        Entity contact_status = addContactStatus(schema, contact);
+        Entity gift = addGift(schema, contact);
+        Entity notification = addNotification(schema, contact);
+
         Entity tnt_service = addTntService(schema);
         tnt_service.setHasKeepSections(true) ;
         Entity service_account = addServiceAccount(schema, tnt_service);
@@ -43,20 +44,35 @@ public class OpenMPDDaoGenerator {
     private static Entity addContact(Schema schema) {
         Entity contact = schema.addEntity("Contact");
         contact.addIdProperty();
-        contact.addStringProperty("tntPeopleId");
-        contact.addStringProperty("subId"); // "primary", "spouse" or UUID if added by user
+        Property tntPeopleId = contact.addStringProperty("tntPeopleId").getProperty();
+        Property uuid = contact.addStringProperty("uuid").getProperty(); // exists only if tntPeopleId doesn't
         contact.addStringProperty("tntAccountName");
         contact.addStringProperty("tntPersonType");
-        contact.addStringProperty("lname");
-        contact.addStringProperty("fname");
-        contact.addStringProperty("mname");
-        contact.addStringProperty("title");
-        contact.addStringProperty("suffix");
         contact.addBooleanProperty("isSubcontact");
-        Property parentContact = contact.addLongProperty("parentContactId").getProperty();
-        contact.addToOne(contact, parentContact).setName("parent");
-        contact.addToMany(contact, parentContact).setName("children");
+        contact.setHasKeepSections(true);
+        Index unique = new Index();
+        unique.addProperty(tntPeopleId);
+        unique.addProperty(uuid);
+        unique.makeUnique();
+        contact.addIndex(unique);
         return contact;
+    }
+    private static Entity addPerson(Schema schema, Entity contact) {
+        Entity person = schema.addEntity("Person");
+        person.addIdProperty();
+        person.addBooleanProperty("isContactPrimary"); // mostly for ordering
+        person.addBooleanProperty("isTntSpouse");
+        person.addStringProperty("lname");
+        person.addStringProperty("fname");
+        person.addStringProperty("mname");
+        person.addStringProperty("title");
+        person.addStringProperty("suffix");
+        Property contactId = person.addLongProperty("contactId").getProperty();
+        person.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(person, contactId).setName("people");
+        person.setHasKeepSections(true);
+        
+        return person;
     }
 
     /** A ContactDetail is information about a contact -- email, phone, address,
@@ -66,26 +82,31 @@ public class OpenMPDDaoGenerator {
         Entity contactDetail = schema.addEntity("ContactDetail");
         contactDetail.addIdProperty();
         contactDetail.addStringProperty("uuid");
-        contactDetail.addStringProperty("tntPeopleId");
         contactDetail.addDateProperty("addedDate");
         contactDetail.addBooleanProperty("operational");
+        contactDetail.addBooleanProperty("fromTnt");
         contactDetail.addStringProperty("type"); // phone, email, mailing, note
         contactDetail.addStringProperty("label"); // home, work, cell, ...
         contactDetail.addStringProperty("data"); // JSON formatted details
+        Property contactId = contactDetail.addLongProperty("contactId").getProperty();
+        contactDetail.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(contactDetail, contactId).setName("details");
         return contactDetail;
     }
 
     /** ContactInteraction is a log of my interactions with my contacts.
     */
-    private static Entity addContactInteraction(Schema schema){
+    private static Entity addContactInteraction(Schema schema, Entity contact){
         Entity contactInteraction = schema.addEntity("ContactInteraction");
         contactInteraction.addIdProperty();
-        contactInteraction.addStringProperty("tntPeopleId");
         contactInteraction.addStringProperty("uuid");
         contactInteraction.addDateProperty("date");
         contactInteraction.addStringProperty("interactionType"); // phone, email, ask
                     // meeting, letter, card, reminder ...
         contactInteraction.addStringProperty("notes");
+        Property contactId = contactInteraction.addLongProperty("contactId").getProperty();
+        contactInteraction.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(contactInteraction, contactId).setName("interactions");
         return contactInteraction;
     }
 
@@ -97,10 +118,14 @@ public class OpenMPDDaoGenerator {
      *      Namestormed: to_contact, contact_later, followup, not_interested
      *      Other: unknown
     */
-    private static Entity addContactStatus(Schema schema){
+    private static Entity addContactStatus(Schema schema, Entity contact){
         Entity contactStatus = schema.addEntity("ContactStatus");
         contactStatus.addIdProperty();
-        Property tntPeopleId = contactStatus.addStringProperty("tntPeopleId").getProperty();
+
+        Property contactId = contactStatus.addLongProperty("contactId").getProperty();
+        contactStatus.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(contactStatus, contactId).setName("status");
+
         contactStatus.addStringProperty("type");  // monthly, regular, annual,
                     // frequent, occasional, onetime, unknown, namestormed
         contactStatus.addStringProperty("status"); 
@@ -115,16 +140,18 @@ public class OpenMPDDaoGenerator {
         contactStatus.addDateProperty("manualSetExpires");
 
         Index unique = new Index();
-        unique.addProperty(tntPeopleId);
+        unique.addProperty(contactId);
         unique.makeUnique();
         contactStatus.addIndex(unique);
         return contactStatus;
     }
 
-    private static Entity addGift(Schema schema){
+    private static Entity addGift(Schema schema, Entity contact){
         Entity gift = schema.addEntity("Gift");
         gift.addIdProperty();
-        gift.addStringProperty("tntPeopleId");
+        Property contactId = gift.addLongProperty("contactId").getProperty();
+        gift.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(gift, contactId).setName("gifts");
         gift.addDateProperty("date");
         gift.addStringProperty("month");
         gift.addLongProperty("amount");
@@ -141,10 +168,14 @@ public class OpenMPDDaoGenerator {
      *       dropped, change_amount, reminder
      * status (of the notification, not the partner) : new, seen, dismissed
      */
-    private static Entity addNotification(Schema schema){
+    private static Entity addNotification(Schema schema, Entity contact){
         Entity notification = schema.addEntity("Notification");
         notification.addIdProperty();
-        notification.addStringProperty("tntPeopleId");
+
+        Property contactId = notification.addLongProperty("contactId").getProperty();
+        notification.addToOne(contact, contactId).setName("contact");
+        contact.addToMany(notification, contactId).setName("notifications");
+
         notification.addStringProperty("type");
         notification.addStringProperty("status");
         notification.addStringProperty("message");
