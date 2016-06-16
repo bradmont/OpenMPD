@@ -207,7 +207,7 @@ public class TntService {
     /**
      * Execute the Addresses TNT query to download contacts.
      */
-    public ArrayList<String> getAddresses(String username, String password){
+    public ArrayList<String> getAddresses(String username, String password) throws ServerException{
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
         arguments.add(new BasicNameValuePair( "Action", getAddressesAction()));
         arguments.add(new BasicNameValuePair( getUsernameKey(), username));
@@ -234,7 +234,7 @@ public class TntService {
     /**
      * Execute the Addresses TNT query to download gifts.
      */
-    public ArrayList<String> getGifts(String username, String password, java.util.Date fromDate){
+    public ArrayList<String> getGifts(String username, String password, java.util.Date fromDate) throws ServerException{
 
         ArrayList<BasicNameValuePair> arguments = new ArrayList<BasicNameValuePair>(4);
 
@@ -365,6 +365,248 @@ public class TntService {
         mQueryIniProcessed = true;
         return true; 
     }
+
+    public ArrayList<String> getStringsFromUrl(String url, ArrayList arguments) throws ServerException{
+        return getStringsFromUrl(url, arguments, true);
+    }
+
+    public ArrayList<String> getStringsFromUrl(String url_raw, ArrayList arguments, boolean handleCertError) throws ServerException{
+        URL url = null;
+        try {
+            url = new URL(url_raw);
+        } catch (Exception e){
+            return null;
+        }
+
+        InputStream stream = getStreamFromUrl(url_raw, arguments, handleCertError);
+        if (stream == null){
+            return null;
+        }
+
+        BufferedReader rd = new BufferedReader(
+                new InputStreamReader(stream), 4096);
+        String line;
+        ArrayList<String> lines = new ArrayList<String>(50);
+        try{
+            while ((line = rd.readLine()) != null) {
+                lines.add(line);
+                //Log.i("net.bradmont.openmpd", line);
+            }
+            rd.close();
+            //Log.i("net.bradmont.openmpd", "finished reading");
+        } catch (Exception e){
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            Log.i("net.bradmont.openmpd.controllers.TntImporter",sw.toString());
+        }
+        Log.i("net.bradmont.openmpd", String.format("returning %d lines", lines.size()));
+        /*for (String l : lines){
+            Log.i("net.bradmont.openmpd", l);
+        }*/
+        if (lines == null ||
+                 lines.get(0).contains("ERROR") ||
+                 lines.get(0).contains("BAD_PASSWORD")){
+            // TODO: we may need to detect other errors here....
+            String error = "";
+            for (String s : lines){
+                error += s;
+            }
+            throw new ServerException(error);
+         }
+        return lines;
+    }
+
+    public class ServerException extends Exception{
+        public ServerException() { super(); }
+        public ServerException(String message) { super(message); }
+        public ServerException(String message, Throwable cause) { super(message, cause); }
+        public ServerException(Throwable cause) { super(cause); }
+    }
+
+
+    private static StringReader getCleanedStringReaderFromUrl(String url){
+        try {
+            InputStream stream = getStreamFromUrl(url, null, false);
+            if (stream == null) { return null; }
+            StringBuilder sb = new StringBuilder();
+            int character = 0;
+            boolean started = false;
+            // read and chop off non-ascii gunk at the beginning
+            character = stream.read();
+            while (character != -1){
+                if ( (char) character == '['){
+                    started=true;
+                }
+                if (started){
+                    sb.append( (char) character);
+                }
+                character = stream.read();
+            }
+            stream.close();
+            return new StringReader(sb.toString());
+
+        } catch (IOException e){
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            Log.i("net.bradmont.openmpd",sw.toString());
+            return null;
+        }
+    }
+
+    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError){
+        return getStreamFromUrl(url_raw, arguments, handleCertError, -1);
+    }
+
+    public static InputStream getStreamFromUrl(String url_raw, ArrayList arguments, boolean handleCertError,  int accountId){
+        InputStream content = null;
+        
+        URL url = null;
+        try {
+            url = new URL(url_raw);
+        } catch (Exception e){
+            return null;
+        }
+        try {
+            DefaultHttpClient httpclient = null;
+            SharedPreferences prefs = OpenMPD.get().getSharedPreferences("openmpd", Context.MODE_PRIVATE);
+            if (prefs.getBoolean("ignore_ssl_" + url.getHost(), false) == true){ 
+                httpclient = getNewHttpClient();
+            } else {
+                httpclient = new DefaultHttpClient();
+            }
+
+            HttpHost targetHost;
+            if (url.getProtocol() == "https"){
+                targetHost = new HttpHost(url.getHost(), 443, url.getProtocol()); 
+            } else if (url.getProtocol() == "http"){
+                targetHost = new HttpHost(url.getHost(), 80, url.getProtocol()); 
+            } else {
+                targetHost = new HttpHost(url.getHost(), 443, url.getProtocol()); 
+            }
+
+
+            HttpUriRequest httpRequest = null;
+            if (arguments != null){
+                HttpPost httpPost = new HttpPost(url_raw);
+                httpPost.setEntity(new UrlEncodedFormEntity(arguments));
+
+                httpclient.getCredentialsProvider().setCredentials(
+                    new AuthScope(targetHost.getHostName(), targetHost.getPort()), 
+                    new UsernamePasswordCredentials(
+                        ((BasicNameValuePair) arguments.get(1)).getValue(), // username
+                        ((BasicNameValuePair) arguments.get(2)).getValue()
+                        ));
+                httpRequest = httpPost;
+            } else {
+                httpRequest = new HttpGet(url_raw);
+            }
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httpRequest);
+            content = response.getEntity().getContent();
+
+            return content;
+        } catch (org.apache.http.conn.HttpHostConnectException e){
+            ImportActivity.setProgress(accountId, 0, 0, false);
+            ImportActivity.setStatus(accountId, R.string.error_connecting_to_server);
+            throw ServerError("Error connecting to server.");
+        } catch (javax.net.ssl.SSLPeerUnverifiedException e){
+            // SSL certs on the server are not accepted
+            if (handleCertError == false){
+                throw new RuntimeException("SSLError Certificate not accepted");
+            }
+            NotificationManager notificationManager =
+                (NotificationManager) OpenMPD.get().getSystemService(Context.NOTIFICATION_SERVICE);
+
+            NotificationCompat.Builder nBuilder =
+                new NotificationCompat.Builder(OpenMPD.get())
+                .setSmallIcon(R.drawable.notification_icon);
+
+            nBuilder.setContentTitle("SSL Certificate Error");
+            nBuilder.setContentText(url.getHost());
+            ImportActivity.setStatus(accountId, R.string.ssl_certificate_error);
+
+            Intent sslCertIntent = new Intent(OpenMPD.get(), HomeActivity.class);
+            sslCertIntent.putExtra("net.bradmont.openmpd.SSLErrorServer", url.getHost());
+
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(OpenMPD.get());
+            stackBuilder.addParentStack(HomeActivity.class);
+            stackBuilder.addNextIntent(sslCertIntent);
+            PendingIntent sslPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            nBuilder.setContentIntent(sslPendingIntent);
+
+
+            notificationManager.notify(666, nBuilder.build());
+            return null;
+
+
+
+        } catch (Exception e){
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            Log.i("net.bradmont.openmpd",sw.toString());
+        }
+        return content;
+    }
+
+    public static DefaultHttpClient getNewHttpClient() {
+        try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            SSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+            HttpParams params = new BasicHttpParams();
+            HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
+
+            return new DefaultHttpClient(ccm, params);
+        } catch (Exception e) {
+            return new DefaultHttpClient();
+        }
+    }
+
+    public static class MySSLSocketFactory extends SSLSocketFactory {
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+
+        public MySSLSocketFactory(KeyStore truststore) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+            super(truststore);
+
+            TrustManager tm = new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            };
+
+            sslContext.init(null, new TrustManager[] { tm }, null);
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException, UnknownHostException {
+            return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
+        }
+
+        @Override
+        public Socket createSocket() throws IOException {
+            return sslContext.getSocketFactory().createSocket();
+        }
+    }
+
+
     // KEEP METHODS END
 
 }

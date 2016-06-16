@@ -269,13 +269,14 @@ public class Contact {
      */
     public Person getPrimaryPersion(){
         QueryBuilder qb = OpenMPD.getDaoSession().getPersonDao().queryBuilder();
-        qb.and(Properties.TntPeopleId.eq(getTntPeopleId()),
+        qb.and(Properties.ContactId.eq(getId()),
                Properties.IsContactPrimary.eq(true)
                 );
         List<Person> results = qb.list();
         if (list.size() > 0){
             return list.get(0);
         }
+        return null;
     }
 
     /**
@@ -283,14 +284,68 @@ public class Contact {
      */
     public Person getTntSpouse(){
         QueryBuilder qb = OpenMPD.getDaoSession().getPersonDao().queryBuilder();
-        qb.and(Properties.TntPeopleId.eq(getTntPeopleId()),
+        qb.and(Properties.ContactId.eq(getId()),
                Properties.IsTntSpouse.eq(true)
                 );
         List<Person> results = qb.list();
         if (list.size() > 0){
             return list.get(0);
         }
+        return null;
     }
+
+    /**
+     * Retrieve phone number created from TNT import, or new
+     */
+    public ContactDetail getTntPhoneOrNew(){
+        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
+        qb.and(Properties.ContactId.eq(getId()),
+               Properties.Type.eq("phone"),
+               Properties.FromTnt.eq(true);
+                );
+        List<ContactDetail> results = qb.list();
+        if (list.size() > 0){
+            return list.get(0);
+        }
+        ContactDetail n = new ContactDetail();
+        n.setType("phone");
+        return n;
+    }
+    /**
+     * Retrieve phone number email from TNT import, or new
+     */
+    public ContactDetail getTntEmailOrNew(){
+        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
+        qb.and(Properties.ContactId.eq(getId()),
+               Properties.Type.eq("email"),
+               Properties.FromTnt.eq(true);
+                );
+        List<ContactDetail> results = qb.list();
+        if (list.size() > 0){
+            return list.get(0);
+        }
+        ContactDetail n = new ContactDetail();
+        n.setType("email");
+        return n;
+    }
+    /**
+     * Retrieve phone number address from TNT import, or new
+     */
+    public ContactDetail getTntAddressOrNew(){
+        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
+        qb.and(Properties.ContactId.eq(getId()),
+               Properties.Type.eq("address"),
+               Properties.FromTnt.eq(true);
+                );
+        List<ContactDetail> results = qb.list();
+        if (list.size() > 0){
+            return list.get(0);
+        }
+        ContactDetail n = new ContactDetail();
+        n.setType("address");
+        return n;
+    }
+
     // KEEP METHODS END
 
 }

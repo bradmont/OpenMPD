@@ -173,6 +173,15 @@ public class ServiceAccount {
     }
 
     /**
+     * Returns a unique name for this account in the form of username@domain.
+     * Used with tnt_people_id in the contact table to avoid collisions from
+     * multiple accounts.
+     */
+    public String getName(){
+        return getUsername() + "@" + getTntService().getDomain();
+    }
+
+    /**
      * Check if the account is valid
      */
     public boolean verifyAccount(){
@@ -227,7 +236,6 @@ public class ServiceAccount {
         Calendar cal = Calendar.getInstance();
         return dateFormat.format(cal.getTime());
     }
-
     // KEEP METHODS END
 
 }
