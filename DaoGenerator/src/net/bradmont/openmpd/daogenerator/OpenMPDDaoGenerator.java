@@ -152,7 +152,7 @@ public class OpenMPDDaoGenerator {
         Property contactId = gift.addLongProperty("contactId").getProperty();
         gift.addToOne(contact, contactId).setName("contact");
         contact.addToMany(gift, contactId).setName("gifts");
-        gift.addDateProperty("date");
+        gift.addStringProperty("date");
         gift.addStringProperty("month");
         gift.addLongProperty("amount");
         gift.addStringProperty("motivationCode");
