@@ -3,7 +3,10 @@ package net.bradmont.openmpd.helpers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.lang.StringBuffer;
+import java.util.Date;
 import java.util.Calendar;
+import java.util.Vector;
 
 import net.bradmont.openmpd.R;
 import net.bradmont.openmpd.OpenMPD;
@@ -14,6 +17,7 @@ public class TextTools{
 
     
     private static String mThisMonth = null;
+    private static String mToday = null;
     public static String getThisMonth(){
         if (mThisMonth == null){
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
@@ -24,12 +28,12 @@ public class TextTools{
     }
 
     public static String getToday(){
-        if (mThisMonth == null){
+        if (mToday == null){
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Calendar cal = Calendar.getInstance();
-            mThisMonth = dateFormat.format(cal.getTime());
+            mToday = dateFormat.format(cal.getTime());
         }
-        return mThisMonth;
+        return mToday;
     }
 
     public static String prettyDate(String date_string){
@@ -67,13 +71,58 @@ public class TextTools{
         }
     }
 
-    private static Calendar mkCalendar(String date_string){
+    public static Calendar mkCalendar(String date_string){
         Calendar date = Calendar.getInstance();
         String [] parts = date_string.split("-");
         date.set(Calendar.YEAR, Integer.parseInt(parts[0]));
         date.set(Calendar.MONTH, Integer.parseInt(parts[1]) -1 );
         date.set(Calendar.DAY_OF_MONTH, Integer.parseInt(parts[2]));
+        date.set(Calendar.HOUR,0);
+        date.set(Calendar.MINUTE,0);
+        date.set(Calendar.SECOND,0);
         return date;
     }
+
+    public static Date mkDate(String date_string){
+        return mkCalendar(date_string).getTime();
+    }
+
+    /**  Split a line of CSV data into a string array
+      */
+    public static String [] csvLineSplit(String line){
+        Vector<String> result = new Vector<String>();
+        StringBuffer element = new StringBuffer();
+
+        if (line==null){ return null;}
+
+        boolean inQuotes=false;
+        for (int i=0; i < line.length(); i++){
+            char ch = line.charAt(i);
+            if (ch == ','){
+                if (inQuotes){
+                    element.append(ch);
+                } else {
+                    result.add(element.toString());
+                    element = new StringBuffer();
+                }
+            } else if (ch == '\"'){
+                inQuotes = inQuotes?false:true;
+            } else {
+                element.append(ch);
+            }
+        }
+        result.add(element.toString());
+        String [] return_value = new String[result.size()];
+        return_value = result.toArray(return_value);
+        return return_value;
+    }
+
+    /** Takes an ISO 8601 date string and converts it to a MM/DD/YYYY string,
+     * as required by TntDataServer.
+     */
+    public static String stupidDateFormat(String date){
+        String [] parts = date.split("-");
+        return String.format("%s/%s/%s", parts[1], parts[2], parts[0]);
+        }
 
 }

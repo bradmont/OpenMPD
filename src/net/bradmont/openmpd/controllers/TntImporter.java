@@ -2,57 +2,21 @@ package net.bradmont.openmpd.controllers;
 
 import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.helpers.TextTools;
 import net.bradmont.supergreen.models.ModelList;
-
-import org.apache.http.*;
-import org.apache.http.auth.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.client.entity.*;
-import org.apache.http.message.*;
-import org.apache.http.conn.HttpHostConnectException;
-import org.apache.http.impl.conn.SingleClientConnManager;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import javax.net.ssl.TrustManager;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ClientConnectionManager;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateException;
 import java.lang.StackTraceElement;
 import java.lang.Thread;
-import java.io.IOException;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.protocol.HTTP;
-
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -68,9 +32,7 @@ import java.lang.Runnable;
 import java.lang.RuntimeException;
 import java.lang.Thread;
 
-import java.net.URL;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -79,15 +41,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.BufferedReader;
 
 import net.bradmont.openmpd.activities.ImportActivity;
 
-import org.ini4j.Ini;
 
 /** Controller to connect to and import data from TntDataServer instances.
   *
@@ -107,28 +63,27 @@ public class TntImporter {
     private int progress = 0;
     private int progressmax=0;
     private static int notification_id=ContactsEvaluator.NOTIFICATION_ID;
-    private static String EPOCH_DATE="01/01/1970";
 
     public TntImporter(Context context, ServiceAccount account){
         this.context = context;
         this.mAccount = account;
-        service = (TntService) mAccount.getRelated("tnt_service_id");
+        service = mAccount.getTntService();
     }
     public TntImporter(Context context, ServiceAccount account, ProgressBar progressbar){
         this.context = context;
         this.mAccount = account;
-        service = (TntService) account.getRelated("tnt_service_id");
+        service = account.getTntService();
         this.progressbar = progressbar;
     }
 
     public TntImporter(Context context, ServiceAccount account, NotificationCompat.Builder builder){
         this.context = context;
         this.mAccount = account;
-        service = (TntService) account.getRelated("tnt_service_id");
+        service = account.getTntService();
         this.builder = builder;
         notifyManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        //notification_id = account.getID();
+        //notification_id = account.getId();
 
     }
 
@@ -149,11 +104,16 @@ public class TntImporter {
             // but it does the job.
         } catch(Exception ex) { }
 
-        ImportActivity.setProgress(mAccount.getID(), progressmax, progress, true);
+        ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, true);
 
         // upgrade from legacy tnt_service to using query.ini properly
         if (service.getUsernameKey() == null || service.getUsernameKey().length() < 2){
-            service.processQueryIni();
+            try {
+                service.processQueryIni();
+            } catch (TntService.ServerException e){
+                Log.i("net.bradmont.openmpd", "ServerException from getAddresses()", e);
+                return false;
+            }
         }
 
         if (builder != null){
@@ -171,11 +131,11 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
-        ImportActivity.setProgress(mAccount.getID(), progressmax, progress, false);
+        ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
         if (getGifts() == false){
             return false;
         }
-        mAccount.setLastImport(getTodaysDate());
+        mAccount.setLastImport(Calendar.getInstance().getTime());
         OpenMPD.getDaoSession().getServiceAccountDao().update(mAccount);
         return true;
     }
@@ -190,10 +150,16 @@ public class TntImporter {
             builder.setProgress(2, 3, true);
             notifyManager.notify(notification_id, builder.build());
         }
-        ImportActivity.setProgress(mAccount.getId(), 2, 3, true);
-        ImportActivity.setStatus(mAccount.getId(), R.string.importing_contacts);
+        ImportActivity.setProgress(mAccount.getId().intValue(), 2, 3, true);
+        ImportActivity.setStatus(mAccount.getId().intValue(), R.string.importing_contacts);
 
-        ArrayList<String> content = mAccount.getAddresses();
+        ArrayList<String> content = null;
+        try {
+            content = mAccount.getAddresses();
+        } catch (TntService.ServerException e){
+            Log.i("net.bradmont.openmpd", "ServerException from getAddresses()", e);
+            return false;
+        }
         if (content == null){
             return false;
         }
@@ -216,16 +182,21 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
-        ImportActivity.setProgress(mAccount.getId(), progressmax, progress, false);
-        Arraylist<Contact> contacts = new Arraylist<Contact>();
+        ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
+        ArrayList<Contact> contacts = new ArrayList<Contact>();
         for(String s:content){
             //Log.i(Config.PACKAGE, s);
             progress++;
             try{
                 Contact c = parseAddressLine(headers, s);
-                contacts.add(c);
+                if (c != null){
+                    contacts.add(c);
+                }
+                // TODO: we're transactionising Contacts, but not ContactDetails
             } catch (Exception e){
-                LogItem.logError(header_line, s, e);
+                //LogItem.logError(header_line, s, e);
+                Log.i("net.bradmont.openmpd", header_line+" "+ s, e);
+                // TODO: log errors
             }
             if (progressbar != null){
                 progressbar.incrementProgressBy(1);
@@ -238,7 +209,7 @@ public class TntImporter {
                     contacts.clear();
                 }
             }
-            ImportActivity.setProgress(mAccount.getID(), progressmax, progress, false);
+            ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
         }
         OpenMPD.getDaoSession().getContactDao().insertOrReplaceInTx(contacts, false);
 
@@ -251,7 +222,7 @@ public class TntImporter {
      */
     public HashMap<String, Long> MakeContactIdHash(){
         HashMap<String, Long> ids = new HashMap<String, Long>();
-        Cursor cur = OpenMPD.getDB.rawQuery("select _id, tnt_people_id from contact");
+        Cursor cur = OpenMPD.getDB().rawQuery("select _id, tnt_people_id from contact", null);
         cur.moveToFirst();
         while (!cur.isAfterLast()){
             ids.put(cur.getString(1), cur.getLong(0));
@@ -266,10 +237,16 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, true);
             notifyManager.notify(notification_id, builder.build());
         }
-        ImportActivity.setProgress(mAccount.getID(), progressmax, progress, true);
-        ImportActivity.setStatus(mAccount.getID(), R.string.importing_gifts);
+        ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, true);
+        ImportActivity.setStatus(mAccount.getId().intValue(), R.string.importing_gifts);
 
-        ArrayList<String> content = mAccount.getGifts();
+        ArrayList<String> content = null;
+        try {
+            content = mAccount.getGifts();
+        } catch (TntService.ServerException e){
+            Log.i("net.bradmont.openmpd", "ServerException from ServiceAccount.getGifts()", e);
+            return false;
+        }
 
         if (content == null){
             return false;
@@ -293,14 +270,17 @@ public class TntImporter {
             builder.setProgress(progressmax, progress, false);
             notifyManager.notify(notification_id, builder.build());
         }
-        ImportActivity.setProgress(mAccount.getID(), progressmax, progress, false);
+        ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
         ArrayList<Gift> gifts = new ArrayList<Gift>();
         for(String s:content){
             try {
                 Gift gift = parseGiftLine(headers, s);
-                gifts.add(gift);
+                if (gift != null){
+                    gifts.add(gift);
+                }
             } catch (Exception e){
-                LogItem.logError(header_line, s, e);
+                //LogItem.logError(header_line, s, e);
+                Log.i("net.bradmont.openmpd", header_line + " " + s, e);
             }
             if (progressbar != null){
                 progressbar.incrementProgressBy(1);
@@ -309,7 +289,7 @@ public class TntImporter {
                 builder.setProgress(progressmax, ++progress, false);
                 notifyManager.notify(notification_id, builder.build());
             }
-            ImportActivity.setProgress(mAccount.getID(), progressmax, progress, false);
+            ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
             if (progress % 1000 == 0){
                 OpenMPD.getDaoSession().getGiftDao().insertOrReplaceInTx(gifts);
                 gifts.clear();
@@ -317,12 +297,12 @@ public class TntImporter {
         }
         OpenMPD.getDaoSession().getGiftDao().insertOrReplaceInTx(gifts);
         gifts.clear();
-        ImportActivity.setStatus(mAccount.getID(), R.string.done);
+        ImportActivity.setStatus(mAccount.getId().intValue(), R.string.done);
         return true;
     }
 
     public Gift parseGiftLine(String [] headers, String line){
-        String [] values = csvLineSplit(line);
+        String [] values = TextTools.csvLineSplit(line);
         for (int i=0; i < headers.length; i++){
             mDataHash.put(headers[i], values[i]);
             //Log.i("net.bradmont.openmpd", "" + headers[i] + ":'" + values[i]+"'");
@@ -334,7 +314,7 @@ public class TntImporter {
             .where(GiftDao.Properties.TntDonationId.eq(mDataHash.get("DONATION_ID")))
                     .list();
         if (gifts.size() != 0){
-            return;
+            return null;
         }
 
         Gift gift = new Gift();
@@ -349,18 +329,18 @@ public class TntImporter {
             Integer.parseInt(dateParts[0]));
 
 
-        gift.setContact(mContactIdByTntId.get (mDataHash.get("PEOPLE_ID") ) );
+        gift.setContactId(mContactIdByTntId.get (mDataHash.get("PEOPLE_ID") ) );
         gift.setDate(date);
         gift.setMonth(month);
-        gift.setAmount(mDataHash.get("AMOUNT"));
+        gift.setAmount(Long.parseLong(mDataHash.get("AMOUNT")));
         gift.setMotivationCode(mDataHash.get("MOTIVATION"));
         //gift.setValue("account", mDataHash.get("DESIGNATION"));
         gift.setTntDonationId(mDataHash.get("DONATION_ID"));
         return gift;
     }
 
-    public void parseAddressLine(String [] headers, String line){
-        String [] values = csvLineSplit(line);
+    public Contact parseAddressLine(String [] headers, String line){
+        String [] values = TextTools.csvLineSplit(line);
 
         for (int i=0; i < headers.length; i++){
             if (headers[i].equals("PEOPLE_ID")){
@@ -372,17 +352,16 @@ public class TntImporter {
 
         // Retrieve existing contact or create a new one
         ContactDao contactDao = OpenMPD.getDaoSession().getContactDao();
-        List<net.bradmont.openmpd.dao.Contact> contacts = contactDao.queryBuilder()
+        List<Contact> contacts = contactDao.queryBuilder()
             .where(ContactDao.Properties.TntPeopleId.eq(mDataHash.get("PEOPLE_ID")))
-            .where(ContactDao.Properties.SubId.eq("0"))
             .list();
-        net.bradmont.openmpd.dao.Contact contact;
+        Contact contact;
         boolean newContact = false;
         if (contacts.size() != 0){
             contact = contacts.get(0);
         } else {
             contact = new Contact();
-            new_contact = true;
+            newContact = true;
         }
         contact.setTntPeopleId(mDataHash.get("PEOPLE_ID")); 
         contact.setTntAccountName(mDataHash.get("ACCT_NAME"));
@@ -418,7 +397,7 @@ public class TntImporter {
             Person spouse = contact.getTntSpouse();
             boolean newSpouse = false;
             if (spouse == null){
-                spouse = new Spouse();
+                spouse = new Person();
                 newSpouse = true;
             }
 
@@ -444,24 +423,27 @@ public class TntImporter {
 
 
         address.setContact(contact);
-        address(getTodaysDate());
-        address.setAddedDate(mDataHash.get("ADDR_CHANGED");
+        address.setAddedDate(TextTools.mkDate(mDataHash.get("ADDR_CHANGED")));
         address.setFromTnt(true);
         address.setLabel(mAccount.getTntService().getName());
-        address.setOperational(address.setValue("deliverable", mDataHash.get("ADDR_DELIVERABLE")));
+        //address.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
 
         JSONObject addressData = new JSONObject();
-        addressData.put("addr1", mDataHash.get("ADDR1"));
-        addressData.put("addr2", mDataHash.get("ADDR2"));
-        addressData.put("addr3", mDataHash.get("ADDR3"));
-        addressData.put("addr4", mDataHash.get("ADDR4"));
-        addressData.put("city", mDataHash.get("CITY"));
-        addressData.put("region", mDataHash.get("STATE"));
-        addressData.put("post_code", mDataHash.get("ZIP"));
-        addressData.put("country_short", mDataHash.get("COUNTRY"));
-        addressData.put("country_long", mDataHash.get("COUNTRY_DESCR"));
-        addressData.put("valid_from", mDataHash.get("ADDR_CHANGED"));
-        address.setData(addressData.toString());
+        try {
+            addressData.put("addr1", mDataHash.get("ADDR1"));
+            addressData.put("addr2", mDataHash.get("ADDR2"));
+            addressData.put("addr3", mDataHash.get("ADDR3"));
+            addressData.put("addr4", mDataHash.get("ADDR4"));
+            addressData.put("city", mDataHash.get("CITY"));
+            addressData.put("region", mDataHash.get("STATE"));
+            addressData.put("post_code", mDataHash.get("ZIP"));
+            addressData.put("country_short", mDataHash.get("COUNTRY"));
+            addressData.put("country_long", mDataHash.get("COUNTRY_DESCR"));
+            addressData.put("valid_from", mDataHash.get("ADDR_CHANGED"));
+            address.setData(addressData.toString());
+        } catch (JSONException e){
+            Log.i("net.bradmont.openmpd", "JSONException", e);
+        }
         try {
             address.update();
         } catch (Exception e){
@@ -470,13 +452,16 @@ public class TntImporter {
 
         phone.setFromTnt(true);
         phone.setContact(contact);
-        phone.setAddedDate(getTodaysDate());
-        phone.setAddedDate(mDataHash.get("PHONE_CHANGED");
+        phone.setAddedDate(TextTools.mkDate(mDataHash.get("PHONE_CHANGED")));
         phone.setLabel(mAccount.getTntService().getName());
-        phone.setOperational(address.setValue("deliverable", mDataHash.get("ADDR_DELIVERABLE")));
+        // phone.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
         
         JSONObject phoneData = new JSONObject();
-        phoneData.put("number", mDataHash.get("PHONE"));
+        try {
+            phoneData.put("number", mDataHash.get("PHONE"));
+        } catch (JSONException e){
+            Log.i("net.bradmont.openmpd", "JSONException", e);
+        }
         phone.setData(phoneData.toString());
         try {
             phone.update();
@@ -487,12 +472,16 @@ public class TntImporter {
 
         email.setFromTnt(true);
         email.setContact(contact);
-        email.setAddedDate(mDataHash.get("EMAIL_CHANGED");
+        email.setAddedDate(TextTools.mkDate(mDataHash.get("EMAIL_CHANGED")));
         email.setLabel(mAccount.getTntService().getName());
-        email.setOperational(address.setValue("deliverable", mDataHash.get("ADDR_DELIVERABLE")));
+        //email.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
         
         JSONObject emailData = new JSONObject();
-        emailData.put("number", mDataHash.get("EMAIL"));
+        try{
+            emailData.put("number", mDataHash.get("EMAIL"));
+        } catch (JSONException e){
+            Log.i("net.bradmont.openmpd", "JSONException", e);
+        }
         email.setData(phoneData.toString());
         try {
             phone.update();
@@ -500,37 +489,8 @@ public class TntImporter {
             OpenMPD.getDaoSession().getContactDetailDao().insert(phone);
         }
 
+        return contact;
     }
 
-    /**  Split a line of CSV data into a string array
-      *
-      */
-    public static String [] csvLineSplit(String line){
-        Vector<String> result = new Vector<String>();
-        StringBuffer element = new StringBuffer();
-
-        if (line==null){ return null;}
-
-        boolean inQuotes=false;
-        for (int i=0; i < line.length(); i++){
-            char ch = line.charAt(i);
-            if (ch == ','){
-                if (inQuotes){
-                    element.append(ch);
-                } else {
-                    result.add(element.toString());
-                    element = new StringBuffer();
-                }
-            } else if (ch == '\"'){
-                inQuotes = inQuotes?false:true;
-            } else {
-                element.append(ch);
-            }
-        }
-        result.add(element.toString());
-        String [] return_value = new String[result.size()];
-        return_value = result.toArray(return_value);
-        return return_value;
-    }
 
 }
