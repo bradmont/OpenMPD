@@ -311,52 +311,34 @@ public class Contact {
      * Retrieve phone number created from TNT import, or new
      */
     public ContactDetail getTntPhoneOrNew(){
-        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
-        qb.and(ContactDetailDao.Properties.ContactId.eq(getId()),
-               ContactDetailDao.Properties.Type.eq("phone"),
-               ContactDetailDao.Properties.FromTnt.eq(true)
-                );
-        List<ContactDetail> results = qb.list();
-        if (results.size() > 0){
-            return results.get(0);
-        }
-        ContactDetail n = new ContactDetail();
-        n.setType("phone");
-        return n;
+        return _getTntDetailOrNew("phone");
     }
     /**
      * Retrieve phone number email from TNT import, or new
      */
     public ContactDetail getTntEmailOrNew(){
-        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
-        qb.and(ContactDetailDao.Properties.ContactId.eq(getId()),
-               ContactDetailDao.Properties.Type.eq("email"),
-               ContactDetailDao.Properties.FromTnt.eq(true)
-                );
-        List<ContactDetail> results = qb.list();
-        if (results.size() > 0){
-            return results.get(0);
-        }
-        ContactDetail n = new ContactDetail();
-        n.setType("email");
-        return n;
+        return _getTntDetailOrNew("email");
     }
     /**
      * Retrieve phone number address from TNT import, or new
      */
     public ContactDetail getTntAddressOrNew(){
-        QueryBuilder qb = OpenMPD.getDaoSession().getContactDetailDao().queryBuilder();
-        qb.and(ContactDetailDao.Properties.ContactId.eq(getId()),
-               ContactDetailDao.Properties.Type.eq("address"),
-               ContactDetailDao.Properties.FromTnt.eq(true)
-                );
-        List<ContactDetail> results = qb.list();
-        if (results.size() > 0){
-            return results.get(0);
-        }
+        return _getTntDetailOrNew("address");
+    }
+
+    private ContactDetail _getTntDetailOrNew(String type){
+        try {
+            for (ContactDetail d : getDetails()){
+                if (d.getFromTnt() && d.getType() == type){
+                    return d;
+                }
+            }
+        } catch (Exception e){}
+
         ContactDetail n = new ContactDetail();
-        n.setType("address");
+        n.setType(type);
         return n;
+
     }
     // KEEP METHODS END
 

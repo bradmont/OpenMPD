@@ -55,8 +55,8 @@ public class TntImporter {
     private NotificationManager notifyManager = null;
     private Context context;
     private HashMap<String, String> mDataHash ;
-    private HashMap<String, Long> mContactIdByTntId ;
         // Initialize this HashMap only once to save time
+    private HashMap<String, Contact> mContactByTntId = new HashMap<String, Contact>();
 
     private ServiceAccount mAccount;
     private TntService service = null;
@@ -123,7 +123,7 @@ public class TntImporter {
         if (getContacts() == false){
             return false;
         }
-        mContactIdByTntId = MakeContactIdHash();
+        
         if (progressbar != null){
             progressbar.setIndeterminate(false);
         }
@@ -332,7 +332,7 @@ public class TntImporter {
             Integer.parseInt(dateParts[0]));
 
 
-        gift.setContactId(mContactIdByTntId.get (mDataHash.get("PEOPLE_ID") ) );
+        gift.setContact(mContactByTntId.get(mDataHash.get("PEOPLE_ID") ) );
         gift.setDate(date);
         gift.setMonth(month);
         gift.setAmount(Long.parseLong(mDataHash.get("AMOUNT").replace(".", "")));
@@ -346,11 +346,7 @@ public class TntImporter {
         String [] values = TextTools.csvLineSplit(line);
 
         for (int i=0; i < headers.length; i++){
-            if (headers[i].equals("PEOPLE_ID")){
-                mDataHash.put(headers[i], values[i] + mAccount.getName());
-            } else {
-                mDataHash.put(headers[i], values[i]);
-            }
+            mDataHash.put(headers[i], values[i]);
         }
 
         // Retrieve existing contact or create a new one
@@ -366,9 +362,10 @@ public class TntImporter {
             contact = new Contact();
             newContact = true;
         }
-        contact.setTntPeopleId(mDataHash.get("PEOPLE_ID")); 
+        contact.setTntPeopleId(mDataHash.get("PEOPLE_ID") + ":" + mAccount.getName()); 
         contact.setTntAccountName(mDataHash.get("ACCT_NAME"));
         contact.setTntPersonType(mDataHash.get("PERSON_TYPE"));
+        mContactByTntId.put(mDataHash.get("PEOPLE_ID"), contact);
 
         // retrieve or create the primary Person for this contact
         Person person = contact.getPrimaryPerson();
@@ -445,10 +442,10 @@ public class TntImporter {
         } catch (JSONException e){
             Log.i("net.bradmont.openmpd", "JSONException", e);
         }
-        try {
-            address.update();
-        } catch (Exception e){
+        if (newContact){
             OpenMPD.getDaoSession().getContactDetailDao().insert(address);
+        } else {
+            address.update();
         }
 
         phone.setFromTnt(true);
@@ -464,9 +461,9 @@ public class TntImporter {
             Log.i("net.bradmont.openmpd", "JSONException", e);
         }
         phone.setData(phoneData.toString());
-        try {
+        if(!newContact) {
             phone.update();
-        } catch (Exception e){
+        } else {
             OpenMPD.getDaoSession().getContactDetailDao().insert(phone);
         }
 
@@ -479,15 +476,15 @@ public class TntImporter {
         
         JSONObject emailData = new JSONObject();
         try{
-            emailData.put("number", mDataHash.get("EMAIL"));
+            emailData.put("email", mDataHash.get("EMAIL"));
         } catch (JSONException e){
             Log.i("net.bradmont.openmpd", "JSONException", e);
         }
-        email.setData(phoneData.toString());
-        try {
-            phone.update();
-        } catch (Exception e){
-            OpenMPD.getDaoSession().getContactDetailDao().insert(phone);
+        email.setData(emailData.toString());
+        if (!newContact) {
+            email.update();
+        } else {
+            OpenMPD.getDaoSession().getContactDetailDao().insert(email);
         }
 
         return contact;
