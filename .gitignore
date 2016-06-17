@@ -32,6 +32,6 @@ logcat_package
 screenshots
 
 # pulled DBs
-supergreen.*
+*.sqlite
 
 devel_info

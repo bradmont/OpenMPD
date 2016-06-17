@@ -1,0 +1,2 @@
+adb -d shell "run-as net.bradmont.openmpdv2 cp databases/openmpd.sqlite /sdcard/Download"
+adb pull /sdcard/Download/openmpd.sqlite
