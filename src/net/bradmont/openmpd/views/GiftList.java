@@ -21,7 +21,7 @@ import android.widget.*;
 import java.lang.Runnable;
 
 public class GiftList extends ListFragment {
-    public static final String [] columns = {"fname", "lname", "date", "amount"};
+    public static final String [] columns = {"FNAME", "LNAME", "DATE", "AMOUNT"};
     public static final int [] fields = {R.id.fname, R.id.lname, R.id.date, R.id.amount};
 
     private Cursor cursor = null;

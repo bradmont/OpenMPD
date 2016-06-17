@@ -54,7 +54,7 @@ public class NotificationsFragment extends ListFragment{
     // and not (contact_status = "5" and message="4") weeds out notification change from "new" to "current"
 
 
-    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "spouse_fname", "date", "type"};
+    private static final String [] columns = { "LNAME", "GIVING_AMOUNT", "TYPE", "FNAME", "FNAME", "SPOUSE_FNAME", "DATE", "TYPE"};
     private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon_left, R.id.user_icon_right, R.id.date, R.id.quickactions};
     private static int[] icon_colors = null;
 

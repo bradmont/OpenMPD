@@ -47,7 +47,7 @@ import java.util.List;
 
 public class DebugFragment extends Fragment implements OnClickListener{
 
-    public static final String [] columns = {"timestamp", "msg1", "msg2", "msg3"};
+    public static final String [] columns = {"TIMESTAMP", "MSG1", "MSG2", "MSG3"};
     public static final int [] fields = {R.id.timestamp, R.id.msg1, R.id.msg2, R.id.msg3};
 
     private Cursor cursor = null;

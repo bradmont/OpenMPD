@@ -44,7 +44,7 @@ import android.widget.SearchView;
 import java.lang.Runnable;
 
 public class ContactListFragment extends ListFragment {
-    public static final String [] columns = {"fname", "partner_type", "giving_amount", "last_gift", "fname", "fname", "s_fname", "partner_type"};
+    public static final String [] columns = {"FNAME", "PARTNER_TYPE", "GIVING_AMOUNT", "LAST_GIFT", "FNAME", "FNAME", "S_FNAME", "PARTNER_TYPE"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
     private Cursor cursor = null;
