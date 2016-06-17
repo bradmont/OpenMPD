@@ -25,28 +25,12 @@ organisations.
 ### Current Status:
 - **Version 1.1 is released!** You can [download OpenMPD on Google Play](https://play.google.com/store/apps/details?id=net.bradmont.openmpd).
 
-As it stands, OpenMPD is fully functional as an MPM tool. We may eventually add more MPD features, but there is some significant refactoring to do beforehand, such as:
+As it stands, OpenMPD is fully functional as an MPM tool. I've got some neat plans for version 2, but right now I'm doing some significant refactoring before starting on them. I'm currently replacing the old home-grown ORM backend with GreenDao, so expect significant breakage on this branch (the v1.1 branch still runs fine).
+
+My refactoring goals before starting any new features are:
 - [ ] Switching to a better (not homebrewed) DAO library
 - [ ] Using Bayesing matching for partner evaluation
 
-Below, you can see some of the ideas we have had for future development. If you'd like to lend a hand, please get in touch!
-
-### Milestone 2 Goals
-- [ ] **"MPM/Partner communications" release**
-- [ ] Manage, track regular contact with regular partners
-- [ ] Integration with MailChimp, etc to evaluate partner engagement
-- [ ] Social network integration
-    
-
-### Milestone 3 Goals
-- [ ] **MPD release**
-- [ ] Namestorming features
-- [ ] Appointment scheduling
-- [ ] Followup scheduling/automation
-- [ ] Web beacon support for emails
-
-### Other development goals
-- [ ] Networked Use, to coordinate couples or groups developing support together
 
 Get Involved
 ------------
