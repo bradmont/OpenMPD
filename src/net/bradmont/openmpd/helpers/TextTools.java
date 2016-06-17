@@ -123,6 +123,14 @@ public class TextTools{
     public static String stupidDateFormat(String date){
         String [] parts = date.split("-");
         return String.format("%s/%s/%s", parts[1], parts[2], parts[0]);
-        }
+    }
+
+    /** Takes an MM/DD/YYYY date (from TntDataServer) and returns an 
+     * ISO 8601 date string and converts it to a MM/DD/YYYY string.
+     */
+    public static String fixDate(String date){
+        String [] parts = date.split("/");
+        return String.format("%s-%s-%s", parts[2], parts[0], parts[1]);
+    }
 
 }
