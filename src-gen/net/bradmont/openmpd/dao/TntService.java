@@ -384,6 +384,9 @@ public class TntService {
             return processQueryIni();
         }
 
+        if (org.containsKey("Name")){
+            setName(org.get("Name"));
+        }
         if (org.containsKey("Code")){
             setNameShort(org.get("Code"));
         }
@@ -415,6 +418,11 @@ public class TntService {
 
         setBalanceUrl(balance.get("Url"));
         setBalanceFormdata(balance.get("Post"));
+        try {
+            setDomain(new URL(getBalanceUrl()).getHost());
+        } catch (Exception e){
+            // if URL is malformed, account won't authenticate anyway
+        }
 
         setDonationsUrl(donations.get("Url"));
         setDonationsFormdata(donations.get("Post"));

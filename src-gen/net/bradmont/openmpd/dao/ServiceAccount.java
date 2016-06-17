@@ -193,7 +193,7 @@
         /**
          * Check if the account is valid
          */
-        public boolean verifyAccount(){
+        public boolean verify(){
             try {
                 getBalance();
             } catch (TntService.ServerException e){

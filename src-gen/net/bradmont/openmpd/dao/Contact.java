@@ -9,6 +9,7 @@ import de.greenrobot.dao.DaoException;
 // KEEP INCLUDES - put your custom includes here
 import net.bradmont.openmpd.*;
 import de.greenrobot.dao.query.QueryBuilder;
+import android.util.Log;
 // KEEP INCLUDES END
 /**
  * Entity mapped to table "CONTACT".
@@ -270,13 +271,18 @@ public class Contact {
      * Get the primary Person associatded with this Contact.
      */
     public Person getPrimaryPerson(){
-        QueryBuilder qb = OpenMPD.getDaoSession().getPersonDao().queryBuilder();
-        qb.and(PersonDao.Properties.ContactId.eq(getId()),
-               PersonDao.Properties.IsContactPrimary.eq(true)
-                );
-        List<Person> results = qb.list();
-        if (results.size() > 0){
-            return results.get(0);
+        try {
+            List people = getPeople();
+        } catch (Exception e){
+            return null;
+        }
+        if (getPeople() == null){
+            return null;
+        }
+        for (Person p: people){
+            if (p.getIsContactPrimary()){
+                return p;
+            }
         }
         return null;
     }
@@ -285,13 +291,18 @@ public class Contact {
      * Get the TNT spouse Person associated with this Contact
      */
     public Person getTntSpouse(){
-        QueryBuilder qb = OpenMPD.getDaoSession().getPersonDao().queryBuilder();
-        qb.and(PersonDao.Properties.ContactId.eq(getId()),
-               PersonDao.Properties.IsTntSpouse.eq(true)
-                );
-        List<Person> results = qb.list();
-        if (results.size() > 0){
-            return results.get(0);
+        try {
+            List people = getPeople();
+        } catch (Exception e){
+            return null;
+        }
+        if (getPeople() == null){
+            return null;
+        }
+        for (Person p: people){
+            if (p.getIsTntSpouse()){
+                return p;
+            }
         }
         return null;
     }

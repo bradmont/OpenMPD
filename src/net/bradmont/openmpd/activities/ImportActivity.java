@@ -58,7 +58,7 @@ public class ImportActivity extends Activity {
 
         mAccountList = (NoScrollListView) findViewById(R.id.account_list);
         Cursor cursor = OpenMPD.getDB().rawQuery(ACCOUNT_QUERY, null);
-        String [] columns = {"name", "username", "balance_url"};
+        String [] columns = {"NAME", "USERNAME", "BALANCE_URL"};
         int [] fields = {R.id.name, R.id.username, R.id.url};
 
         mAdapter = new SimpleCursorAdapter(this,

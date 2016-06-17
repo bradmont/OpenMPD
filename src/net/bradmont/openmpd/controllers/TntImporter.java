@@ -213,6 +213,7 @@ public class TntImporter {
         }
         OpenMPD.getDaoSession().getContactDao().insertOrReplaceInTx(contacts, false);
 
+        Log.i("net.bradmont.openMPD", "finished importing contacts.");
         return true;
     }
 
@@ -226,11 +227,13 @@ public class TntImporter {
         cur.moveToFirst();
         while (!cur.isAfterLast()){
             ids.put(cur.getString(1), cur.getLong(0));
+            cur.moveToNext();
         }
         return ids;
     }
 
     public boolean getGifts(){
+        Log.i("net.bradmont.openMPD", "beginning getGifts");
 
         if (builder != null){
             builder.setContentTitle("Importing Gifts");
@@ -332,7 +335,7 @@ public class TntImporter {
         gift.setContactId(mContactIdByTntId.get (mDataHash.get("PEOPLE_ID") ) );
         gift.setDate(date);
         gift.setMonth(month);
-        gift.setAmount(Long.parseLong(mDataHash.get("AMOUNT")));
+        gift.setAmount(Long.parseLong(mDataHash.get("AMOUNT").replace(".", "")));
         gift.setMotivationCode(mDataHash.get("MOTIVATION"));
         //gift.setValue("account", mDataHash.get("DESIGNATION"));
         gift.setTntDonationId(mDataHash.get("DONATION_ID"));
@@ -372,7 +375,6 @@ public class TntImporter {
         if (person == null) {
             person = new Person();
         }
-        person.setContact(contact);
         person.setLname(mDataHash.get("LAST_NAME_ORG"));
         person.setFname(mDataHash.get("FIRST_NAME"));
         person.setMname(mDataHash.get("MIDDLE_NAME"));
@@ -381,14 +383,13 @@ public class TntImporter {
         person.setIsContactPrimary(true);
         person.setIsTntSpouse(false);
 
-        if (person.getFname() != "" || person.getLname() != ""){
-            if (newContact){
-                OpenMPD.getDaoSession().getContactDao().insert(contact);
-                OpenMPD.getDaoSession().getPersonDao().insert(person);
-            } else {
-                OpenMPD.getDaoSession().getContactDao().update(contact);
-                OpenMPD.getDaoSession().getPersonDao().update(person);
-            }
+        if (newContact){
+            OpenMPD.getDaoSession().getContactDao().insert(contact);
+            person.setContact(contact);
+            OpenMPD.getDaoSession().getPersonDao().insert(person);
+        } else {
+            OpenMPD.getDaoSession().getContactDao().update(contact);
+            OpenMPD.getDaoSession().getPersonDao().update(person);
         }
 
         // if the record includes a spouse
@@ -396,7 +397,7 @@ public class TntImporter {
             // create or retrieve spouse
             Person spouse = contact.getTntSpouse();
             boolean newSpouse = false;
-            if (spouse == null){
+            if (spouse == null || newContact){
                 spouse = new Person();
                 newSpouse = true;
             }
@@ -423,10 +424,10 @@ public class TntImporter {
 
 
         address.setContact(contact);
-        address.setAddedDate(TextTools.mkDate(mDataHash.get("ADDR_CHANGED")));
+        address.setAddedDate(TextTools.mkDate(TextTools.fixDate(mDataHash.get("ADDR_CHANGED"))));
         address.setFromTnt(true);
         address.setLabel(mAccount.getTntService().getName());
-        //address.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
+        address.setOperational(mDataHash.get("ADDR_DELIVERABLE").equals("TRUE"));
 
         JSONObject addressData = new JSONObject();
         try {
@@ -452,9 +453,9 @@ public class TntImporter {
 
         phone.setFromTnt(true);
         phone.setContact(contact);
-        phone.setAddedDate(TextTools.mkDate(mDataHash.get("PHONE_CHANGED")));
+        phone.setAddedDate(TextTools.mkDate(TextTools.fixDate(mDataHash.get("PHONE_CHANGED"))));
         phone.setLabel(mAccount.getTntService().getName());
-        // phone.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
+         phone.setOperational(mDataHash.get("ADDR_DELIVERABLE").equals("TRUE"));
         
         JSONObject phoneData = new JSONObject();
         try {
@@ -472,9 +473,9 @@ public class TntImporter {
 
         email.setFromTnt(true);
         email.setContact(contact);
-        email.setAddedDate(TextTools.mkDate(mDataHash.get("EMAIL_CHANGED")));
+        email.setAddedDate(TextTools.mkDate(TextTools.fixDate(mDataHash.get("EMAIL_CHANGED"))));
         email.setLabel(mAccount.getTntService().getName());
-        //email.setOperational(mDataHash.get("ADDR_DELIVERABLE"));
+        email.setOperational(mDataHash.get("ADDR_DELIVERABLE").equals("TRUE"));
         
         JSONObject emailData = new JSONObject();
         try{

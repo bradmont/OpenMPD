@@ -1,5 +1,6 @@
 package net.bradmont.openmpd.models;
 import net.bradmont.openmpd.*;
+import net.bradmont.openmpd.helpers.*;
 import net.bradmont.openmpd.controllers.TntImporter;
 
 import net.bradmont.supergreen.*;
@@ -177,7 +178,7 @@ public class Contact extends DBModel{
         int partner = evaluate(giftPattern, cs);
         cs.setValue("partner_type", partner);
         if (cs.getString("manual_set_expires") == null ||
-            cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0){
+            cs.getString("manual_set_expires").compareTo(TextTools.getToday()) < 0){
             // if user has manually set ContactStatus, and it hasn't
             // expired, we won't save our evaluated one. We'll still
             // notify against it, though.
@@ -185,12 +186,12 @@ public class Contact extends DBModel{
         }
 
         // check if we've already made a notification for this partner's last gift
-        generateNotification(oldStatus, cs, lastGift, TntImporter.getTodaysDate());
+        generateNotification(oldStatus, cs, lastGift, TextTools.getToday());
 
         if (oldStatus == null || !lastGift.equals(oldStatus.getString("last_notify"))){
             if (oldStatus == null || 
             (cs.getString("manual_set_expires") == null ||
-             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) ){
+             cs.getString("manual_set_expires").compareTo(TextTools.getToday()) < 0) ){
                 // make sure we're not overwriting manually set statuses
                 cs.setValue("last_notify", lastGift);
                 cs.dirtySave();
@@ -242,7 +243,7 @@ public class Contact extends DBModel{
             if (cs.getInt("partner_type") != ContactStatus.PARTNER_OCCASIONAL){
                 // if they changed to a different type (except one-time to occasional)
                 if (cs.getString("manual_set_expires") == null ||
-                 cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
+                 cs.getString("manual_set_expires").compareTo(TextTools.getToday()) < 0) {
                     // don't give notifications for manually set statuses
                     note.setValue("type", Notification.CHANGE_PARTNER_TYPE);
                     note.setValue("message", Integer.toString(oldStatus.getInt("partner_type")));
@@ -261,7 +262,7 @@ public class Contact extends DBModel{
                 && cs.getInt("giving_amount") != 0){
                 // change giving amount for monthly, regular or annual partner
             if (cs.getString("manual_set_expires") == null ||
-             cs.getString("manual_set_expires").compareTo(TntImporter.getTodaysDate()) < 0) {
+             cs.getString("manual_set_expires").compareTo(TextTools.getToday()) < 0) {
                     // don't give notifications for manually set statuses
                 note.setValue("type", Notification.CHANGE_AMOUNT);
                 note.setValue("message", Integer.toString(oldStatus.getInt("giving_amount")));

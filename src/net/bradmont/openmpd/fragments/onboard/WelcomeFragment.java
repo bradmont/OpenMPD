@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -38,7 +39,7 @@ import android.widget.ViewFlipper;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
-import net.bradmont.openmpd.helpers.Log;
+import net.bradmont.openmpd.helpers.TextTools;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -59,7 +60,7 @@ import net.bradmont.openmpd.views.HelpDialog;
 import net.bradmont.openmpd.helpers.Analytics;
 import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.views.*;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.AccountVerifyService;
 
@@ -158,7 +159,7 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
             service_names = new String[service_defs.length];
             service_urls = new String[service_defs.length];
             for (int i = 0; i < service_defs.length; i++){
-                String [] parts = TntImporter.csvLineSplit(service_defs[i]);
+                String [] parts = TextTools.csvLineSplit(service_defs[i]);
                 service_names[i] = parts[0];
                 service_urls[i] = parts[1];
             }
@@ -168,8 +169,8 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
 
         mAccountList = (NoScrollListView) view.findViewById(R.id.account_list);
         // populate account list
-        Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery(ACCOUNT_QUERY, null);
-        String [] columns = {"name", "username", "balance_url"};
+        Cursor cursor = OpenMPD.getDB().rawQuery(ACCOUNT_QUERY, null);
+        String [] columns = {"NAME", "USERNAME", "BALANCE_URL"};
         int [] fields = {R.id.name, R.id.username, R.id.url};
 
         mAdapter = new SimpleCursorAdapter(getActivity(),
@@ -229,9 +230,9 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
         ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(true);
         final ServiceAccount account = new ServiceAccount();
         // get values from form fields
-        account.setValue("username",
+        account.setUsername(
             ((EditText) getView().findViewById(R.id.username)).getText().toString());
-        account.setValue("password",
+        account.setPassword(
             ((EditText) getView().findViewById(R.id.password)).getText().toString());
         // get selected service
         mSelectedService = mPicker.getCurrent();
@@ -239,21 +240,21 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
         // if service not already in DB
         if (getServiceid(service_names[mSelectedService]) == -1){
             TntService service = new TntService();
-            service.setValue("name", service_names[mSelectedService]);
-            service.setValue("query_ini_url", service_urls[mSelectedService]);
-            service.dirtySave();
-            account.setValue("tnt_service_id", service.getID());
+            service.setName(service_names[mSelectedService]);
+            service.setQueryIniUrl(service_urls[mSelectedService]);
+            OpenMPD.getDaoSession().getTntServiceDao().insert(service);
+            account.setTntService(service);
         } else {
-            account.setValue("tnt_service_id", getServiceid(service_names[mSelectedService]));
+            account.setTntServiceId((long)getServiceid(service_names[mSelectedService]));
         }
         mAccountVerifyService.setOnFinishHandler(new AccountVerifyService.OnFinishHandler(){
             @Override
             public void onFinish(boolean success){
                 if (success == true){
-                    account.dirtySave();
+                    OpenMPD.getDaoSession().getServiceAccountDao().insert(account);
                     ((FabButton) getView().findViewById(R.id.account_fab_verify)).showProgress(false);
                     ((ViewFlipper) getView().findViewById(R.id.onboard_flipper)).showNext();
-                    Cursor cursor = OpenMPD.getDB().getReadableDatabase().rawQuery(ACCOUNT_QUERY, null);
+                    Cursor cursor = OpenMPD.getDB().rawQuery(ACCOUNT_QUERY, null);
                     mAdapter.changeCursor(cursor);
                     ((EditText) getView().findViewById(R.id.username)).setText("");
                     ((EditText) getView().findViewById(R.id.password)).setText("");
@@ -269,13 +270,15 @@ public class WelcomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private int getServiceid(String name){
-        SQLiteDatabase db = OpenMPD.getDB().getReadableDatabase();
-        Cursor c = db.rawQuery("select _id from tnt_service where name=?", new String[]{ name });
+        Cursor c = OpenMPD.getDB().rawQuery("select _id from tnt_service where name=?", new String[]{ name });
         if (c.getCount() == 0){
+            c.close();
             return -1;
         }
         c.moveToFirst();
-        return c.getInt(0);
+        int result = c.getInt(0);
+        c.close();
+        return result;
     }
 
     public void onClick(View v) {

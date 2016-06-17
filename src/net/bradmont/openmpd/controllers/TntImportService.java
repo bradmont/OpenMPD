@@ -21,11 +21,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.activities.ImportActivity;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.fragments.AnalyticsFragment;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
@@ -47,7 +48,7 @@ public class TntImportService extends IntentService {
             return;
         }
         Bundle b = intent.getExtras();
-        ArrayList<Integer> newdata = new ArrayList<Integer>();
+        ArrayList<Long> newdata = new ArrayList<Long>();
         ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
         /*
         if (MPDDBHelper.rawGet() == null){
@@ -70,9 +71,10 @@ public class TntImportService extends IntentService {
         // import our stuff
         startForeground(ContactsEvaluator.NOTIFICATION_ID, builder.build());
         if (b.containsKey("net.bradmont.openmpd.account_id")){
-            ServiceAccount account = new ServiceAccount(b.getInt("net.bradmont.openmpd.account_id"));
+            ServiceAccount account = OpenMPD.getDaoSession().getServiceAccountDao().load( 
+                    (long) b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account) || b.containsKey("net.bradmont.openmpd.force_update")){
-                if (account.getString("last_import") == null) {
+                if (account.getLastImport() == null) {
                     initialImport.add(new Boolean(true));
                 } else {
                     initialImport.add(new Boolean(false));
@@ -80,21 +82,21 @@ public class TntImportService extends IntentService {
                 TntImporter importer = new TntImporter(this, account, builder);
                 try {
                     if (importer.run() == true){
-                        newdata.add(new Integer(account.getID()));
+                        newdata.add(account.getId().longValue());
                     } else {
                         return;
                     }
                 } catch (Exception e){
-                    LogItem.logError("TntImporter crashed", "", e);
+                    Log.i("net.bradmont.openmpd", "TntImporter crashed", e);
                     notifyError(notificationManager, "TntImporter Exception", e);
                 }
             }
         } else if (b.containsKey("net.bradmont.openmpd.account_ids")){
             int [] ids = b.getIntArray("net.bradmont.openmpd.account_ids");
             for (int i = 0; i < ids.length; i++){
-                ServiceAccount account = new ServiceAccount(ids[i]);
+                ServiceAccount account = OpenMPD.getDaoSession().getServiceAccountDao().load((long)ids[i]);
                 if (isOld(account) || b.containsKey("net.bradmont.openmpd.force_update")){
-                    if (account.getString("last_import") == null) {
+                    if (account.getLastImport() == null) {
                         initialImport.add(new Boolean(true));
                     } else {
                         initialImport.add(new Boolean(false));
@@ -102,12 +104,12 @@ public class TntImportService extends IntentService {
                     TntImporter importer = new TntImporter(this, account, builder);
                     try {
                         if (importer.run() == true){
-                            newdata.add(new Integer(account.getID()));
+                            newdata.add(new Long(account.getId()));
                         } else {
                             return;
                         }
                     } catch (Exception e){
-                        LogItem.logError("TntImporter crashed", "", e);
+                        Log.i("net.bradmont.opemnpd", "TntImporter crashed", e);
                         notifyError(notificationManager, "TntImporter Exception", e);
                     }
                 }
@@ -115,6 +117,7 @@ public class TntImportService extends IntentService {
         }
 
         // Evaluate contacts if we have newly imported data
+        /* TODO: this!
         if (newdata.size() > 0){
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
@@ -135,6 +138,7 @@ public class TntImportService extends IntentService {
 
             notifyUser(builder, notificationManager);
         }
+        */
 
         ImportActivity.onFinish();
         stopForeground(true);
@@ -172,6 +176,8 @@ public class TntImportService extends IntentService {
     }
 
     protected void notifyUser(NotificationCompat.Builder builder, NotificationManager notificationManager){
+        // TODO
+        /*
         // notify of important changes
         ModelList notifications = MPDDBHelper.filter("notification", "status", Notification.STATUS_NEW);
         
@@ -264,6 +270,7 @@ public class TntImportService extends IntentService {
 
             notificationManager.notify(ContactsEvaluator.NOTIFICATION_ID +1, builder.build());
         }
+        */
     }
 
     protected boolean isNetworkAvailable(){
@@ -274,17 +281,12 @@ public class TntImportService extends IntentService {
     }
 
     private boolean isOld(ServiceAccount account){
-        String date = account.getString("last_import");
-        if (date == null){return true;}
+        Date lastImport = account.getLastImport();
+        if (lastImport == null){return true;}
 
         Calendar now = Calendar.getInstance();
         Calendar next_update = new GregorianCalendar();
-        String [] parts = date.split("-");
-        next_update.set(
-            Integer.parseInt(parts[0]),
-            Integer.parseInt(parts[1]) - 1,
-            Integer.parseInt(parts[2])
-            );
+        next_update.setTime(lastImport);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OpenMPD.get());
 
@@ -313,7 +315,7 @@ public class TntImportService extends IntentService {
             Log.i("net.bradmont.openmpd", "Not updating; " + nx + " is after today, " + nw);
             return false;
         } else {
-            Log.i("net.bradmont.openmpd", "Updating; " + nx + " is before or equal to today, " + nw + ". Last was " + date);
+            Log.i("net.bradmont.openmpd", "Updating; " + nx + " is before or equal to today, " + nw + ". Last was " + lastImport.toString());
             return true;
         }
 

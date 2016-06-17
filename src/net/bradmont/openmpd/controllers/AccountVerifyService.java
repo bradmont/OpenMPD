@@ -7,7 +7,7 @@ import android.os.IBinder;
 
 import net.bradmont.openmpd.helpers.Log;
 
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.activities.*;
 
 public class AccountVerifyService extends Service {
@@ -41,8 +41,13 @@ public class AccountVerifyService extends Service {
                 Log.i("net.bradmont.openmpd", "getting query.ini");
                 TntImporter importer = new TntImporter(AccountVerifyService.this, account);
                 Log.i("net.bradmont.openmpd", "verifying account");
-                importer.processQueryIni((TntService) account.getRelated("tnt_service_id"));
-                if (importer.verifyAccount()){
+                TntService service = account.getTntService();
+                try {
+                    service.processQueryIni();
+                } catch (Exception e){
+                    Log.i("net.bradmont.openmpd", "Failed to update query.ini");
+                }
+                if (account.verify()){
                     activity.runOnUiThread(new Runnable(){
                         public void run(){
                             Log.i("net.bradmont.openmpd", "account verified");
