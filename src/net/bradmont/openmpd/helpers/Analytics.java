@@ -107,7 +107,7 @@ public class Analytics {
     }
 
     public static String getAverageSpecial (){
-        String month = TextTools.getThisMonth();
+        String month = TextTools.getThisYearMonth();
         String [] args = new String[2];
         args[0] = month;
         args[1] = Integer.toString(OpenMPD.get().getApplicationContext()
@@ -116,7 +116,7 @@ public class Analytics {
 
     }
     public static String getAverage (){
-        String month = TextTools.getThisMonth();
+        String month = TextTools.getThisYearMonth();
         String [] args = new String[2];
         args[0] = month;
         args[1] = Integer.toString(OpenMPD.get().getApplicationContext()
@@ -125,7 +125,7 @@ public class Analytics {
     }
 
     public static String getWeightedAverage (){
-        String month = TextTools.getThisMonth();
+        String month = TextTools.getThisYearMonth();
         String [] args = new String[2];
         args[0] = month;
         int period = OpenMPD.get().getApplicationContext()

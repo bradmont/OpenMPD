@@ -16,15 +16,33 @@ public class TextTools{
 
 
     
+    private static String mThisYearMonth = null;
     private static String mThisMonth = null;
+    private static String mThisYear = null;
     private static String mToday = null;
+    public static String getThisYearMonth(){
+        if (mThisYearMonth == null){
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+            Calendar cal = Calendar.getInstance();
+            mThisYearMonth = dateFormat.format(cal.getTime());
+        }
+        return mThisYearMonth;
+    }
     public static String getThisMonth(){
         if (mThisMonth == null){
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+            DateFormat dateFormat = new SimpleDateFormat("MM");
             Calendar cal = Calendar.getInstance();
             mThisMonth = dateFormat.format(cal.getTime());
         }
         return mThisMonth;
+    }
+    public static String getThisYear(){
+        if (mThisYear == null){
+            DateFormat dateFormat = new SimpleDateFormat("yyyy");
+            Calendar cal = Calendar.getInstance();
+            mThisYear = dateFormat.format(cal.getTime());
+        }
+        return mThisYear;
     }
 
     public static String getToday(){
