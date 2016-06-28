@@ -112,11 +112,12 @@ public class OpenMPDDaoGenerator {
 
     /** ContactStatus tracks the type of contact, their giving, and whether
      * they're up to date.
-     * "type" can be:  monthly, regular, annual, frequent, occasional, onetime, unknown, namestormed
+     * "type" can be:  monthly, regular, annual, frequent, occasional, onetime, unknown, namestormed, none
      * "status" can be:
      *      Partner: current, new, late, lapsed, dropped, pledged
      *      Namestormed: to_contact, contact_later, followup, not_interested
      *      Other: unknown
+     *      none: none
     */
     private static Entity addContactStatus(Schema schema, Entity contact){
         Entity contactStatus = schema.addEntity("ContactStatus");
@@ -133,7 +134,7 @@ public class OpenMPDDaoGenerator {
             // Namestormed: to_contact, contact_later, followup, not_interested
             // Other: unknown
 
-        contactStatus.addDateProperty("lastGift");
+        contactStatus.addStringProperty("lastGift");
         contactStatus.addLongProperty("givingAmount");
         contactStatus.addIntProperty("givingFrequency"); // in months
         contactStatus.addDateProperty("lastNotify");
