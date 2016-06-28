@@ -117,7 +117,6 @@ public class TntImportService extends IntentService {
         }
 
         // Evaluate contacts if we have newly imported data
-        /* TODO: this!
         if (newdata.size() > 0){
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
@@ -138,7 +137,6 @@ public class TntImportService extends IntentService {
 
             notifyUser(builder, notificationManager);
         }
-        */
 
         ImportActivity.onFinish();
         stopForeground(true);
