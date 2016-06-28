@@ -9,6 +9,7 @@ import de.greenrobot.dao.DaoException;
 // KEEP INCLUDES - put your custom includes here
 import net.bradmont.openmpd.*;
 import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.Query;
 import android.util.Log;
 // KEEP INCLUDES END
 /**
@@ -37,6 +38,7 @@ public class Contact {
     private List<Notification> notifications;
 
     // KEEP FIELDS - put your custom fields here
+    private List<Gift> orderedGifts;
     // KEEP FIELDS END
 
     public Contact() {
@@ -339,6 +341,25 @@ public class Contact {
         n.setType(type);
         return n;
 
+    }
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    public List<Gift> getOrderedGifts() {
+        if (orderedGifts == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+
+            QueryBuilder<Gift> queryBuilder = daoSession.getGiftDao().queryBuilder();
+
+            queryBuilder.where(GiftDao.Properties.ContactId.eq(null));
+            queryBuilder.orderDesc(GiftDao.Properties.Date);
+
+            Query<Gift> query = queryBuilder.build();
+            query.setParameter(0, getId());
+
+            orderedGifts = query.list();
+        }
+        return orderedGifts;
     }
     // KEEP METHODS END
 
