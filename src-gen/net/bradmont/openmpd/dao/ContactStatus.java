@@ -13,7 +13,7 @@ public class ContactStatus {
     private Long contactId;
     private String type;
     private String status;
-    private java.util.Date lastGift;
+    private String lastGift;
     private Long givingAmount;
     private Integer givingFrequency;
     private java.util.Date lastNotify;
@@ -36,7 +36,7 @@ public class ContactStatus {
         this.id = id;
     }
 
-    public ContactStatus(Long id, Long contactId, String type, String status, java.util.Date lastGift, Long givingAmount, Integer givingFrequency, java.util.Date lastNotify, java.util.Date manualSetExpires) {
+    public ContactStatus(Long id, Long contactId, String type, String status, String lastGift, Long givingAmount, Integer givingFrequency, java.util.Date lastNotify, java.util.Date manualSetExpires) {
         this.id = id;
         this.contactId = contactId;
         this.type = type;
@@ -86,11 +86,11 @@ public class ContactStatus {
         this.status = status;
     }
 
-    public java.util.Date getLastGift() {
+    public String getLastGift() {
         return lastGift;
     }
 
-    public void setLastGift(java.util.Date lastGift) {
+    public void setLastGift(String lastGift) {
         this.lastGift = lastGift;
     }
 

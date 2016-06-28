@@ -32,7 +32,7 @@ public class ContactStatusDao extends AbstractDao<ContactStatus, Long> {
         public final static Property ContactId = new Property(1, Long.class, "contactId", false, "CONTACT_ID");
         public final static Property Type = new Property(2, String.class, "type", false, "TYPE");
         public final static Property Status = new Property(3, String.class, "status", false, "STATUS");
-        public final static Property LastGift = new Property(4, java.util.Date.class, "lastGift", false, "LAST_GIFT");
+        public final static Property LastGift = new Property(4, String.class, "lastGift", false, "LAST_GIFT");
         public final static Property GivingAmount = new Property(5, Long.class, "givingAmount", false, "GIVING_AMOUNT");
         public final static Property GivingFrequency = new Property(6, Integer.class, "givingFrequency", false, "GIVING_FREQUENCY");
         public final static Property LastNotify = new Property(7, java.util.Date.class, "lastNotify", false, "LAST_NOTIFY");
@@ -60,7 +60,7 @@ public class ContactStatusDao extends AbstractDao<ContactStatus, Long> {
                 "\"CONTACT_ID\" INTEGER," + // 1: contactId
                 "\"TYPE\" TEXT," + // 2: type
                 "\"STATUS\" TEXT," + // 3: status
-                "\"LAST_GIFT\" INTEGER," + // 4: lastGift
+                "\"LAST_GIFT\" TEXT," + // 4: lastGift
                 "\"GIVING_AMOUNT\" INTEGER," + // 5: givingAmount
                 "\"GIVING_FREQUENCY\" INTEGER," + // 6: givingFrequency
                 "\"LAST_NOTIFY\" INTEGER," + // 7: lastNotify
@@ -101,9 +101,9 @@ public class ContactStatusDao extends AbstractDao<ContactStatus, Long> {
             stmt.bindString(4, status);
         }
  
-        java.util.Date lastGift = entity.getLastGift();
+        String lastGift = entity.getLastGift();
         if (lastGift != null) {
-            stmt.bindLong(5, lastGift.getTime());
+            stmt.bindString(5, lastGift);
         }
  
         Long givingAmount = entity.getGivingAmount();
@@ -147,7 +147,7 @@ public class ContactStatusDao extends AbstractDao<ContactStatus, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // contactId
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // type
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // status
-            cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)), // lastGift
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // lastGift
             cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // givingAmount
             cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // givingFrequency
             cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // lastNotify
@@ -163,7 +163,7 @@ public class ContactStatusDao extends AbstractDao<ContactStatus, Long> {
         entity.setContactId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
         entity.setType(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setStatus(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setLastGift(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setLastGift(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setGivingAmount(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
         entity.setGivingFrequency(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
         entity.setLastNotify(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
