@@ -27,7 +27,7 @@ public class OpenMPD extends Application {
         instance = this;
     }
     public void onCreate(){
-        mDatabase = new DaoMaster.DevOpenHelper(this, "openmpd.sqlite", null).getWritableDatabase();
+        mDatabase = new OpenMpdOpenHelper(this, "openmpd.sqlite", null).getWritableDatabase();
         mDaoMaster = new DaoMaster(mDatabase);
         mDaoSession = mDaoMaster.newSession();
     }
