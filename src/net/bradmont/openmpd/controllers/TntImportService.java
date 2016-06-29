@@ -35,7 +35,7 @@ import net.bradmont.supergreen.models.*;
 
 public class TntImportService extends IntentService {
     static final String UPDATE_FREQUENCY = "3"; // import values every 3 days
-    public static final boolean DEBUG_TEST_EVALUATOR = true;
+    public static final boolean DEBUG_TEST_EVALUATOR = false;
 
     public TntImportService(){
         super("TntImportService");
@@ -66,10 +66,9 @@ public class TntImportService extends IntentService {
         startForeground(ContactsEvaluator.NOTIFICATION_ID, builder.build());
 
         // DEBUG: skip importingg.
-        if (DEBUG_TEST_EVALUATOR) {}
+        if (DEBUG_TEST_EVALUATOR) {
             newdata = null;
-        else 
-        if (b.containsKey("net.bradmont.openmpd.account_id")){
+        } else if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = OpenMPD.getDaoSession().getServiceAccountDao().load( 
                     (long) b.getInt("net.bradmont.openmpd.account_id"));
             if (isOld(account) || b.containsKey("net.bradmont.openmpd.force_update")){

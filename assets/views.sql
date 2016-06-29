@@ -2,7 +2,7 @@
 
 
 -- months:
-drop view if exists month;
+drop view if exists months;
 
 create view MONTHS as select distinct month from gift;
 
