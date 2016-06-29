@@ -44,7 +44,7 @@ import android.widget.SearchView;
 import java.lang.Runnable;
 
 public class ContactListFragment extends ListFragment {
-    public static final String [] columns = {"FNAME", "PARTNER_TYPE", "GIVING_AMOUNT", "LAST_GIFT", "FNAME", "FNAME", "S_FNAME", "PARTNER_TYPE"};
+    public static final String [] columns = {"fname", "status", "giving_amount", "last_gift", "fname", "fname", "s_fname", "type"};
     public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
     private Cursor cursor = null;
@@ -53,28 +53,53 @@ public class ContactListFragment extends ListFragment {
 
     private SimpleCursorAdapter adapter = null;
     private static int[] icon_colors = null;
-    private static final String BASE_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
-    private static final String STATUS_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and C.status=? order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
-    private static final String OCCASIONAL_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, C.last_gift  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (C.partner_type=30 or C.partner_type=20) order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
+    private static final String CONTACT_COUPLE_SUBQUERY =
+				"select A.contact_id as _contact_id, fname, lname, s_fname, s_lname from " +
 
-    private static final String SEARCH_QUERY = "select A.fname as fname, A.lname as lname, " +
-                "B.fname as s_fname, A._id, C.partner_type, C.giving_amount, C.status, C.gift_frequency, "+
-                "C.last_gift, A.fname || ' ' || A.lname as full_name, B.fname || ' ' || B.lname as spouse_full_name  from " + 
-                "contact A left outer join contact B on A._id = B.spouse_id " +
-                "left outer join contact_status C on A._id=c.contact_id where A.primary_contact = 1 " +
-                "and (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') order by (status = 4) desc, status desc, partner_type desc, A.lname, A.fname";
+ 				"(select * from contact join person on person.contact_id =contact._id "+
+				"	where IS_CONTACT_PRIMARY = 1) A "+
+ 				"left outer join " +
+				"(select contact_id, fname as s_fname, lname as s_lname "+
+				"	from person where IS_TNT_SPOUSE = 1) B "+ 
+ 				"on A.contact_id = B.contact_id ";
+
+    private static final String FIELDS = "fname, lname, s_fname, s_lname, _contact_id as _id, " +
+                 "type, giving_amount, status, giving_frequency, last_gift ";
+
+    private static final String BASE_QUERY = 
+                "select " + FIELDS +
+                "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
+                "   left outer join contact_status " +
+                "   on _contact_id = contact_status.contact_id "+
+                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+
+
+    private static final String STATUS_QUERY = 
+                "select " + FIELDS +
+                "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
+                "   left outer join contact_status " +
+                "   on _contact_id = contact_status.contact_id "+
+                "where status=? " +
+                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+
+    private static final String OCCASIONAL_QUERY = 
+                "select " + FIELDS +
+                "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
+                "   left outer join contact_status " +
+                "   on _contact_id = contact_status.contact_id "+
+                "where type='onetime' or type='occasional' " +
+                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+
+
+    private static final String SEARCH_QUERY = 
+                "select " + FIELDS +
+                "fname || ' ' || lname as full_name, s_fname || ' ' || s_lname as spouse_full_name  "+
+                "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
+                "   left outer join contact_status " +
+                "   on _contact_id = contact_status.contact_id "+
+                "where (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') " +
+                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+
 
     @Override
     public View onCreateView(
@@ -103,7 +128,7 @@ public class ContactListFragment extends ListFragment {
                 TextView tv = null;
                 String value = "";
                 switch(view.getId()){
-                    // 0: fname, 1:lname, 2:s_name, 3:_id, 4:partner_type, 5:giving_amount, 6: status, 7: gift_frequency, 8: last_gift
+                    // 0: fname, 1:lname, 2:s_name, 3:_id, 4:type, 5:giving_amount, 6: status, 7: gift_frequency, 8: last_gift
                     // public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left};
                     case R.id.name: 
                         tv = (TextView) view;
@@ -159,7 +184,7 @@ public class ContactListFragment extends ListFragment {
                     case R.id.status:
                         // partner type
                         status = cursor.getInt(cursor.getColumnIndex("status"));
-                        type = cursor.getInt(cursor.getColumnIndex("partner_type"));
+                        type = cursor.getInt(cursor.getColumnIndex("type"));
                         tv = (TextView) view;
                         String text = getActivity().getResources()
                             .getString(ContactStatus.partnership(type));
@@ -180,7 +205,7 @@ public class ContactListFragment extends ListFragment {
                     case R.id.amount:
                         // amount
                         status = cursor.getInt(cursor.getColumnIndex("status"));
-                        type = cursor.getInt(cursor.getColumnIndex("partner_type"));
+                        type = cursor.getInt(cursor.getColumnIndex("type"));
                         tv = (TextView) view;
                         if (cursor.getInt(5) == 0){
                             tv.setText("");

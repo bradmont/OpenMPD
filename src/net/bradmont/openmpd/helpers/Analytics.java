@@ -17,47 +17,47 @@ public class Analytics {
     public static final String STABLE_MONTHLY_SQL =
         "select sum(giving_amount) "+
             "from contact_status " +
-            "where partner_type=60 " +
-            "and (status=4 or status=5);";
+            "where type='monthly' " +
+            "and (status='current' or status='new');";
             // magic numbers! 
 
     // current or new regular or annual partners
     public static final String STABLE_REGULAR_SQL =
-        "select sum(giving_amount/gift_frequency) " +
+        "select sum(giving_amount/giving_frequency) " +
             "from contact_status "+
-            "where (partner_type=40 or partner_type=50) "+
-                "and (status=4 or status=5);";
+            "where (type='annual' or type='regular') "+
+                "and (status='new' or status='current');";
 
     // Frequent, but irregular, partners
     public static final String FREQUENT_SQL =
         "select sum(giving_amount) " +
             "from contact_status "+
-            "where (partner_type=35) "+
-                "and (status=4 or status=5);";
+            "where (type='frequent') "+
+                "and (status='new' or status='current');";
 
     // late partners
     public static final String LATE_SQL =
-        "select sum(giving_amount/gift_frequency) "+
+        "select sum(giving_amount/giving_frequency) "+
             "from contact_status "+
-            "where (partner_type=60 or partner_type=50 or partner_type=40) "+
-            "and status=3;";
+            "where (type='monthly' or type='regular' or type='annual') "+
+            "and status='late';";
 
     // lapsed partners
     public static final String LAPSED_SQL =
-        "select sum(giving_amount/gift_frequency) "+
+        "select sum(giving_amount/giving_frequency) "+
             "from contact_status "+
-            "where (partner_type=60 or partner_type=50 or partner_type=40) "+
-            "and status=2;";
+            "where (type='monthly' or type='current' or type='annual') "+
+            "and status='lapsed';";
 
     // Average of special gifts
     private static final String SPECIAL_SQL =
         "select avg(total_gifts) from "+
             "(select month, sum(total_gifts) - sum(giving_amount)  as total_gifts "+
                 "from  "+
-                    "(select * from ( select contact_id, tnt_people_id, giving_amount from contact join contact_status on contact_id=contact._id where tnt_people_id not like '-%') A  "+
+                    "(select * from ( select contact._id, contact_id, giving_amount from contact join contact_status on contact_id=contact._id ) A  "+
                     "join  "+
-                    "(select tnt_people_id, month, sum(amount) as total_gifts from gift where month!=? group by tnt_people_id,month) B  "+
-                    "on A.tnt_people_id = B.tnt_people_id  "+
+                    "(select contact_id, month, sum(amount) as total_gifts from gift where month!=? group by contact_id,month) B  "+
+                    "on A.contact_id = B.contact_id  "+
                 "where total_gifts>giving_amount)  "+
                 "group by month  "+
                 "order by month desc "+

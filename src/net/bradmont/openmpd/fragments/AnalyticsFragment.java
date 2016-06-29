@@ -50,19 +50,20 @@ public class AnalyticsFragment extends Fragment {
     private static final String VERIFY_CACHE_SQL =
         "SELECT name FROM sqlite_master WHERE type='table' AND name='giving_summary_cache';";
     private static final String CACHE_SQL =
-        "create table giving_summary_cache as " +
-        "select month.month as month, base_giving/100 as base, " +
-        "regular_giving/100 as regular, frequent_giving/100 as frequent, "+
-        "special_gifts/100 as special from "+
-        "    month left outer join monthly_base_giving A "+
-        "        on month.month=A.month"+
-        "        left outer join regular_by_month B"+
-        "            on month.month=B.month"+
-        "        left outer join frequent_by_month C"+
-        "            on month.month=C.month"+
-        "        left outer join special_gifts_by_month D"+
-        "            on month.month=D.month"+
-        "    order by month.month;";
+		"create table giving_summary_cache as "+
+		"select months.month as month, base_giving/100 as base, "+
+		"regular_giving/100 as regular, frequent_giving/100 as frequent, "+
+		"special_gifts/100 as special from "+
+		"    months left outer join monthly_base_giving A "+
+		"        on months.month=A.month "+
+		"        left outer join regular_by_month B "+
+		"            on months.month=B.month "+
+		"        left outer join frequent_by_month C "+
+		"            on months.month=C.month "+
+		"        left outer join special_gifts_by_month D "+
+		"            on months.month=D.month "+
+		"    order by months.month;";
+
     private static final String GIVING_SQL =
         "select * from giving_summary_cache;";
 
