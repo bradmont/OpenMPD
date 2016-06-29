@@ -56,7 +56,6 @@ public class HomeActivity extends BaseActivity {
             case OpenMPD.ONBOARD_FINISHED:
                 if (controllers.TntImportService.DEBUG_TEST_EVALUATOR){
                     Intent switchIntent = null;
-                    // TODO: DEBUG: REMOVE THIS
                     switchIntent = new Intent(this, ImportActivity.class);
                     startActivity(switchIntent);
                     finish();
