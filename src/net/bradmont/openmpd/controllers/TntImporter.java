@@ -264,10 +264,17 @@ public class TntImporter {
         String [] headers = header_line.split(",");
         mDataHash = new HashMap<String, String>(headers.length);
 
-        if (progressbar != null){
-            progressbar.setMax((progressbar.getMax()/2) + content.size());
-        }
         progressmax = content.size();
+        int progressIncrement = 1;
+        if (progressbar != null){
+            if (content.size() > 200){
+                progressbar.setMax(100);
+                progressmax = 100;
+                progressIncrement = content.size() / 100;
+            } else{
+                progressbar.setMax((progressbar.getMax()/2) + content.size());
+            }
+        }
         progress = 0;
         if (builder != null){
             builder.setProgress(progressmax, progress, false);
@@ -275,7 +282,9 @@ public class TntImporter {
         }
         ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
         ArrayList<Gift> gifts = new ArrayList<Gift>();
+        int giftCount = 0;
         for(String s:content){
+            giftCount++;
             try {
                 Gift gift = parseGiftLine(headers, s);
                 if (gift != null){
@@ -285,18 +294,20 @@ public class TntImporter {
                 //LogItem.logError(header_line, s, e);
                 Log.i("net.bradmont.openmpd", header_line + " " + s, e);
             }
-            if (progressbar != null){
-                progressbar.incrementProgressBy(1);
+            if (giftCount % progressIncrement == 0){
+                if (progressbar != null){
+                    progressbar.incrementProgressBy(1);
+                }
+                if (builder != null){
+                    builder.setProgress(progressmax, ++progress, false);
+                    notifyManager.notify(notification_id, builder.build());
+                }
+                ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
             }
-            if (builder != null){
-                builder.setProgress(progressmax, ++progress, false);
-                notifyManager.notify(notification_id, builder.build());
-            }
-            ImportActivity.setProgress(mAccount.getId().intValue(), progressmax, progress, false);
-            if (progress % 1000 == 0){
+            /*if (progress % 1000 == 0){
                 OpenMPD.getDaoSession().getGiftDao().insertOrReplaceInTx(gifts);
                 gifts.clear();
-            }
+            }*/
         }
         OpenMPD.getDaoSession().getGiftDao().insertOrReplaceInTx(gifts);
         gifts.clear();
@@ -312,24 +323,22 @@ public class TntImporter {
         }
 
         // if this gift has already been imported, skip it.
-        GiftDao giftDao = OpenMPD.getDaoSession().getGiftDao();
+        /*GiftDao giftDao = OpenMPD.getDaoSession().getGiftDao();
         List<net.bradmont.openmpd.dao.Gift> gifts = giftDao.queryBuilder()
             .where(GiftDao.Properties.TntDonationId.eq(mDataHash.get("DONATION_ID")))
                     .list();
         if (gifts.size() != 0){
             return null;
-        }
+        }*/
 
         Gift gift = new Gift();
         String date = mDataHash.get("DISPLAY_DATE");
         String [] dateParts = date.split("/");
-        date = String.format("%04d-%02d-%02d", 
-            Integer.parseInt(dateParts[2]),
-            Integer.parseInt(dateParts[0]),
-            Integer.parseInt(dateParts[1]));
         String month = String.format("%04d-%02d", 
             Integer.parseInt(dateParts[2]),
             Integer.parseInt(dateParts[0]));
+        date = month + String.format("-%02d", 
+            Integer.parseInt(dateParts[1]));
 
 
         gift.setContact(mContactByTntId.get(mDataHash.get("PEOPLE_ID") ) );
@@ -362,6 +371,7 @@ public class TntImporter {
             contact = new Contact();
             newContact = true;
         }
+        contact.setAccount(mAccount);
         contact.setTntPeopleId(mDataHash.get("PEOPLE_ID") + ":" + mAccount.getName()); 
         contact.setTntAccountName(mDataHash.get("ACCT_NAME"));
         contact.setTntPersonType(mDataHash.get("PERSON_TYPE"));

@@ -35,6 +35,7 @@ import net.bradmont.supergreen.models.*;
 
 public class TntImportService extends IntentService {
     static final String UPDATE_FREQUENCY = "3"; // import values every 3 days
+    public static final boolean DEBUG_TEST_EVALUATOR = true;
 
     public TntImportService(){
         super("TntImportService");
@@ -50,13 +51,6 @@ public class TntImportService extends IntentService {
         Bundle b = intent.getExtras();
         ArrayList<Long> newdata = new ArrayList<Long>();
         ArrayList<Boolean> initialImport = new ArrayList<Boolean>();
-        /*
-        if (MPDDBHelper.rawGet() == null){
-            MPDDBHelper dbh = new MPDDBHelper(this);
-        } else if (MPDDBHelper.get().getContext() != this){
-            MPDDBHelper.get().close();
-            MPDDBHelper dbh = new MPDDBHelper(this);
-        }*/ // DEPRECATED? 
         NotificationCompat.Builder builder =
             new NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.notification_icon)
@@ -70,6 +64,11 @@ public class TntImportService extends IntentService {
 
         // import our stuff
         startForeground(ContactsEvaluator.NOTIFICATION_ID, builder.build());
+
+        // DEBUG: skip importingg.
+        if (DEBUG_TEST_EVALUATOR) {}
+            newdata = null;
+        else 
         if (b.containsKey("net.bradmont.openmpd.account_id")){
             ServiceAccount account = OpenMPD.getDaoSession().getServiceAccountDao().load( 
                     (long) b.getInt("net.bradmont.openmpd.account_id"));
@@ -83,7 +82,9 @@ public class TntImportService extends IntentService {
                 try {
                     if (importer.run() == true){
                         newdata.add(account.getId().longValue());
+                        Log.i("net.bradmont.openmpd", "importer returned true.");
                     } else {
+                        Log.i("net.bradmont.openmpd", "importer returned false.");
                         return;
                     }
                 } catch (Exception e){
@@ -105,7 +106,9 @@ public class TntImportService extends IntentService {
                     try {
                         if (importer.run() == true){
                             newdata.add(new Long(account.getId()));
+                            Log.i("net.bradmont.openmpd", "importer returned true.");
                         } else {
+                            Log.i("net.bradmont.openmpd", "importer returned false.");
                             return;
                         }
                     } catch (Exception e){
@@ -115,9 +118,11 @@ public class TntImportService extends IntentService {
                 }
             }
         }
+        Log.i("net.bradmont.openmpd", "import done");
 
         // Evaluate contacts if we have newly imported data
-        if (newdata.size() > 0){
+        if (newdata == null || newdata.size() > 0 ){
+            Log.i("net.bradmont.openmpd", "starting evaluation");
             ContactsEvaluator evaluator = new ContactsEvaluator(this, builder, newdata, initialImport);
             builder.setContentTitle("Evaluating Contacts")
                 .setContentText(" ");

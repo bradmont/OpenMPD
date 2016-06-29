@@ -74,12 +74,13 @@ public class ContactsEvaluator implements Runnable{
         if (newdata == null){
             contact_lists.add( contactDao.loadAll());
             total_contacts = contact_lists.get(0).size();
+            initialImport = new ArrayList<Boolean>(1);
+            initialImport.add(true);
         } else {
             for (int i = 0; i < newdata.size(); i++){
-                TntService service = OpenMPD.getDaoSession().getTntServiceDao().load(newdata.get(i));
-                contact_lists.add(contactDao.queryBuilder()
-                    .where(ContactDao.Properties.TntAccountName.eq(service.getName()))
-                    .list());
+                ServiceAccount account = OpenMPD.getDaoSession().getServiceAccountDao()
+                    .load(newdata.get(i));
+                contact_lists.add(account.getContacts());
                 total_contacts += contact_lists.get(i).size();
             }
         }
@@ -89,6 +90,7 @@ public class ContactsEvaluator implements Runnable{
         int progress = 0;
         ArrayList<ContactStatus> statuses = new ArrayList<ContactStatus>(total_contacts);
 
+        Log.i("net.bradmont.openmpd", "evaluating " + total_contacts + " contacts");
         for (int j = 0; j < contact_lists.size(); j++){
             List<Contact> contacts = contact_lists.get(j);
             for (int i=0; i < contacts.size(); i++){
@@ -119,17 +121,21 @@ public class ContactsEvaluator implements Runnable{
 
     private ContactStatus evaluateContact(Contact contact, boolean initialImport){
         HashMap<String, Integer> map = analyseContact(contact);
-        ContactStatus status = contact.getStatus().get(0); // should only be one...
+        ContactStatus status = null;
+        if (contact.getStatus().size() > 0){
+            status = contact.getStatus().get(0);// should only be one...
+        }; 
         boolean giving = true;
         if (status == null){
             status = new ContactStatus();
             status.setContact(contact);
-            giving = false;
         }
+
         // None if : contains "nogifts"
-        else if (map.containsKey("nogifts")){
+        if (map.containsKey("nogifts")){
             status.setType("none");
             status.setStatus("none");
+            giving = false;
         }
         // Onetime if: totalGifts1
         else if (map.containsKey("totalGifts") &&

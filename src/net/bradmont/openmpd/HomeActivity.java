@@ -54,10 +54,17 @@ public class HomeActivity extends BaseActivity {
         SharedPreferences prefs = getSharedPreferences("openmpd", Context.MODE_PRIVATE);
         switch (prefs.getInt("onboardState", OpenMPD.ONBOARD_FIRST_RUN)){
             case OpenMPD.ONBOARD_FINISHED:
+                if (controllers.TntImportService.DEBUG_TEST_EVALUATOR){
+                    Intent switchIntent = null;
+                    // TODO: DEBUG: REMOVE THIS
+                    switchIntent = new Intent(this, ImportActivity.class);
+                    startActivity(switchIntent);
+                    finish();
+                }
                 break;
             case OpenMPD.ONBOARD_FIRST_RUN:
             case OpenMPD.ONBOARD_ACCOUNT_ADDED:
-                Intent switchIntent = new Intent(this, OnboardActivity.class);
+                switchIntent = new Intent(this, OnboardActivity.class);
                 startActivity(switchIntent);
                 finish();
                 break;
