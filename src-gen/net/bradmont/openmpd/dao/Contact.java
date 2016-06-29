@@ -23,12 +23,16 @@ public class Contact {
     private String tntAccountName;
     private String tntPersonType;
     private Boolean isSubcontact;
+    private Long serviceAccountId;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
 
     /** Used for active entity operations. */
     private transient ContactDao myDao;
+
+    private ServiceAccount account;
+    private Long account__resolvedKey;
 
     private List<Person> people;
     private List<ContactDetail> details;
@@ -48,13 +52,14 @@ public class Contact {
         this.id = id;
     }
 
-    public Contact(Long id, String tntPeopleId, String uuid, String tntAccountName, String tntPersonType, Boolean isSubcontact) {
+    public Contact(Long id, String tntPeopleId, String uuid, String tntAccountName, String tntPersonType, Boolean isSubcontact, Long serviceAccountId) {
         this.id = id;
         this.tntPeopleId = tntPeopleId;
         this.uuid = uuid;
         this.tntAccountName = tntAccountName;
         this.tntPersonType = tntPersonType;
         this.isSubcontact = isSubcontact;
+        this.serviceAccountId = serviceAccountId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -109,6 +114,39 @@ public class Contact {
 
     public void setIsSubcontact(Boolean isSubcontact) {
         this.isSubcontact = isSubcontact;
+    }
+
+    public Long getServiceAccountId() {
+        return serviceAccountId;
+    }
+
+    public void setServiceAccountId(Long serviceAccountId) {
+        this.serviceAccountId = serviceAccountId;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    public ServiceAccount getAccount() {
+        Long __key = this.serviceAccountId;
+        if (account__resolvedKey == null || !account__resolvedKey.equals(__key)) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ServiceAccountDao targetDao = daoSession.getServiceAccountDao();
+            ServiceAccount accountNew = targetDao.load(__key);
+            synchronized (this) {
+                account = accountNew;
+            	account__resolvedKey = __key;
+            }
+        }
+        return account;
+    }
+
+    public void setAccount(ServiceAccount account) {
+        synchronized (this) {
+            this.account = account;
+            serviceAccountId = account == null ? null : account.getId();
+            account__resolvedKey = serviceAccountId;
+        }
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */

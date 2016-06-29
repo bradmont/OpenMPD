@@ -19,7 +19,12 @@ public class OpenMPDDaoGenerator {
     public static void main(String[] args) throws Exception {
         Schema schema = new Schema(SCHEMA_VERSION, "net.bradmont.openmpd.dao");
 
-        Entity contact = addContact(schema);
+        Entity tnt_service = addTntService(schema);
+        tnt_service.setHasKeepSections(true) ;
+        Entity service_account = addServiceAccount(schema, tnt_service);
+        service_account.setHasKeepSections(true) ;
+
+        Entity contact = addContact(schema, service_account);
         Entity person = addPerson(schema, contact);
 
         Entity contact_detail = addContactDetail(schema, contact);
@@ -28,10 +33,6 @@ public class OpenMPDDaoGenerator {
         Entity gift = addGift(schema, contact);
         Entity notification = addNotification(schema, contact);
 
-        Entity tnt_service = addTntService(schema);
-        tnt_service.setHasKeepSections(true) ;
-        Entity service_account = addServiceAccount(schema, tnt_service);
-        service_account.setHasKeepSections(true) ;
 
         Entity quick_message = addQuickMessage(schema);
         Entity giving_summary_cache = addGivingSummaryCache(schema);
@@ -41,7 +42,7 @@ public class OpenMPDDaoGenerator {
         new DaoGenerator().generateAll(schema, "../src-gen");
     }
 
-    private static Entity addContact(Schema schema) {
+    private static Entity addContact(Schema schema, Entity service_account) {
         Entity contact = schema.addEntity("Contact");
         contact.addIdProperty();
         Property tntPeopleId = contact.addStringProperty("tntPeopleId").getProperty();
@@ -49,6 +50,10 @@ public class OpenMPDDaoGenerator {
         contact.addStringProperty("tntAccountName");
         contact.addStringProperty("tntPersonType");
         contact.addBooleanProperty("isSubcontact");
+        Property accountId = contact.addLongProperty("serviceAccountId").getProperty();
+        contact.addToOne(service_account, accountId).setName("account");
+        service_account.addToMany(contact, accountId).setName("contacts");
+
         contact.setHasKeepSections(true);
         Index unique = new Index();
         unique.addProperty(tntPeopleId);

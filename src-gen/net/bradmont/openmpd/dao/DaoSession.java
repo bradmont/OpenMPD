@@ -9,6 +9,8 @@ import de.greenrobot.dao.AbstractDaoSession;
 import de.greenrobot.dao.identityscope.IdentityScopeType;
 import de.greenrobot.dao.internal.DaoConfig;
 
+import net.bradmont.openmpd.dao.TntService;
+import net.bradmont.openmpd.dao.ServiceAccount;
 import net.bradmont.openmpd.dao.Contact;
 import net.bradmont.openmpd.dao.Person;
 import net.bradmont.openmpd.dao.ContactDetail;
@@ -16,13 +18,13 @@ import net.bradmont.openmpd.dao.ContactInteraction;
 import net.bradmont.openmpd.dao.ContactStatus;
 import net.bradmont.openmpd.dao.Gift;
 import net.bradmont.openmpd.dao.Notification;
-import net.bradmont.openmpd.dao.TntService;
-import net.bradmont.openmpd.dao.ServiceAccount;
 import net.bradmont.openmpd.dao.QuickMessage;
 import net.bradmont.openmpd.dao.GivingSummaryCache;
 import net.bradmont.openmpd.dao.Log;
 import net.bradmont.openmpd.dao.ContactSublist;
 
+import net.bradmont.openmpd.dao.TntServiceDao;
+import net.bradmont.openmpd.dao.ServiceAccountDao;
 import net.bradmont.openmpd.dao.ContactDao;
 import net.bradmont.openmpd.dao.PersonDao;
 import net.bradmont.openmpd.dao.ContactDetailDao;
@@ -30,8 +32,6 @@ import net.bradmont.openmpd.dao.ContactInteractionDao;
 import net.bradmont.openmpd.dao.ContactStatusDao;
 import net.bradmont.openmpd.dao.GiftDao;
 import net.bradmont.openmpd.dao.NotificationDao;
-import net.bradmont.openmpd.dao.TntServiceDao;
-import net.bradmont.openmpd.dao.ServiceAccountDao;
 import net.bradmont.openmpd.dao.QuickMessageDao;
 import net.bradmont.openmpd.dao.GivingSummaryCacheDao;
 import net.bradmont.openmpd.dao.LogDao;
@@ -46,6 +46,8 @@ import net.bradmont.openmpd.dao.ContactSublistDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
+    private final DaoConfig tntServiceDaoConfig;
+    private final DaoConfig serviceAccountDaoConfig;
     private final DaoConfig contactDaoConfig;
     private final DaoConfig personDaoConfig;
     private final DaoConfig contactDetailDaoConfig;
@@ -53,13 +55,13 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig contactStatusDaoConfig;
     private final DaoConfig giftDaoConfig;
     private final DaoConfig notificationDaoConfig;
-    private final DaoConfig tntServiceDaoConfig;
-    private final DaoConfig serviceAccountDaoConfig;
     private final DaoConfig quickMessageDaoConfig;
     private final DaoConfig givingSummaryCacheDaoConfig;
     private final DaoConfig logDaoConfig;
     private final DaoConfig contactSublistDaoConfig;
 
+    private final TntServiceDao tntServiceDao;
+    private final ServiceAccountDao serviceAccountDao;
     private final ContactDao contactDao;
     private final PersonDao personDao;
     private final ContactDetailDao contactDetailDao;
@@ -67,8 +69,6 @@ public class DaoSession extends AbstractDaoSession {
     private final ContactStatusDao contactStatusDao;
     private final GiftDao giftDao;
     private final NotificationDao notificationDao;
-    private final TntServiceDao tntServiceDao;
-    private final ServiceAccountDao serviceAccountDao;
     private final QuickMessageDao quickMessageDao;
     private final GivingSummaryCacheDao givingSummaryCacheDao;
     private final LogDao logDao;
@@ -77,6 +77,12 @@ public class DaoSession extends AbstractDaoSession {
     public DaoSession(SQLiteDatabase db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
+
+        tntServiceDaoConfig = daoConfigMap.get(TntServiceDao.class).clone();
+        tntServiceDaoConfig.initIdentityScope(type);
+
+        serviceAccountDaoConfig = daoConfigMap.get(ServiceAccountDao.class).clone();
+        serviceAccountDaoConfig.initIdentityScope(type);
 
         contactDaoConfig = daoConfigMap.get(ContactDao.class).clone();
         contactDaoConfig.initIdentityScope(type);
@@ -99,12 +105,6 @@ public class DaoSession extends AbstractDaoSession {
         notificationDaoConfig = daoConfigMap.get(NotificationDao.class).clone();
         notificationDaoConfig.initIdentityScope(type);
 
-        tntServiceDaoConfig = daoConfigMap.get(TntServiceDao.class).clone();
-        tntServiceDaoConfig.initIdentityScope(type);
-
-        serviceAccountDaoConfig = daoConfigMap.get(ServiceAccountDao.class).clone();
-        serviceAccountDaoConfig.initIdentityScope(type);
-
         quickMessageDaoConfig = daoConfigMap.get(QuickMessageDao.class).clone();
         quickMessageDaoConfig.initIdentityScope(type);
 
@@ -117,6 +117,8 @@ public class DaoSession extends AbstractDaoSession {
         contactSublistDaoConfig = daoConfigMap.get(ContactSublistDao.class).clone();
         contactSublistDaoConfig.initIdentityScope(type);
 
+        tntServiceDao = new TntServiceDao(tntServiceDaoConfig, this);
+        serviceAccountDao = new ServiceAccountDao(serviceAccountDaoConfig, this);
         contactDao = new ContactDao(contactDaoConfig, this);
         personDao = new PersonDao(personDaoConfig, this);
         contactDetailDao = new ContactDetailDao(contactDetailDaoConfig, this);
@@ -124,13 +126,13 @@ public class DaoSession extends AbstractDaoSession {
         contactStatusDao = new ContactStatusDao(contactStatusDaoConfig, this);
         giftDao = new GiftDao(giftDaoConfig, this);
         notificationDao = new NotificationDao(notificationDaoConfig, this);
-        tntServiceDao = new TntServiceDao(tntServiceDaoConfig, this);
-        serviceAccountDao = new ServiceAccountDao(serviceAccountDaoConfig, this);
         quickMessageDao = new QuickMessageDao(quickMessageDaoConfig, this);
         givingSummaryCacheDao = new GivingSummaryCacheDao(givingSummaryCacheDaoConfig, this);
         logDao = new LogDao(logDaoConfig, this);
         contactSublistDao = new ContactSublistDao(contactSublistDaoConfig, this);
 
+        registerDao(TntService.class, tntServiceDao);
+        registerDao(ServiceAccount.class, serviceAccountDao);
         registerDao(Contact.class, contactDao);
         registerDao(Person.class, personDao);
         registerDao(ContactDetail.class, contactDetailDao);
@@ -138,8 +140,6 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(ContactStatus.class, contactStatusDao);
         registerDao(Gift.class, giftDao);
         registerDao(Notification.class, notificationDao);
-        registerDao(TntService.class, tntServiceDao);
-        registerDao(ServiceAccount.class, serviceAccountDao);
         registerDao(QuickMessage.class, quickMessageDao);
         registerDao(GivingSummaryCache.class, givingSummaryCacheDao);
         registerDao(Log.class, logDao);
@@ -147,6 +147,8 @@ public class DaoSession extends AbstractDaoSession {
     }
     
     public void clear() {
+        tntServiceDaoConfig.getIdentityScope().clear();
+        serviceAccountDaoConfig.getIdentityScope().clear();
         contactDaoConfig.getIdentityScope().clear();
         personDaoConfig.getIdentityScope().clear();
         contactDetailDaoConfig.getIdentityScope().clear();
@@ -154,12 +156,18 @@ public class DaoSession extends AbstractDaoSession {
         contactStatusDaoConfig.getIdentityScope().clear();
         giftDaoConfig.getIdentityScope().clear();
         notificationDaoConfig.getIdentityScope().clear();
-        tntServiceDaoConfig.getIdentityScope().clear();
-        serviceAccountDaoConfig.getIdentityScope().clear();
         quickMessageDaoConfig.getIdentityScope().clear();
         givingSummaryCacheDaoConfig.getIdentityScope().clear();
         logDaoConfig.getIdentityScope().clear();
         contactSublistDaoConfig.getIdentityScope().clear();
+    }
+
+    public TntServiceDao getTntServiceDao() {
+        return tntServiceDao;
+    }
+
+    public ServiceAccountDao getServiceAccountDao() {
+        return serviceAccountDao;
     }
 
     public ContactDao getContactDao() {
@@ -188,14 +196,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public NotificationDao getNotificationDao() {
         return notificationDao;
-    }
-
-    public TntServiceDao getTntServiceDao() {
-        return tntServiceDao;
-    }
-
-    public ServiceAccountDao getServiceAccountDao() {
-        return serviceAccountDao;
     }
 
     public QuickMessageDao getQuickMessageDao() {

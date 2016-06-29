@@ -1,5 +1,6 @@
 package net.bradmont.openmpd.dao;
 
+import java.util.List;
 import net.bradmont.openmpd.dao.DaoSession;
 import de.greenrobot.dao.DaoException;
 
@@ -37,6 +38,7 @@ public class ServiceAccount {
     private TntService tntService;
     private Long tntService__resolvedKey;
 
+    private List<Contact> contacts;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -134,6 +136,28 @@ public class ServiceAccount {
             tntServiceId = tntService == null ? null : tntService.getId();
             tntService__resolvedKey = tntServiceId;
         }
+    }
+
+    /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
+    public List<Contact> getContacts() {
+        if (contacts == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            ContactDao targetDao = daoSession.getContactDao();
+            List<Contact> contactsNew = targetDao._queryServiceAccount_Contacts(id);
+            synchronized (this) {
+                if(contacts == null) {
+                    contacts = contactsNew;
+                }
+            }
+        }
+        return contacts;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    public synchronized void resetContacts() {
+        contacts = null;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

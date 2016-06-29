@@ -8,6 +8,8 @@ import android.util.Log;
 import de.greenrobot.dao.AbstractDaoMaster;
 import de.greenrobot.dao.identityscope.IdentityScopeType;
 
+import net.bradmont.openmpd.dao.TntServiceDao;
+import net.bradmont.openmpd.dao.ServiceAccountDao;
 import net.bradmont.openmpd.dao.ContactDao;
 import net.bradmont.openmpd.dao.PersonDao;
 import net.bradmont.openmpd.dao.ContactDetailDao;
@@ -15,8 +17,6 @@ import net.bradmont.openmpd.dao.ContactInteractionDao;
 import net.bradmont.openmpd.dao.ContactStatusDao;
 import net.bradmont.openmpd.dao.GiftDao;
 import net.bradmont.openmpd.dao.NotificationDao;
-import net.bradmont.openmpd.dao.TntServiceDao;
-import net.bradmont.openmpd.dao.ServiceAccountDao;
 import net.bradmont.openmpd.dao.QuickMessageDao;
 import net.bradmont.openmpd.dao.GivingSummaryCacheDao;
 import net.bradmont.openmpd.dao.LogDao;
@@ -31,6 +31,8 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(SQLiteDatabase db, boolean ifNotExists) {
+        TntServiceDao.createTable(db, ifNotExists);
+        ServiceAccountDao.createTable(db, ifNotExists);
         ContactDao.createTable(db, ifNotExists);
         PersonDao.createTable(db, ifNotExists);
         ContactDetailDao.createTable(db, ifNotExists);
@@ -38,8 +40,6 @@ public class DaoMaster extends AbstractDaoMaster {
         ContactStatusDao.createTable(db, ifNotExists);
         GiftDao.createTable(db, ifNotExists);
         NotificationDao.createTable(db, ifNotExists);
-        TntServiceDao.createTable(db, ifNotExists);
-        ServiceAccountDao.createTable(db, ifNotExists);
         QuickMessageDao.createTable(db, ifNotExists);
         GivingSummaryCacheDao.createTable(db, ifNotExists);
         LogDao.createTable(db, ifNotExists);
@@ -48,6 +48,8 @@ public class DaoMaster extends AbstractDaoMaster {
     
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(SQLiteDatabase db, boolean ifExists) {
+        TntServiceDao.dropTable(db, ifExists);
+        ServiceAccountDao.dropTable(db, ifExists);
         ContactDao.dropTable(db, ifExists);
         PersonDao.dropTable(db, ifExists);
         ContactDetailDao.dropTable(db, ifExists);
@@ -55,8 +57,6 @@ public class DaoMaster extends AbstractDaoMaster {
         ContactStatusDao.dropTable(db, ifExists);
         GiftDao.dropTable(db, ifExists);
         NotificationDao.dropTable(db, ifExists);
-        TntServiceDao.dropTable(db, ifExists);
-        ServiceAccountDao.dropTable(db, ifExists);
         QuickMessageDao.dropTable(db, ifExists);
         GivingSummaryCacheDao.dropTable(db, ifExists);
         LogDao.dropTable(db, ifExists);
@@ -92,6 +92,8 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(SQLiteDatabase db) {
         super(db, SCHEMA_VERSION);
+        registerDaoClass(TntServiceDao.class);
+        registerDaoClass(ServiceAccountDao.class);
         registerDaoClass(ContactDao.class);
         registerDaoClass(PersonDao.class);
         registerDaoClass(ContactDetailDao.class);
@@ -99,8 +101,6 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(ContactStatusDao.class);
         registerDaoClass(GiftDao.class);
         registerDaoClass(NotificationDao.class);
-        registerDaoClass(TntServiceDao.class);
-        registerDaoClass(ServiceAccountDao.class);
         registerDaoClass(QuickMessageDao.class);
         registerDaoClass(GivingSummaryCacheDao.class);
         registerDaoClass(LogDao.class);
