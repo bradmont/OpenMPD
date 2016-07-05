@@ -32,7 +32,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
 import net.bradmont.openmpd.helpers.TextTools;
 import net.bradmont.openmpd.*;
@@ -45,16 +45,41 @@ public class NotificationsFragment extends ListFragment{
     private EnhancedListView mListView;
     private OnClickListener mOnClickListener = null;
 
+    public static final String NEW_PARTNER = "new_partner";
+    public static final String CHANGE_PARTNER_TYPE = "change_partner_type";
+    public static final String SPECIAL_GIFT = "special_gift";
+    public static final String LATE = "late";
+    public static final String LAPSED = "lapsed";
+    public static final String DROPPED = "dropped";
+    public static final String RESTARTED = "restarted";
+    public static final String FULFILLED = "fulfilled";
+    public static final String CHANGE_AMOUNT = "change_amount";
+    public static final String REMINDER = "reminder";
+
+    public static final String NEW_NOTIFICATON = "new";
+    public static final String SEEN_NOTIFICATION = "seen";
+    public static final String DISMISSED_NOTIFICATION = "dismissed";
+
+
+
     private final static String NOTIFICATIONS_QUERY = 
-        "select notification._id, notification.contact_id, notification.type, notification.status, notification.message, notification.date, notification.last_gift, notification.giving_amount, notification.partner_type, notification.partner_status, contact.*, contact_status.status as contact_status, contact_status.partner_type, contact_status.giving_amount, contact_status.manual_set_expires, contact_status.gift_frequency, spouse.fname as spouse_fname, spouse.lname as spouse_lname from notification left join contact on notification.contact_id = contact._id left join contact_status on contact._id=contact_status.contact_id left outer join contact as spouse on contact.spouse_id=spouse._id where notification.status = ? and not (type = 2 and contact_status = 5 and manual_set_expires > date) and not (notification.partner_type < 10 and notification.partner_type > 0) and not (contact_Status = 5 and message = 4) order by date desc;";
-    // and not (type = 2 and contact_status = 5 and manual_set_expires > date) 
-    // filters out  "Continued" notifications for donors set as regular by 
-    // the user
-    // and not (0 < partner_type < 10) is to weed out old notifications from a previous app version
-    // and not (contact_status = "5" and message="4") weeds out notification change from "new" to "current"
+        "select " +
+            "notification._id as _id, notification.type as n_type, " +
+            "notification.status as n_status, notification.message, notification.date, " +
+            "fname, lname, s_fname, s_lname, CONTACTS._id as _contact_id, contacts.type, " +
+            "giving_amount, contacts.status, giving_frequency, last_gift, " +
+            "manual_set_expires " +
+        "from " +
+
+            "notification join " +
+                "(" +ContactListFragment.BASE_QUERY + ") as CONTACTS " + // contacts + statuses
+                "on notification.contact_id = _contact_id "+
+        "where "+
+            "n_status != ? " +
+        "order by date desc;";
 
 
-    private static final String [] columns = { "LNAME", "GIVING_AMOUNT", "TYPE", "FNAME", "FNAME", "SPOUSE_FNAME", "DATE", "TYPE"};
+    private static final String [] columns = { "lname", "giving_amount", "type", "fname", "fname", "s_fname", "DATE", "n_type"};
     private static final int [] fields = { R.id.name, R.id.amount, R.id.type,  R.id.initials, R.id.user_icon_left, R.id.user_icon_right, R.id.date, R.id.quickactions};
     private static int[] icon_colors = null;
 
@@ -72,9 +97,15 @@ public class NotificationsFragment extends ListFragment{
 
         Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
-                new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
+                new String [] { DISMISSED_NOTIFICATION });
 
         mOnClickListener = new NotificationCardClickListener();
+
+        String [] cols = cursor.getColumnNames();
+        String res = "";
+        for (int i = 0; i < cols.length; i++) res = res + cols[i] +", ";
+        Log.i("net.bradmont.openmpd", res);
+
         mAdapter = new EnhancedListAdapter(getActivity(),
                  R.layout.notification_list_item, cursor, columns, fields);
         mAdapter.setViewBinder(new NotificationListViewBinder());
@@ -109,9 +140,9 @@ public class NotificationsFragment extends ListFragment{
                 case R.id.user_icon_right :
                     iconView = (ImageView) view;
 
-                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
-                        value = cursor.getString(cursor.getColumnIndex("spouse_fname")) + " " +
-                                cursor.getString(cursor.getColumnIndex("spouse_lname")) ;
+                    if (!cursor.isNull(cursor.getColumnIndex("s_fname"))){
+                        value = cursor.getString(cursor.getColumnIndex("s_fname")) + " " +
+                                cursor.getString(cursor.getColumnIndex("s_lname")) ;
                         String spouse_value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
                                 cursor.getString(cursor.getColumnIndex("lname")) ;
                         iconView.getDrawable().setColorFilter( getColor(value, spouse_value), Mode.MULTIPLY );
@@ -128,9 +159,9 @@ public class NotificationsFragment extends ListFragment{
                     try {
                         value += cursor.getString(cursor.getColumnIndex("fname")).substring(0,1);
                     } catch (Exception e){}
-                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
+                    if (!cursor.isNull(cursor.getColumnIndex("s_fname"))){
                         try {
-                            value += cursor.getString(cursor.getColumnIndex("spouse_fname")).substring(0,1);
+                            value += cursor.getString(cursor.getColumnIndex("s_fname")).substring(0,1);
                         } catch (Exception e){}
                     } else {
                         try {
@@ -142,9 +173,9 @@ public class NotificationsFragment extends ListFragment{
                     return true;
                 case R.id.name :
                     tv = (TextView) view;
-                    if (!cursor.isNull(cursor.getColumnIndex("spouse_fname"))){
+                    if (!cursor.isNull(cursor.getColumnIndex("s_fname"))){
                         value = cursor.getString(cursor.getColumnIndex("fname")) +
-                                "&" + cursor.getString(cursor.getColumnIndex("spouse_fname")) +
+                                "&" + cursor.getString(cursor.getColumnIndex("s_fname")) +
                                 " " + cursor.getString(cursor.getColumnIndex("lname")) ;
                     } else {
                         value = cursor.getString(cursor.getColumnIndex("fname")) + " " +
@@ -156,11 +187,11 @@ public class NotificationsFragment extends ListFragment{
                     return true;
                 case R.id.amount:
                     tv = (TextView) view;
-                    if (cursor.getInt(cursor.getColumnIndex("type")) == Notification.SPECIAL_GIFT){
+                    if (cursor.getString(cursor.getColumnIndex("type")).equals(SPECIAL_GIFT)){
                         // on special gifts, put the value of the special gift rather than the
                         // partner's regular giving amount
                         try {
-                            String message = cursor.getString(cursor.getColumnIndex("message"));
+                            String message = cursor.getString(cursor.getColumnIndex("MESSAGE"));
                             value = "$" + message.substring(0, message.length() - 2);
                             tv.setText(value);
                             return true;
@@ -169,82 +200,63 @@ public class NotificationsFragment extends ListFragment{
                     int amount = cursor.getInt(columnIndex)/100;
                     value = Integer.toString(amount);
 
-                    switch (cursor.getInt(cursor.getColumnIndex("type"))){
-                        case Notification.SPECIAL_GIFT:
-                            break;
-                        case Notification.CHANGE_PARTNER_TYPE:
-                        case Notification.CHANGE_AMOUNT:
-                        case Notification.CHANGE_STATUS:
-                            switch (cursor.getInt(cursor.getColumnIndex("partner_type"))){
-                                case ContactStatus.PARTNER_MONTHLY:
-                                    value += getString(R.string.per_month);
-                                    break;
-                                case ContactStatus.PARTNER_ANNUAL:
-                                    value += getString(R.string.per_year);
-                                    break;
-                                case ContactStatus.PARTNER_REGULAR:
-                                    value += getString(R.string.per_n_months);
-                                    int frequency = cursor.getInt(cursor.getColumnIndex("gift_frequency"));
-                                    value = value.replace("?", Integer.toString(frequency));
+                    if (!cursor.getString(cursor.getColumnIndex("n_type")).equals(SPECIAL_GIFT)){
+                        switch (cursor.getString(cursor.getColumnIndex("type"))){
+                            case "monthly":
+                                value += getString(R.string.per_month);
+                                break;
+                            case "annual":
+                                value += getString(R.string.per_year);
+                                break;
+                            case "regular":
+                                value += getString(R.string.per_n_months);
+                                int frequency = cursor.getInt(cursor.getColumnIndex("gift_frequency"));
+                                value = value.replace("?", Integer.toString(frequency));
 
-                            }
+                        }
                     }
                     tv.setText("$" + value);
                     return true;
                 case R.id.type:
                     tv = (TextView) view;
-                    switch (cursor.getInt(columnIndex)){
-                        case Notification.CHANGE_PARTNER_TYPE:
-                            int partnership = cursor.getInt(cursor.getColumnIndex("partner_type"));
-                            if (partnership == ContactStatus.PARTNER_MONTHLY ||
-                                    partnership == ContactStatus.PARTNER_REGULAR){
-                                int status = cursor.getInt(cursor.getColumnIndex("contact_status"));
-                                if (status == ContactStatus.STATUS_NEW){
+                    switch (cursor.getString(columnIndex)){
+                        case CHANGE_PARTNER_TYPE:
+                            String partnership = cursor.getString(cursor.getColumnIndex("type"));
+                            if (partnership.equals("monthly")||
+                                    partnership.equals("regular")){
+                                String status = cursor.getString(cursor.getColumnIndex("status"));
+                                if (status.equals("new")) {
                                     value = getString(R.string.new_partner);
-                                } else if (status == ContactStatus.STATUS_CURRENT){
+                                } else if (status.equals("current")){
                                     value = getString(R.string.restarted_partner);
                                 }
                             } else {
                                 value = getString(R.string.change_type);
                             }
                             break;
-                        case Notification.CHANGE_STATUS:
-                            switch (cursor.getInt(cursor.getColumnIndex("contact_status"))){
-                                case ContactStatus.STATUS_LATE:
-                                    value = getString(R.string.late_partner);
-                                    break;
-                                case ContactStatus.STATUS_LAPSED:
-                                    value = getString(R.string.lapsed_partner);
-                                    break;
-                                case ContactStatus.STATUS_DROPPED:
-                                    value = getString(R.string.dropped);
-                                    break;
-                                case ContactStatus.STATUS_NEW:
-                                    value = getString(R.string.new_partner);
-                                    break;
-                                case ContactStatus.STATUS_CURRENT:
-                                    try { 
-                                        int oldstatus = Integer.parseInt(cursor.getString(
-                                                    cursor.getColumnIndex("message")));
-                                        if (oldstatus == ContactStatus.STATUS_LATE ||
-                                            oldstatus == ContactStatus.STATUS_LAPSED ||
-                                            oldstatus == ContactStatus.STATUS_DROPPED){
-                                            value = getString(R.string.restarted_partner);
-                                        } else if (cursor.getString(cursor.getColumnIndex("manual_set_expires"))
-                                                .compareTo( cursor.getString(cursor.getColumnIndex("date"))) >= 0){
-                                            value = getString(R.string.partner_continued);
-                                        } else if (oldstatus == ContactStatus.STATUS_NEW){
-                                            value = "Maintained";
-                                        }
-                                    } catch (Exception e){
-                                    }
-                                    break;
-                            }
+                        case LATE:
+                            value = getString(R.string.late_partner);
                             break;
-                        case Notification.CHANGE_AMOUNT:
+                        case LAPSED:
+                            value = getString(R.string.lapsed_partner);
+                            break;
+                        case DROPPED:
+                            value = getString(R.string.dropped);
+                            break;
+                        case NEW_PARTNER:
+                            value = getString(R.string.new_partner);
+                            break;
+                        case RESTARTED:
+                            value = getString(R.string.restarted_partner);
+                            break;
+
+                        case FULFILLED:
+                                value = "Fulfilled";
+                            break;
+                        case CHANGE_AMOUNT:
                             value = getString(R.string.amount_change);
                             break;
-                        case Notification.SPECIAL_GIFT:
+                        case SPECIAL_GIFT:
                             value = getString(R.string.special_gift);
                             break;
                     }
@@ -257,7 +269,7 @@ public class NotificationsFragment extends ListFragment{
                 case R.id.quickactions:
                     view.findViewById(R.id.action_icon).setOnClickListener(mOnClickListener);
                     view.findViewById(R.id.action_icon).setTag(cursor.getInt(1)); // contact ID
-                    if (cursor.getInt(columnIndex) == Notification.SPECIAL_GIFT){
+                    if (cursor.getString(columnIndex).equals(SPECIAL_GIFT)){
                         TextView phone = (TextView) view.findViewById(R.id.action_icon);
                         phone.setTextSize(TypedValue.COMPLEX_UNIT_PX, 
                             getResources().getDimension(R.dimen.icon_text_size_small));
@@ -352,10 +364,10 @@ public class NotificationsFragment extends ListFragment{
             int notificationId = getCursor().getInt(0);
             OpenMPD.getDB().execSQL(
                     "update notification set status = ? where _id = ?",
-                    new String [] {Integer.toString(Notification.STATUS_ACKNOWLEDGED), Integer.toString(notificationId)});
+                    new String [] {DISMISSED_NOTIFICATION, Integer.toString(notificationId)});
             Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
-                new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
+                new String [] { SEEN_NOTIFICATION }) ;
             swapCursor(cursor);
             return notificationId;
         }
@@ -363,10 +375,10 @@ public class NotificationsFragment extends ListFragment{
         public void insert(int archived_id){
             OpenMPD.getDB().execSQL(
                     "update notification set status = ? where _id = ?",
-                    new String [] {Integer.toString(Notification.STATUS_NOTIFIED), Integer.toString(archived_id)});
+                    new String [] {SEEN_NOTIFICATION, Integer.toString(archived_id)});
             Cursor cursor = OpenMPD.getDB()
                 .rawQuery(NOTIFICATIONS_QUERY, 
-                new String [] { Integer.toString(Notification.STATUS_NOTIFIED)});
+                new String [] { SEEN_NOTIFICATION });
             swapCursor(cursor);
         }
     }
@@ -397,9 +409,10 @@ public class NotificationsFragment extends ListFragment{
                     mView = v;
                     Integer nID = (Integer) v.getTag();
                     Log.i("net.bradmont.openmpd", "Loading notification " +nID);
-                    mNotification = new Notification(nID);
-                    mContactStatus = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status")
-                        .getByField("contact_id", mNotification.getInt("contact"));
+                    mNotification = OpenMPD.getDaoSession().getNotificationDao()
+                        .load((long)nID);
+
+                    mContactStatus = mNotification.getContact().getStatus();
                     PopupMenu popup = new PopupMenu(getActivity(), v);
                     MenuInflater inflater = popup.getMenuInflater();
                     inflater.inflate(R.menu.special_gift_card_actions, popup.getMenu());
@@ -407,6 +420,7 @@ public class NotificationsFragment extends ListFragment{
                     popup.show();
                     break;
                 case R.id.action_icon:
+                    /*
                     PhoneNumber phone = (PhoneNumber) MPDDBHelper
                             .getModelByField("phone_number", "contact_id", (Integer)v.getTag());
                     Log.i("net.bradmont.openmpd", "Calling contact " + v.getTag());
@@ -420,10 +434,14 @@ public class NotificationsFragment extends ListFragment{
                         intent.setData(Uri.parse(number));
                         getActivity().startActivity(intent);
                     }
+                    */
+                    ((BaseActivity) getActivity()).userMessage("TODO!");
 
             }
         }
         public boolean onMenuItemClick(MenuItem item){
+            ((BaseActivity) getActivity()).userMessage("TODO!");
+            /*
             switch (item.getItemId()) {
                 case R.id.menu_make_monthly:
                     ((BaseActivity) getActivity()).userMessage(R.string.assigned_monthly);
@@ -480,6 +498,7 @@ public class NotificationsFragment extends ListFragment{
                     AnalyticsFragment.clearCache();
                     return true;
             }
+            */
             return false;
         }
     }

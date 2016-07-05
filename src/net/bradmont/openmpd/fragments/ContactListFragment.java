@@ -63,10 +63,11 @@ public class ContactListFragment extends ListFragment {
 				"	from person where IS_TNT_SPOUSE = 1) B "+ 
  				"on A.contact_id = B.contact_id ";
 
-    private static final String FIELDS = "fname, lname, s_fname, s_lname, _contact_id as _id, " +
-                 "type, giving_amount, status, giving_frequency, last_gift ";
+    private static final String FIELDS = 
+                "fname, lname, s_fname, s_lname, _contact_id as _id, type, " +
+                "giving_amount, status, giving_frequency, last_gift, manual_set_expires ";
 
-    private static final String BASE_QUERY = 
+    public static final String BASE_QUERY = 
                 "select " + FIELDS +
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +

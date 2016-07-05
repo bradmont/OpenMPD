@@ -122,9 +122,7 @@ public class ContactsEvaluator implements Runnable{
     private ContactStatus evaluateContact(Contact contact, boolean initialImport){
         HashMap<String, Integer> map = analyseContact(contact);
         ContactStatus status = null;
-        if (contact.getStatus().size() > 0){
-            status = contact.getStatus().get(0);// should only be one...
-        }; 
+        status = contact.getStatus();// should only be one...
         boolean giving = true;
         if (status == null){
             status = new ContactStatus();
