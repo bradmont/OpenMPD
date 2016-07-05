@@ -85,13 +85,14 @@ public class MPDDBHelper extends DBHelper{
     public void onCreate(SQLiteDatabase db){
         super.onCreate(db);
         String file = "";
+        /*
         try {
-            file = context.getResources().getResourceName(R.raw.views);
-            executeSqlScript(context, db, R.raw.views);
+            //file = context.getResources().getResourceName(R.raw.views);
+            //executeSqlScript(context, db, R.raw.views);
         } catch (IOException e){
             // TODO we should die gracefully here...
             Log.i("net.bradmont.openmpd", "FAILURE: could not open " + file );
-        }
+        }*/
     }
 
     /** 
@@ -198,13 +199,13 @@ public class MPDDBHelper extends DBHelper{
             db.execSQL("update contact_status set partner_type=partner_type*10;");
             db.execSQL("drop table if exists giving_summary_cache;");
             String file = "";
-            try {
-                file = context.getResources().getResourceName(R.raw.views);
-                executeSqlScript(context, db, R.raw.views);
+            /*try {
+                //file = context.getResources().getResourceName(R.raw.views);
+                //executeSqlScript(context, db, R.raw.views);
             } catch (IOException e){
                 // TODO we should die gracefully here...
                 Log.i("net.bradmont.openmpd", "FAILURE: could not open " + file );
-            }
+            }*/
         }
         if (oldVersion < 18){
             db.execSQL("drop view _monthly_base_giving;");
