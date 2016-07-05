@@ -127,10 +127,11 @@ public class OpenMPDDaoGenerator {
     private static Entity addContactStatus(Schema schema, Entity contact){
         Entity contactStatus = schema.addEntity("ContactStatus");
         contactStatus.addIdProperty();
+        contactStatus.setHasKeepSections(true);
 
         Property contactId = contactStatus.addLongProperty("contactId").getProperty();
         contactStatus.addToOne(contact, contactId).setName("contact");
-        contact.addToMany(contactStatus, contactId).setName("status");
+        contact.addToMany(contactStatus, contactId).setName("statuses");
 
         contactStatus.addStringProperty("type");  // monthly, regular, annual,
                     // frequent, occasional, onetime, unknown, namestormed
@@ -185,7 +186,7 @@ public class OpenMPDDaoGenerator {
         notification.addStringProperty("type");
         notification.addStringProperty("status");
         notification.addStringProperty("message");
-        notification.addDateProperty("date");
+        notification.addStringProperty("date");
         return notification;
     }
 

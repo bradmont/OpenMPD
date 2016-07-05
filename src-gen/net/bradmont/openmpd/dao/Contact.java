@@ -37,7 +37,7 @@ public class Contact {
     private List<Person> people;
     private List<ContactDetail> details;
     private List<ContactInteraction> interactions;
-    private List<ContactStatus> status;
+    private List<ContactStatus> statuses;
     private List<Gift> gifts;
     private List<Notification> notifications;
 
@@ -216,25 +216,25 @@ public class Contact {
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
-    public List<ContactStatus> getStatus() {
-        if (status == null) {
+    public List<ContactStatus> getStatuses() {
+        if (statuses == null) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             ContactStatusDao targetDao = daoSession.getContactStatusDao();
-            List<ContactStatus> statusNew = targetDao._queryContact_Status(id);
+            List<ContactStatus> statusesNew = targetDao._queryContact_Statuses(id);
             synchronized (this) {
-                if(status == null) {
-                    status = statusNew;
+                if(statuses == null) {
+                    statuses = statusesNew;
                 }
             }
         }
-        return status;
+        return statuses;
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    public synchronized void resetStatus() {
-        status = null;
+    public synchronized void resetStatuses() {
+        statuses = null;
     }
 
     /** To-many relationship, resolved on first access (and after reset). Changes to to-many relations are not persisted, make changes to the target entity. */
@@ -398,6 +398,13 @@ public class Contact {
             orderedGifts = query.list();
         }
         return orderedGifts;
+    }
+
+    public ContactStatus getStatus(){
+        if (getStatuses().size() != 0){
+            return getStatuses().get(0);
+        }
+        return null;
     }
     // KEEP METHODS END
 
