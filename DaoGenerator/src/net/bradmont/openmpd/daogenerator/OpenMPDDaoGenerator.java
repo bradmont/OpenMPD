@@ -39,7 +39,7 @@ public class OpenMPDDaoGenerator {
         Entity log = addLog(schema);
         Entity contact_sublist = addContactSublist(schema);
 
-        new DaoGenerator().generateAll(schema, "../src-gen");
+        new DaoGenerator().generateAll(schema, "../src");
     }
 
     private static Entity addContact(Schema schema, Entity service_account) {
