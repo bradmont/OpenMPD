@@ -25,6 +25,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
 import net.bradmont.openmpd.helpers.Log;
+import net.bradmont.openmpd.helpers.TextTools;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -54,9 +55,9 @@ public class ContactListFragment extends ListFragment {
     private SimpleCursorAdapter adapter = null;
     private static int[] icon_colors = null;
     private static final String CONTACT_COUPLE_SUBQUERY =
-				"select A.contact_id as _contact_id, fname, lname, s_fname, s_lname from " +
+				"select distinct A.contact_id as _contact_id, fname, lname, s_fname, s_lname from " +
 
- 				"(select * from contact join person on person.contact_id =contact._id "+
+ 				"(select distinct * from contact join person on person.contact_id =contact._id "+
 				"	where IS_CONTACT_PRIMARY = 1) A "+
  				"left outer join " +
 				"(select contact_id, fname as s_fname, lname as s_lname "+
@@ -64,15 +65,17 @@ public class ContactListFragment extends ListFragment {
  				"on A.contact_id = B.contact_id ";
 
     private static final String FIELDS = 
-                "fname, lname, s_fname, s_lname, _contact_id as _id, type, " +
-                "giving_amount, status, giving_frequency, last_gift, manual_set_expires ";
+                "fname, lname, s_fname, s_lname, _contact_id as _id, TYPE as type, " +
+                "GIVING_AMOUNT as giving_amount, STATUS as status, GIVING_FREQUENCY "+
+                "as giving_frequency, LAST_GIFT as last_gift, MANUAL_SET_EXPIRES as manual_set_expires ";
 
     public static final String BASE_QUERY = 
                 "select " + FIELDS +
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +
                 "   on _contact_id = contact_status.contact_id "+
-                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+                "order by (status = 'new') desc, (status='current') desc, (type='monthly') "+
+                "desc, (type='annual') desc, (type='regular') desc, type desc, lname, fname";
 
 
     private static final String STATUS_QUERY = 
@@ -122,6 +125,7 @@ public class ContactListFragment extends ListFragment {
 
         // set up adapter
         cursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
+        TextTools.dumpCursorColumns(cursor);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
         adapter.setViewBinder( new SimpleCursorAdapter.ViewBinder(){
@@ -144,35 +148,30 @@ public class ContactListFragment extends ListFragment {
                         return true;
 
                     case R.id.type:
-                        int type = cursor.getInt(columnIndex);
-                        int status = cursor.getInt(cursor.getColumnIndex("status"));
+                        String type = cursor.getString(columnIndex);
+                        String status = cursor.getString(cursor.getColumnIndex("status"));
                         tv = (TextView) view;
                         if (cursor.getPosition() ==0){
                             view.setVisibility(View.VISIBLE);
-                            if (ContactStatus.getStatusStringRes(status) != R.string.current &&
-                                    ContactStatus.getStatusStringRes(status) != R.string.none){
-                                value = getActivity().getResources()
-                                    .getString(ContactStatus.getStatusStringRes(status)) + " "; 
+                            if (!status.equals("current") && !status.equals("none")) {
+                                value = status + " ";
                             }
-                            value += getActivity().getResources()
-                                .getString(ContactStatus.getTypeStringRes(type));
-                            if (ContactStatus.getTypeStringRes(type) != R.string.none){
+                            value += type;
+                            if (!type.equals("none")){
                                 value += " " + getActivity().getResources().getString(R.string.partners);
                             }
                             tv.setText(value);
                         } else {
                             cursor.moveToPrevious();
-                            if (type != cursor.getInt(columnIndex) ||
-                                    status != cursor.getInt(cursor.getColumnIndex("status"))){
+                            if (!(type.equals( cursor.getString(columnIndex)) ||
+                                    !status.equals(cursor.getString(cursor.getColumnIndex("status"))))){
                                 view.setVisibility(View.VISIBLE);
-                                if (ContactStatus.getStatusStringRes(status) != R.string.current &&
-                                        ContactStatus.getStatusStringRes(status) != R.string.none){
-                                    value = getActivity().getResources()
-                                        .getString(ContactStatus.getStatusStringRes(status)) + " "; 
+                                if (!status.equals("current") &&
+                                        !status.equals("none")){
+                                    value = status + " ";
                                 }
-                                value += getActivity().getResources()
-                                    .getString(ContactStatus.getTypeStringRes(type));
-                                if (ContactStatus.getTypeStringRes(type) != R.string.none){
+                                value += type;
+                                if (!type.equals("none")){
                                     value += " " + getActivity().getResources().getString(R.string.partners);
                                 }
                                 tv.setText(value);
@@ -184,47 +183,53 @@ public class ContactListFragment extends ListFragment {
                         return true;
                     case R.id.status:
                         // partner type
-                        status = cursor.getInt(cursor.getColumnIndex("status"));
-                        type = cursor.getInt(cursor.getColumnIndex("type"));
+                        status = cursor.getString(cursor.getColumnIndex("status"));
+                        type = cursor.getString(cursor.getColumnIndex("type"));
+                        int gift_frequency = cursor.getInt(cursor.getColumnIndex("giving_frequency"));
                         tv = (TextView) view;
-                        String text = getActivity().getResources()
-                            .getString(ContactStatus.partnership(type));
+                        String text = type;
+                        if (type.equals("monthly"))
+                                text = getActivity().getResources().getString(R.string.per_month);
+                        if (type.equals("annual"))
+                                text = getActivity().getResources().getString(R.string.per_year);
+                        if (type.equals("regular"))
+                                text = getActivity().getResources().getString(R.string.per_n_months);
+                        // TODO: change "type" to "/?mo"...
                         // replace ? with giving frequency (for REGULAR donors)
-                        if (cursor.getString(7) != null){
-                            text = text.replace("?", cursor.getString(7));
+                        if (gift_frequency != 0 && gift_frequency != 1 && gift_frequency != 12){
+                            text = text.replace("?",  Integer.toString(gift_frequency));
                         }
                         tv.setText(text);
-                        if (status == ContactStatus.STATUS_LATE ||
-                                status == ContactStatus.STATUS_LAPSED ||
-                                status == ContactStatus.STATUS_DROPPED){
-                            tv.setTextColor(ContactStatus.STATUS_COLORS[status]);
+                        if (status.equals("late")||
+                                status.equals("lapsed")||
+                                status.equals("dropped")){
+                            tv.setTextColor(getStatusColour(status));
                         } else {
-                            tv.setTextColor(getActivity().getResources()
-                                    .getColor(ContactStatus.getTypeColorRes(type)));
+                            tv.setTextColor(getStatusColour(type));
                         }
                         return true;
                     case R.id.amount:
                         // amount
-                        status = cursor.getInt(cursor.getColumnIndex("status"));
-                        type = cursor.getInt(cursor.getColumnIndex("type"));
+                        status = cursor.getString(cursor.getColumnIndex("status"));
+                        type = cursor.getString(cursor.getColumnIndex("type"));
                         tv = (TextView) view;
-                        if (cursor.getInt(5) == 0){
+                        int amount = cursor.getInt(cursor.getColumnIndex("giving_amount"));
+                        if (type.equals("monthly") ||type.equals("regular") || type.equals("annual")){
+                            tv.setText(" $" + Integer.toString(amount/100));
+                        } else {
                             tv.setText("");
-                        } else {
-                            tv.setText(" $" + Integer.toString(cursor.getInt(5)/100));
                         }
-                        if (status == ContactStatus.STATUS_LATE ||
-                                status == ContactStatus.STATUS_LAPSED ||
-                                status == ContactStatus.STATUS_DROPPED){
-                            tv.setTextColor(ContactStatus.STATUS_COLORS[status]);
+                        if (status.equals("late")||
+                                status.equals("lapsed")||
+                                status.equals("dropped")){
+                            tv.setTextColor(getStatusColour(status));
                         } else {
-                            tv.setTextColor(getActivity().getResources()
-                                    .getColor(ContactStatus.getTypeColorRes(type)));
+                            tv.setTextColor(getStatusColour(type));
                         }
                         return true;
                     case R.id.last_gift:
                         tv = (TextView) view;
-                        String date = cursor.getString(8);
+                        String date = cursor.getString(cursor.getColumnIndex("last_gift"));
                         if (date != null){
                             tv.setText(date.substring(0,7));
                         } else {
@@ -282,6 +287,29 @@ public class ContactListFragment extends ListFragment {
         setListAdapter(adapter);
         mListView.setOnItemClickListener(new ContactListClickListener());
 
+    }
+    private int getStatusColour(String status){
+        switch(status){
+            case "late":
+                return getActivity().getResources().getColor(R.color.late_partner);
+            case "lapsed":
+                return getActivity().getResources().getColor(R.color.lapsed_partner);
+            case "dropped":
+                return getActivity().getResources().getColor(R.color.dropped_partner);
+            case "new":
+                return getActivity().getResources().getColor(R.color.new_partner);
+            case "monthly":
+                return getActivity().getResources().getColor(R.color.monthly_partner);
+            case "regular":
+            case "annual":
+                return getActivity().getResources().getColor(R.color.regular_partner);
+            case "frequent":
+                return getActivity().getResources().getColor(R.color.frequent_partner);
+            case "special":
+            case "onetime":
+                return getActivity().getResources().getColor(R.color.special_partner);
+        }
+        return 0;
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

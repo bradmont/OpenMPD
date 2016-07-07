@@ -22,6 +22,8 @@
 
     <color name="late_partner">#795548</color>
     <color name="lapsed_partner">#607d8b</color>
+    <color name="dropped_partner">#A0A0A0</color>
+    <color name="new_partner">#99CC00</color>
     <color name="monthly_partner">#5677fc</color>
     <color name="regular_partner">#ff9800</color>
     <color name="frequent_partner">#ffc107</color>

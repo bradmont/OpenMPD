@@ -1,5 +1,6 @@
 package net.bradmont.openmpd.helpers;
 
+import android.database.Cursor; 
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -151,4 +152,10 @@ public class TextTools{
         return String.format("%s-%s-%s", parts[2], parts[0], parts[1]);
     }
 
+    public static void dumpCursorColumns(Cursor c){
+        String [] cols = c.getColumnNames();
+        String res = "";
+        for (int i = 0; i < cols.length; i++) res = res + cols[i] +", ";
+        Log.i("net.bradmont.openmpd", res);
+    }
 }
