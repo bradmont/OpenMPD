@@ -369,14 +369,31 @@ public class Contact {
     private ContactDetail _getTntDetailOrNew(String type){
         try {
             for (ContactDetail d : getDetails()){
-                if (d.getFromTnt() && d.getType() == type){
+                if (d.getFromTnt() && d.getType().equals(type)){
                     return d;
                 }
             }
         } catch (Exception e){}
 
         ContactDetail n = new ContactDetail();
+        n.setContact(this);
         n.setType(type);
+        return n;
+
+    }
+
+    public ContactDetail getNoteOrNew(){
+        try {
+            for (ContactDetail d : getDetails()){
+                if (d.getFromTnt() && d.getType().equals("note")){
+                    return d;
+                }
+            }
+        } catch (Exception e){}
+
+        ContactDetail n = new ContactDetail();
+        n.setContact(this);
+        n.setType("note");
         return n;
 
     }

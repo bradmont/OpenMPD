@@ -362,7 +362,7 @@ public class TntImporter {
         ContactDao contactDao = OpenMPD.getDaoSession().getContactDao();
         List<Contact> contacts = contactDao.queryBuilder()
             .where(ContactDao.Properties.TntPeopleId
-                .eq(mDataHash.get("PEOPLE_ID") + ":" + mAccount.getName())
+                .eq(mDataHash.get("PEOPLE_ID") + ":" + mAccount.getName()))
             .list();
         Contact contact;
         boolean newContact = false;

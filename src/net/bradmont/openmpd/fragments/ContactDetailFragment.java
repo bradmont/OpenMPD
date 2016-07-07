@@ -1,9 +1,8 @@
 package net.bradmont.openmpd.fragments;
 
-import net.bradmont.supergreen.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.holograph.BarGraph;
 import net.bradmont.openmpd.*;
-import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.QuickMessenger;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
@@ -38,7 +37,11 @@ import android.view.MenuInflater;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.lang.Runnable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ContactDetailFragment extends Fragment implements OnClickListener{
     private HashMap<String, String> values = new HashMap();
@@ -48,7 +51,11 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     private View layout;
 
     private Contact contact = null;
-    private Contact spouse = null;
+    private Person mPrimaryPerson = null;
+    private Person mSpouse = null;
+    private List<Person> mPeople = null;
+    private List<ContactDetail> mDetails = null;
+
     private ContactStatus status  = null;
 
     public static final int EMAIL = 1;
@@ -57,7 +64,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     public static final int NOTES = 4;
 
     public ContactDetailFragment(int id){
-        contact = new Contact(id);
+        contact = OpenMPD.getDaoSession().getContactDao().load((long)id);
     }
 
     public ContactDetailFragment(){
@@ -68,7 +75,10 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     }
 
     public void setContact(int id){
-        contact = new Contact(id);
+        setContact((long) id);
+    }
+    public void setContact(long id){
+        contact = OpenMPD.getDaoSession().getContactDao().load(id);
         populateView();
     }
     public void setContact(Contact contact){
@@ -82,7 +92,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             Bundle savedInstanceState) {
 
         if (savedInstanceState != null && savedInstanceState.containsKey("contact_id")){
-            contact = new Contact(savedInstanceState.getInt("contact_id"));
+            setContact(savedInstanceState.getLong("contact_id"));
         }
 
 
@@ -101,161 +111,68 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         View layout = getView();
         if (layout == null) return;
 
-        if (contact.getString("fname") == null && contact.getString("lname") == null){
-            // ugly hack to move around a bug in the import routines when
-            // donor data is dirty
-            try {
-                spouse = (Contact) contact.getRelated("spouse");
-                String temp = spouse.getString("tnt_people_id");
-                temp = temp.substring(1);
-                contact.setValue("tnt_people_id", temp);
-            } catch (Exception e){ 
-                // at this point, we're pretty much screwed...
-            }
-        }
-        values.put("fname", contact.getString("fname"));
-        values.put("lname", contact.getString("lname"));
+        mPrimaryPerson = contact.getPrimaryPerson();
+        mSpouse = contact.getTntSpouse();
 
-        // spouse
-        try {
-            spouse = (Contact) contact.getRelated("spouse");
-            values.put("spouse_fname", spouse.getString("fname"));
-            if (spouse.getString("lname").equals(contact.getString("lname"))){
+        values.put("fname", mPrimaryPerson.getFname());
+        values.put("lname", mPrimaryPerson.getLname());
+
+        if (mSpouse != null){
+            values.put("spouse_fname", mSpouse.getFname());
+            if (mSpouse.getLname().equals(mPrimaryPerson.getLname())){
                 values.put("name", 
-                    contact.getString("fname") + " "+
+                    mPrimaryPerson.getFname()+ " "+
                         getActivity().getResources().getString(R.string.and) + " " +
-                        spouse.getString("fname") + " " +
-                        contact.getString("lname")
-                );
+                        mSpouse.getFname()+ " " +
+                        mPrimaryPerson.getLname());
             } else {
                 values.put("name", 
-                    contact.getString("fname") + " "+
-                        contact.getString("lname") + " " +
+                    mPrimaryPerson.getFname()+ " "+ mPrimaryPerson.getLname()+ " " +
                         getActivity().getResources().getString(R.string.and) + " " +
-                        spouse.getString("fname") + " " +
-                        spouse.getString("lname"));
+                        mSpouse.getFname()+ " " + mSpouse.getLname());
             }
-        } catch (Exception e){ 
+        } else { 
             values.put("name", 
-                contact.getString("fname") + " "+
-                    contact.getString("lname"));
+                mPrimaryPerson.getFname()+ " "+ mPrimaryPerson.getLname());
         }
         ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(values.get("name"));
 
-        ArrayList<Link> links = new ArrayList<Link>(4);
-
-        // email
-        try {
-            EmailAddress email = (EmailAddress) MPDDBHelper
-                    .getModelByField("email_address", "contact_id", contact.getInt("id"));
-            values.put("email_address", email.getString("address"));
-            Link link = new Link();
-            link.title = R.string.Email;
-            link.value = email.getString("address");
-            link.type = EMAIL;
-            if (link.value != "" && link.value != null && link.value.length() > 1){
-                links.add(link);
-            }
-        } catch (Exception e){ }
-
-        // phone number
-        try {
-            PhoneNumber phone = (PhoneNumber) MPDDBHelper
-                    .getModelByField("phone_number", "contact_id", contact.getInt("id"));
-            values.put("phone_number", phone.getString("number"));
-            Link link = new Link();
-            link.title = R.string.Phone;
-            link.value = phone.getString("number");
-            link.type = PHONE;
-            if (link.value != "" && link.value != null && link.value.length() > 1){
-                links.add(link);
-            }
-        } catch (Exception e){ }
-
-        // address
-        try {
-            Address address = (Address) MPDDBHelper
-                    .getModelByField("address", "contact_id", contact.getInt("id"));
-
-            values.put("addr1", address.getString("addr1"));
-            String fullAddress = address.getString("addr1");
-            if (address.getString("addr2") != null
-                && !address.getString("addr2").equals("")){
-                values.put("addr2", address.getString("addr2"));
-                fullAddress = fullAddress + ", " + values.get("addr2");
-            }
-            if (address.getString("addr3") != null
-                && !address.getString("addr3").equals("")){
-                values.put("addr3", address.getString("addr3"));
-                fullAddress = fullAddress + ", " + values.get("addr3");
-            }
-            if (address.getString("addr4") != null
-                && !address.getString("addr4").equals("")){
-                values.put("addr4", address.getString("addr4"));
-                fullAddress = fullAddress + ", " + values.get("addr4");
-            }
-            values.put("city", address.getString("city"));
-            fullAddress = fullAddress + ", " + values.get("city");
-            values.put("region", address.getString("region"));
-            fullAddress = fullAddress + ", " + values.get("region");
-            values.put("post_code", address.getString("post_code"));
-            fullAddress = fullAddress + ", " + values.get("post_code");
-            values.put("country_short", address.getString("country_short"));
-
-            Link link = new Link();
-            link.title = R.string.Address;
-            link.value = fullAddress;
-            link.type = ADDRESS;
-            if (link.value != "" && link.value != null){
-                links.add(link);
-            }
-        } catch (Exception e){ }
-
-        // Partner status & notes
-        try {
-            status = (ContactStatus) MPDDBHelper.getReferenceModel("contact_status").getByField("contact_id", contact.getInt("id"));
-
-            String partner_type = getActivity().getResources()
-                            .getString(ContactStatus.partnership(status.getInt("partner_type")));
-            String giving_amount = "$" + Integer.toString(status.getInt("giving_amount")/100);
-            String giving_status = 
-                getActivity().getResources().getString(
-                    ContactStatus.getStatusStringRes(status.getInt("status")));
-            
-            // header will be different depending on partner type
-            if (status.getInt("partner_type") >= ContactStatus.PARTNER_ANNUAL){
-                String subTitle = giving_amount + partner_type + ", " + giving_status;
-                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
-            } else if (status.getInt("partner_type") >= ContactStatus.PARTNER_ONETIME){
-                // TODO: set up last_gift in partner_status
-                String subTitle = partner_type + ". " + 
-                    getActivity().getResources().getString(R.string.last_gift) + 
-                    status.getString("last_gift");
-                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
-            } else {
-                String subTitle = partner_type;
-                ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
-            }
-            Link link = new Link();
-            link.title = R.string.Notes;
-            link.value = status.getString("notes");
-            link.type = NOTES;
-            if (link.value != "" && link.value != null && link.value.length() > 1){
-                links.add(link);
-            }
-        } catch (Exception e){ }
+        mDetails = contact.getDetails();
 
         // Add links to the view
         LinearLayout linkList = (LinearLayout) layout.findViewById(R.id.contactinfo_list);
-        for (int i = 0; i < links.size(); i++){
-            Log.i("net.bradmont.openmpd", "Adding view " + links.get(i).title);
-            View v = buildLinkView(links.get(i), linkList);
+        for (ContactDetail detail : mDetails){
+            View v = buildLinkView(detail, linkList);
             v.setLayoutParams(linkList.getLayoutParams());
             linkList.addView(v);
         }
+        // Status
+        status = contact.getStatus();
+        if (status != null){
+            String partner_type = status.getType();
+            String giving_amount = "$" + Long.toString(status.getGivingAmount()/100);
+            String giving_status = status.getStatus();
+            String subTitle = "";
+            
+            // header will be different depending on partner type
+            if (status.getType().equals("annual") ||
+                status.getType().equals("regular") ||
+                status.getType().equals("monthly")){
+                subTitle = giving_amount + partner_type + ", " + giving_status;
+            } else if (status.getType().equals("frequent") ||
+                status.getType().equals("occasional") ||
+                status.getType().equals("onetime")){
+                subTitle = partner_type + ". " + 
+                    getActivity().getResources().getString(R.string.last_gift) + 
+                    status.getLastGift();
+            } else {
+                subTitle = partner_type;
+            }
+            ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(subTitle);
+        } 
 
         // barGraph
-        if (!buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph), contact.getString("tnt_people_id"))){
+        if (!buildGraph((BarGraph) layout.findViewById(R.id.gifts_graph) )){
             // Hide bar graph if no gifts in last year
             layout.findViewById(R.id.bar_graph_layout).setVisibility(View.GONE);
         }
@@ -272,14 +189,21 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.notes_text, null);
 
-        notes_text.setText(status.getString("notes"));
+        ContactDetail note = contact.getNoteOrNew();
+        try {
+            JSONObject json = new JSONObject(note.getData());
+            notes_text.setText(json.getString("note"));
+        } catch (JSONException e){}
         ad.setView(notes_text);
-        final ContactStatus local_status = status;
+        final ContactDetail local_note = note;
         ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                local_status.setValue("notes", notes_text.getText().toString());
-                local_status.dirtySave();
-                //((FragmentActivity)getActivity()).switchContent(new ContactDetail(contact.getID()));
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("note", notes_text.getText().toString());
+                } catch (JSONException e){}
+                local_note.setData(json.toString());
+                OpenMPD.getDaoSession().getContactDetailDao().insertOrReplace(local_note);
             }
         });
         ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -300,9 +224,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                     .inflate(R.layout.dialog_list, null);
 
-                String [] args = new String[1]; args[0] = contact.getString("tnt_people_id");
+                String [] args = new String[1]; args[0] = Long.toString(contact.getId());
                 Cursor cur = OpenMPD.getDB().rawQuery(
-                    "select _id, date, amount as amount from gift where tnt_people_id=? order by date desc; " , args);
+                    "select _id, date, amount as amount from gift where contact_id=? order by date desc; " , args);
 
                 SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
                     R.layout.contact_gift_list_item,
@@ -337,26 +261,23 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
 
 
 
-    private boolean buildGraph(BarGraph graph, String tnt_people_id){
+    private boolean buildGraph(BarGraph graph){
         String [] args = new String [1];
-        args[0] = contact.getString("tnt_people_id");
-        if (args[0] == null){
-            args[0] = spouse.getString("tnt_people_id");
-        }
-        if (args[0] == null){
-            return false;
-        }
+
+        args[0] = Long.toString(contact.getId());
 
         Cursor cur = OpenMPD.getDB().rawQuery(
-            "select sum(amount) from (select amount, a.month from (select distinct month from gift order by month desc limit 13) a join gift b on a.month=b.month where tnt_people_id=?);", args);
+            "select sum(amount) from (select amount, a.month from (select month from months order by month desc limit 13) a join gift b on a.month=b.month where contact_id=?);", args);
         cur.moveToFirst();
         if (cur.getInt(0) == 0){
             // if no gifts in last 13 months, return false
+            cur.close();
             return false;
         }
+        cur.close();
 
         cur = OpenMPD.getDB().rawQuery(
-            "select a.month, group_concat(b.amount) from (select distinct month from gift order by month desc) a left outer join (select * from gift where tnt_people_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
+            "select a.month, group_concat(b.amount) from months a left outer join (select * from gift where contact_id=?) b on a.month=b.month group by a.month order by a.month; " , args);
         Float [][] values = new Float[cur.getCount()][];
         String [] labels = new String[cur.getCount()];
         cur.moveToFirst();
@@ -394,7 +315,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     @Override
     public void onSaveInstanceState (Bundle outState){
         if (contact != null){
-            outState.putInt("contact_id", contact.getID());
+            outState.putLong("contact_id", contact.getId());
         }
     }
 
@@ -421,7 +342,68 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         public int type = 0;
     }
 
-    public View buildLinkView(final Link link, ViewGroup parent) {
+    private void populateEmailView(ContactDetail detail, 
+            TextView title, TextView value, TextView subtitle){
+
+        title.setText(R.string.Email);
+        try {
+            JSONObject json = new JSONObject(detail.getData());
+            value.setText(json.getString("email"));
+        } catch (JSONException e){ 
+            value.setText("--ERROR--" );// TODO
+        }
+        subtitle.setText(detail.getLabel());
+    }
+    private void populatePhoneView(ContactDetail detail, 
+            TextView title, TextView value, TextView subtitle){
+
+        title.setText(R.string.Phone);
+        try {
+            JSONObject json = new JSONObject(detail.getData());
+            value.setText(json.getString("number"));
+        } catch (JSONException e){ 
+            value.setText("--ERROR--" );// TODO
+        }
+        subtitle.setText(detail.getLabel());
+    }
+    private void populateAddressView(ContactDetail detail, 
+            TextView title, TextView value, TextView subtitle){
+
+        title.setText(R.string.Address);
+        try {
+            JSONObject json = new JSONObject(detail.getData());
+            String address = json.getString("addr1");
+
+            for ( String part : new String [] {"addr2", "addr3", "addr4", "city", "region", 
+                    "post_code", "country_short" }){
+                if (!json.getString(part).equals("")){
+                    address = address + ", " + json.getString(part);
+                }
+            }
+
+            value.setText(address);
+        } catch (JSONException e){ 
+            value.setText("--ERROR--" );// TODO
+        }
+        subtitle.setText(detail.getLabel());
+    }
+
+    private void populateNoteView(ContactDetail detail, 
+            TextView title, TextView value, TextView subtitle){
+
+        title.setText(R.string.Notes);
+        try {
+            JSONObject json = new JSONObject(detail.getData());
+            value.setText(json.getString("note"));
+        } catch (JSONException e){ 
+            value.setText("--ERROR--" );// TODO
+        }
+        subtitle.setText(detail.getLabel());
+    }
+
+
+
+    public View buildLinkView(final ContactDetail detail, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getActivity()
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
@@ -429,38 +411,63 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         TextView title = (TextView) rowView.findViewById(R.id.title);
         TextView value = (TextView) rowView.findViewById(R.id.value);
         TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
-
-        title.setText(link.title);
-        value.setText(link.value);
-        if (link.subtitle != null){
-            subtitle.setText(link.subtitle);
-        } else {
-            subtitle.setVisibility(View.GONE);
+        switch (detail.getType()){
+            case "email":
+                populateEmailView(detail, title, value, subtitle);
+                break;
+            case "phone":
+                populatePhoneView(detail, title, value, subtitle);
+                break;
+            case "address":
+                populateAddressView(detail, title, value, subtitle);
+                break;
+            case "note":
+                populateNoteView(detail, title, value, subtitle);
+                break;
         }
+
         value.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = null;
-                switch (link.type){
-                    case EMAIL:
+                JSONObject json = null;
+                try {
+                    json = new JSONObject(detail.getData());
+                } catch (JSONException e){}
+                switch (detail.getType()){
+                    case "email":
                         // TODO: Log contact
-                        QuickMessenger q = new QuickMessenger(getActivity(), contact);
-                        q.showQuickMessageDialog();
+                        //QuickMessenger q = new QuickMessenger(getActivity(), contact);
+                        //q.showQuickMessageDialog();
+                        ((BaseActivity) getActivity()).userMessage("TODO");
                         break;
-                    case PHONE:
+                    case "phone":
                         // TODO: Log contact
-                        String number = link.value.replaceAll("[^\\d]", "");
+                        String number ="";
+                        try {
+                            number = json.getString("number").replaceAll("[^\\d]", "");
+                        } catch (JSONException e) { 
+                            ((BaseActivity)getActivity()).userMessage("Invalid stored number...");
+                            break;
+                        }
                         number = "tel:" + number;
                         intent = new Intent(Intent.ACTION_DIAL);
                         intent.setData(Uri.parse(number));
                         getActivity().startActivity(intent);
                         break;
-                    case ADDRESS:
-                        String uri = "geo:0,0?q=" + Uri.encode(link.value);
+                    case "address":
+                        String uri = "";
+                        try {
+                            uri = "geo:0,0?q=" + Uri.encode(json.getString("addr1") + ", " + 
+                                    json.getString("city") + ", " + json.getString("region") );
+                        } catch (JSONException e) { 
+                            ((BaseActivity)getActivity()).userMessage("Invalid stored address...");
+                            break;
+                        }
                         intent = new Intent(android.content.Intent.ACTION_VIEW, 
                             Uri.parse(uri));
                         getActivity().startActivity(intent);
                         break;
-                    case NOTES:
+                    case "note":
                         editNotes();
                         break;
                 }
