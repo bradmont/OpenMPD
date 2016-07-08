@@ -119,7 +119,7 @@ public class ContactsEvaluator implements Runnable{
         statuses.clear();
     }
 
-    private ContactStatus evaluateContact(Contact contact, boolean initialImport){
+    public static ContactStatus evaluateContact(Contact contact, boolean initialImport){
         HashMap<String, Integer> map = analyseContact(contact);
         ContactStatus status = null;
         status = contact.getStatus();// should only be one...
@@ -146,6 +146,12 @@ public class ContactsEvaluator implements Runnable{
                 || (map.containsKey("recentGifts")  && map.get("recentGifts") >= 3)){
             status.setType("monthly");
             status.setStatus("current");
+            status.setGivingFrequency(1);
+        }
+        // New monthly if: recentGifts2
+        else if (map.containsKey("recentGifts")  && map.get("recentGifts") == 2){
+            status.setType("monthly");
+            status.setStatus("new");
             status.setGivingFrequency(1);
         }
         // annual if : 1in12months && 2in24months
@@ -179,7 +185,7 @@ public class ContactsEvaluator implements Runnable{
             status.setGivingFrequency(3);
         }
         // monthly dropped if: miss5, maxGiftStreak>2
-        else if (map.containsKey("miss") && map.get("miss") == 5
+        else if (map.containsKey("miss") && map.get("miss") > 5
                 && map.containsKey("maxGiftStreak") && map.get("maxGiftStreak") > 2){
             status.setType("monthly");
             status.setStatus("dropped");
@@ -208,15 +214,22 @@ public class ContactsEvaluator implements Runnable{
         
         if (giving == true){
             status.setGivingAmount(calcGivingAmount(contact));
+        }
+        if (!status.getType().equals("none")){
             status.setLastGift(calcLastGift(contact));
         }
+        Log.i("net.bradmont.openmpd", "Map: " + map.toString());
+        Log.i("net.bradmont.openmpd", "Type: " + status.getType());
+        Log.i("net.bradmont.openmpd", "Status: " + status.getStatus());
+        Log.i("net.bradmont.openmpd", "Frequency: " + status.getGivingFrequency());
+        Log.i("net.bradmont.openmpd", "Amount: " + status.getGivingAmount());
         return status;
     }
 
     /* returns the most common amount, in the lasts five gifts or the
      * average of the last five gifts.
      */
-    private long calcGivingAmount (Contact contact){
+    private static long calcGivingAmount (Contact contact){
         List<Gift> gifts = contact.getOrderedGifts();
         HashMap<Long, Integer> map = new HashMap<Long, Integer>();
 
@@ -248,7 +261,7 @@ public class ContactsEvaluator implements Runnable{
         return totalGiving / totalGifts;
 
     }
-    private String calcLastGift(Contact contact){
+    private static String calcLastGift(Contact contact){
         List<Gift> gifts = contact.getOrderedGifts();
         if (gifts.size() == 0) return null;
         return (gifts.get(0).getDate());
@@ -264,7 +277,7 @@ public class ContactsEvaluator implements Runnable{
      *       totalGifts# -- # total gifts
      *       avgGiftSpace# -- # average months between gifts
      */
-    private HashMap<String, Integer> analyseContact(Contact contact){
+    private static HashMap<String, Integer> analyseContact(Contact contact){
         HashMap<String, Integer> tokens = new HashMap<String, Integer>();
         if (contact.getGifts().size() == 0){
             tokens.put("nogifts", 1);
@@ -313,6 +326,9 @@ public class ContactsEvaluator implements Runnable{
                     if (recentGifts %5 == 0) tokens.put("give", recentGifts);
                 }
                 giftStreak++;
+                if (giftStreak > maxGiftStreak){
+                    maxGiftStreak = giftStreak;
+                }
                 missStreak = 0;
                 if (giftStreak > maxMissStreak) maxMissStreak = giftStreak;
             }
