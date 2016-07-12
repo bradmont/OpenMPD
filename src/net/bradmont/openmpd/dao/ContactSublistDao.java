@@ -24,7 +24,7 @@ public class ContactSublistDao extends AbstractDao<ContactSublist, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property TntPeopleId = new Property(1, String.class, "tntPeopleId", false, "TNT_PEOPLE_ID");
+        public final static Property Contact_id = new Property(1, String.class, "contact_id", false, "CONTACT_ID");
         public final static Property ListName = new Property(2, String.class, "listName", false, "LIST_NAME");
     };
 
@@ -42,11 +42,11 @@ public class ContactSublistDao extends AbstractDao<ContactSublist, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"CONTACT_SUBLIST\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"TNT_PEOPLE_ID\" TEXT," + // 1: tntPeopleId
+                "\"CONTACT_ID\" TEXT," + // 1: contact_id
                 "\"LIST_NAME\" TEXT);"); // 2: listName
         // Add Indexes
-        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_CONTACT_SUBLIST_TNT_PEOPLE_ID_LIST_NAME ON CONTACT_SUBLIST" +
-                " (\"TNT_PEOPLE_ID\",\"LIST_NAME\");");
+        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_CONTACT_SUBLIST_CONTACT_ID_LIST_NAME ON CONTACT_SUBLIST" +
+                " (\"CONTACT_ID\",\"LIST_NAME\");");
     }
 
     /** Drops the underlying database table. */
@@ -65,9 +65,9 @@ public class ContactSublistDao extends AbstractDao<ContactSublist, Long> {
             stmt.bindLong(1, id);
         }
  
-        String tntPeopleId = entity.getTntPeopleId();
-        if (tntPeopleId != null) {
-            stmt.bindString(2, tntPeopleId);
+        String contact_id = entity.getContact_id();
+        if (contact_id != null) {
+            stmt.bindString(2, contact_id);
         }
  
         String listName = entity.getListName();
@@ -87,7 +87,7 @@ public class ContactSublistDao extends AbstractDao<ContactSublist, Long> {
     public ContactSublist readEntity(Cursor cursor, int offset) {
         ContactSublist entity = new ContactSublist( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // tntPeopleId
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // contact_id
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // listName
         );
         return entity;
@@ -97,7 +97,7 @@ public class ContactSublistDao extends AbstractDao<ContactSublist, Long> {
     @Override
     public void readEntity(Cursor cursor, ContactSublist entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setTntPeopleId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setContact_id(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setListName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
      }
     

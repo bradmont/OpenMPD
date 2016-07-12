@@ -7,7 +7,7 @@ package net.bradmont.openmpd.dao;
 public class ContactSublist {
 
     private Long id;
-    private String tntPeopleId;
+    private String contact_id;
     private String listName;
 
     public ContactSublist() {
@@ -17,9 +17,9 @@ public class ContactSublist {
         this.id = id;
     }
 
-    public ContactSublist(Long id, String tntPeopleId, String listName) {
+    public ContactSublist(Long id, String contact_id, String listName) {
         this.id = id;
-        this.tntPeopleId = tntPeopleId;
+        this.contact_id = contact_id;
         this.listName = listName;
     }
 
@@ -31,12 +31,12 @@ public class ContactSublist {
         this.id = id;
     }
 
-    public String getTntPeopleId() {
-        return tntPeopleId;
+    public String getContact_id() {
+        return contact_id;
     }
 
-    public void setTntPeopleId(String tntPeopleId) {
-        this.tntPeopleId = tntPeopleId;
+    public void setContact_id(String contact_id) {
+        this.contact_id = contact_id;
     }
 
     public String getListName() {
