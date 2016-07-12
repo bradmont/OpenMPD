@@ -232,7 +232,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     }
     private void addEmail(){
         AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-        ad.setTitle(R.string.Email);
+        ad.setTitle(R.string.add_email);
         LinearLayout layout = (LinearLayout) ((LayoutInflater) getActivity()
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.dialog_new_email, null);
@@ -266,7 +266,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     }
     private void addPhone(){
         AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-        ad.setTitle(R.string.Phone);
+        ad.setTitle(R.string.add_phone);
         LinearLayout layout = (LinearLayout) ((LayoutInflater) getActivity()
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
             .inflate(R.layout.dialog_new_phone, null);
@@ -299,6 +299,51 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         ad.show();
     }
     private void addAddress(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setTitle(R.string.add_address);
+        LinearLayout layout = (LinearLayout) ((LayoutInflater) getActivity()
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+            .inflate(R.layout.dialog_new_address, null);
+
+        final EditText addr1View = (EditText) layout.findViewById(R.id.addr1);
+        final EditText addr2View = (EditText) layout.findViewById(R.id.addr2);
+        final EditText cityView = (EditText) layout.findViewById(R.id.city);
+        final EditText regionView = (EditText) layout.findViewById(R.id.region);
+        final EditText postCodeView = (EditText) layout.findViewById(R.id.post_code);
+        final EditText countryView = (EditText) layout.findViewById(R.id.country);
+        final Spinner spinner = (Spinner) layout.findViewById(R.id.spinner);
+
+        ad.setView(layout);
+
+        ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ContactDetail detail = new ContactDetail();
+                detail.setContact(contact);
+                detail.setType("address");
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("addr1", addr1View.getText().toString());
+                    json.put("addr2", addr2View.getText().toString());
+                    json.put("addr3", "");
+                    json.put("addr4", "");
+                    json.put("city", cityView.getText().toString());
+                    json.put("region", regionView.getText().toString());
+                    json.put("post_code", postCodeView.getText().toString());
+                    json.put("country_short", countryView.getText().toString());
+                    json.put("country_long", countryView.getText().toString());
+                } catch (JSONException e){}
+                detail.setData(json.toString());
+                detail.setLabel(spinner.getSelectedItem().toString());
+                detail.setAddedDate(new java.util.Date());
+                OpenMPD.getDaoSession().getContactDetailDao().insertOrReplace(detail);
+                loadDetails();
+            }
+        });
+        ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        ad.show();
     }
 
     @Override
