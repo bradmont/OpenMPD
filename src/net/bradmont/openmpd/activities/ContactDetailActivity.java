@@ -25,10 +25,16 @@ import net.bradmont.openmpd.fragments.*;
 import net.bradmont.openmpd.models.*;
 import net.bradmont.openmpd.R;
 
+import com.github.rubensousa.floatingtoolbar.FloatingToolbar;
+import android.support.design.widget.FloatingActionButton;
+
+
 
 public class ContactDetailActivity extends ActionBarActivity {
 
     private int mContactId = 1;
+    private FloatingToolbar mFloatingToolbar = null;
+    private FloatingActionButton mFab = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +43,21 @@ public class ContactDetailActivity extends ActionBarActivity {
         mContactId = intent.getIntExtra("contactId", 1);
 
         setContentView(R.layout.container_contact_detail);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFloatingToolbar = (FloatingToolbar) findViewById(R.id.floatingToolbar);
+        mFloatingToolbar.attachFab(mFab);
 
         ContactDetailFragment contactDetailFragment = (ContactDetailFragment) getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment);
         contactDetailFragment.setContact(mContactId);
+
+    }
+
+    @Override public void onBackPressed(){
+        if (mFloatingToolbar.isShowing()){
+            mFloatingToolbar.hide();
+        } else {
+            super.onBackPressed();
+        }
 
     }
 
