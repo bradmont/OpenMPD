@@ -6,7 +6,7 @@ import net.bradmont.openmpd.activities.ContactSublistActivity;
 import net.bradmont.openmpd.controllers.ContactsEvaluator;
 import net.bradmont.openmpd.controllers.TntImporter;
 import net.bradmont.openmpd.controllers.TntImportService;
-import net.bradmont.openmpd.models.*;
+import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.views.*;
 
 import android.app.AlertDialog;
@@ -152,14 +152,16 @@ public class ContactListFragment extends ListFragment {
 
                     case R.id.type:
                         String type = cursor.getString(columnIndex);
+                        String p_type = ContactStatus.prettifyType(type);
                         String status = cursor.getString(cursor.getColumnIndex("status"));
+                        String p_status = ContactStatus.prettifyStatus(status);
                         tv = (TextView) view;
                         if (cursor.getPosition() ==0){
                             view.setVisibility(View.VISIBLE);
                             if (!status.equals("current") && !status.equals("none")) {
-                                value = status + " ";
+                                value = p_status + " ";
                             }
-                            value += type;
+                            value += p_type;
                             if (!type.equals("none")){
                                 value += " " + getActivity().getResources().getString(R.string.partners);
                             }
@@ -171,9 +173,9 @@ public class ContactListFragment extends ListFragment {
                                 view.setVisibility(View.VISIBLE);
                                 if (!status.equals("current") &&
                                         !status.equals("none")){
-                                    value = status + " ";
+                                    value = p_status + " ";
                                 }
-                                value += type;
+                                value += p_type;
                                 if (!type.equals("none")){
                                     value += " " + getActivity().getResources().getString(R.string.partners);
                                 }
