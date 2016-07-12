@@ -1,6 +1,5 @@
 package net.bradmont.openmpd.fragments;
 
-import net.bradmont.supergreen.models.*;
 import net.bradmont.openmpd.*;
 import net.bradmont.openmpd.activities.ContactDetailActivity;
 import net.bradmont.openmpd.activities.ContactSublistActivity;
@@ -69,13 +68,15 @@ public class ContactListFragment extends ListFragment {
                 "GIVING_AMOUNT as giving_amount, STATUS as status, GIVING_FREQUENCY "+
                 "as giving_frequency, LAST_GIFT as last_gift, MANUAL_SET_EXPIRES as manual_set_expires ";
 
+    private static final String ORDER = "status != 'new', status != 'current', type !='monthly', " +
+                "   type !='regular', type !='annual', status desc, type desc, lname, fname";
+
     public static final String BASE_QUERY = 
                 "select " + FIELDS +
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +
                 "   on _contact_id = contact_status.contact_id "+
-                "order by (status = 'new') desc, (status='current') desc, (type='monthly') "+
-                "desc, (type='annual') desc, (type='regular') desc, type desc, lname, fname";
+                "order by " + ORDER;
 
 
     private static final String STATUS_QUERY = 
@@ -84,7 +85,7 @@ public class ContactListFragment extends ListFragment {
                 "   left outer join contact_status " +
                 "   on _contact_id = contact_status.contact_id "+
                 "where status=? " +
-                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+                "order by type desc, lname, fname";
 
     private static final String OCCASIONAL_QUERY = 
                 "select " + FIELDS +
@@ -97,12 +98,12 @@ public class ContactListFragment extends ListFragment {
 
     private static final String SEARCH_QUERY = 
                 "select " + FIELDS +
-                "fname || ' ' || lname as full_name, s_fname || ' ' || s_lname as spouse_full_name  "+
+                ", fname || ' ' || lname as full_name, s_fname || ' ' || s_lname as spouse_full_name  "+
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +
                 "   on _contact_id = contact_status.contact_id "+
                 "where (full_name like '%' || ? ||'%' or spouse_full_name like '%' || ? ||'%') " +
-                "order by (status = 'new') desc, status desc, type desc, lname, fname";
+                "order by " + ORDER;
 
 
     @Override
@@ -163,8 +164,8 @@ public class ContactListFragment extends ListFragment {
                             tv.setText(value);
                         } else {
                             cursor.moveToPrevious();
-                            if (!(type.equals( cursor.getString(columnIndex)) ||
-                                    !status.equals(cursor.getString(cursor.getColumnIndex("status"))))){
+                            if (!(type.equals( cursor.getString(columnIndex)) &&
+                                    status.equals(cursor.getString(cursor.getColumnIndex("status"))))){
                                 view.setVisibility(View.VISIBLE);
                                 if (!status.equals("current") &&
                                         !status.equals("none")){
@@ -386,31 +387,31 @@ public class ContactListFragment extends ListFragment {
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_new:
-                args[0] = Integer.toString(ContactStatus.STATUS_NEW);
+                args[0] = "new";
                 newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_current:
-                args[0] = Integer.toString(ContactStatus.STATUS_CURRENT);
+                args[0] = "current";
                 newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_late:
-                args[0] = Integer.toString(ContactStatus.STATUS_LATE);
+                args[0] = "late";
                 newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_lapsed:
-                args[0] = Integer.toString(ContactStatus.STATUS_LAPSED);
+                args[0] = "lapsed";
                 newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
             case R.id.menu_filter_dropped:
-                args[0] = Integer.toString(ContactStatus.STATUS_DROPPED);
+                args[0] = "dropped";
                 newCursor = OpenMPD.getDB().rawQuery(STATUS_QUERY, args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
