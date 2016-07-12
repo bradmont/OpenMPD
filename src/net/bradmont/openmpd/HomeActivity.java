@@ -5,9 +5,6 @@ import net.bradmont.openmpd.dao.*;
 import net.bradmont.openmpd.views.*;
 import net.bradmont.openmpd.controllers.*;
 
-import net.bradmont.supergreen.*;
-import net.bradmont.supergreen.models.ModelList;
-
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
