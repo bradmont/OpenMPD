@@ -32,3 +32,8 @@ screenshots
 *.sqlite
 
 devel_info
+FloatingToolbar
+appcompat
+design
+recyclerview
+
