@@ -254,12 +254,11 @@ public class OpenMPDDaoGenerator {
     }
     private static Entity addContactSublist(Schema schema){
         Entity contact_sublist = schema.addEntity("ContactSublist");
-        contact_sublist.addIdProperty();
-        Property tntPeopleId = contact_sublist.addStringProperty("tntPeopleId").getProperty();
+        Property contactId = contact_sublist.addStringProperty("contact_id").getProperty();
         Property list_name = contact_sublist.addStringProperty("listName").getProperty();
 
         Index unique = new Index();
-        unique.addProperty(tntPeopleId);
+        unique.addProperty(contactId);
         unique.addProperty(list_name);
         unique.makeUnique();
         contact_sublist.addIndex(unique);
