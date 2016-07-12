@@ -43,6 +43,7 @@ public class Contact {
 
     // KEEP FIELDS - put your custom fields here
     private List<Gift> orderedGifts;
+    private List<ContactDetail> orderedDetails;
     // KEEP FIELDS END
 
     public Contact() {
@@ -415,6 +416,27 @@ public class Contact {
             orderedGifts = query.list();
         }
         return orderedGifts;
+    }
+    public void resetOrderedDetails(){
+        orderedDetails = null;
+    }
+    public List<ContactDetail> getOrderedDetails() {
+        if (orderedDetails == null) {
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+
+            QueryBuilder<ContactDetail> queryBuilder = daoSession.getContactDetailDao().queryBuilder();
+
+            queryBuilder.where(ContactDetailDao.Properties.ContactId.eq(null));
+            queryBuilder.orderRaw("type='note', type != 'phone', type != 'email'");
+
+            Query<ContactDetail> query = queryBuilder.build();
+            query.setParameter(0, getId());
+
+            orderedDetails = query.list();
+        }
+        return orderedDetails;
     }
 
     public ContactStatus getStatus(){

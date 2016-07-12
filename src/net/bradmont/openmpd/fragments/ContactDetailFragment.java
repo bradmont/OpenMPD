@@ -177,14 +177,21 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
 
 
     private void loadDetails(){
-        contact.resetDetails();
-        mDetails = contact.getDetails();
+        contact.resetOrderedDetails();
+        mDetails = contact.getOrderedDetails();
 
         // Add details to the view
         LinearLayout linkList = (LinearLayout) layout.findViewById(R.id.contactinfo_list);
         linkList.removeAllViews();
+        String lastType = "";
         for (ContactDetail detail : mDetails){
-            View v = buildLinkView(detail, linkList);
+            View v = null;
+            if (lastType.equals(detail.getType())){
+                v = buildLinkView(detail, linkList, false);
+            } else {
+                v = buildLinkView(detail, linkList, true);
+                lastType = detail.getType();
+            }
             v.setLayoutParams(linkList.getLayoutParams());
             linkList.addView(v);
         }
@@ -422,7 +429,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
 
 
 
-    public View buildLinkView(final ContactDetail detail, ViewGroup parent) {
+    public View buildLinkView(final ContactDetail detail, ViewGroup parent, boolean showHeader) {
         LayoutInflater inflater = (LayoutInflater) getActivity()
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
@@ -431,6 +438,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         TextView value = (TextView) rowView.findViewById(R.id.value);
         TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
         TextView date = (TextView) rowView.findViewById(R.id.date);
+        if (!showHeader){
+            title.setVisibility(View.GONE);
+        }
         switch (detail.getType()){
             case "email":
                 populateEmailView(detail, title, value, subtitle, date);
