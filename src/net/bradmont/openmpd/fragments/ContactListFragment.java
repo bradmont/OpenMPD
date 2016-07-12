@@ -34,6 +34,8 @@ import android.widget.*;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
+
 import android.app.ActionBar;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -44,16 +46,16 @@ import android.widget.SearchView;
 import java.lang.Runnable;
 
 public class ContactListFragment extends ListFragment {
-    public static final String [] columns = {"fname", "status", "giving_amount", "last_gift", "fname", "fname", "s_fname", "type"};
-    public static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
+    protected static final String [] columns = {"fname", "status", "giving_amount", "last_gift", "fname", "fname", "s_fname", "type"};
+    protected static final int [] fields = {R.id.name, R.id.status, R.id.amount, R.id.last_gift, R.id.initials, R.id.user_icon_right, R.id.user_icon_left, R.id.type};
 
-    private Cursor cursor = null;
+    protected Cursor cursor = null;
 
-    private ListView mListView = null;
+    protected ListView mListView = null;
 
-    private SimpleCursorAdapter adapter = null;
-    private static int[] icon_colors = null;
-    private static final String CONTACT_COUPLE_SUBQUERY =
+    protected SimpleCursorAdapter adapter = null;
+    protected static int[] icon_colors = null;
+    protected static final String CONTACT_COUPLE_SUBQUERY =
 				"select distinct A.contact_id as _contact_id, fname, lname, s_fname, s_lname from " +
 
  				"(select distinct * from contact join person on person.contact_id =contact._id "+
@@ -63,12 +65,12 @@ public class ContactListFragment extends ListFragment {
 				"	from person where IS_TNT_SPOUSE = 1) B "+ 
  				"on A.contact_id = B.contact_id ";
 
-    private static final String FIELDS = 
+    protected static final String FIELDS = 
                 "fname, lname, s_fname, s_lname, _contact_id as _id, TYPE as type, " +
                 "GIVING_AMOUNT as giving_amount, STATUS as status, GIVING_FREQUENCY "+
                 "as giving_frequency, LAST_GIFT as last_gift, MANUAL_SET_EXPIRES as manual_set_expires ";
 
-    private static final String ORDER = "status != 'new', status != 'current', type !='monthly', " +
+    protected static final String ORDER = "status != 'new', status != 'current', type !='monthly', " +
                 "   type !='regular', type !='annual', status desc, type desc, lname, fname";
 
     public static final String BASE_QUERY = 
@@ -79,7 +81,7 @@ public class ContactListFragment extends ListFragment {
                 "order by " + ORDER;
 
 
-    private static final String STATUS_QUERY = 
+    protected static final String STATUS_QUERY = 
                 "select " + FIELDS +
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +
@@ -87,7 +89,7 @@ public class ContactListFragment extends ListFragment {
                 "where status=? " +
                 "order by type desc, lname, fname";
 
-    private static final String OCCASIONAL_QUERY = 
+    protected static final String OCCASIONAL_QUERY = 
                 "select " + FIELDS +
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
                 "   left outer join contact_status " +
@@ -96,7 +98,7 @@ public class ContactListFragment extends ListFragment {
                 "order by (status = 'new') desc, status desc, type desc, lname, fname";
 
 
-    private static final String SEARCH_QUERY = 
+    protected static final String SEARCH_QUERY = 
                 "select " + FIELDS +
                 ", fname || ' ' || lname as full_name, s_fname || ' ' || s_lname as spouse_full_name  "+
                 "from (" + CONTACT_COUPLE_SUBQUERY + ") A "+
@@ -125,7 +127,7 @@ public class ContactListFragment extends ListFragment {
         icon_colors = getActivity().getResources().getIntArray(R.array.user_icon_colors);
 
         // set up adapter
-        cursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
+        cursor = OpenMPD.getDB().rawQuery(getBaseQuery(), null);
         TextTools.dumpCursorColumns(cursor);
         adapter = new SimpleCursorAdapter(getActivity(),
             R.layout.contact_list_item, cursor, columns, fields);
@@ -338,14 +340,14 @@ public class ContactListFragment extends ListFragment {
 
         // set up search
         SearchView searchView = new
-                SearchView( ((BaseActivity)getActivity()).getSupportActionBar().getThemedContext());
+                SearchView( ((ActionBarActivity)getActivity()).getSupportActionBar().getThemedContext());
         //searchView.setQueryHint(getString(R.string.hint_search_bar));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
             public boolean onQueryTextChange(String newText){
                 String [] args = new String[1];
                 args[0] = newText;
                 // filter on a concatenation of contacts's names, to avoid really complex SQL...
-                Cursor newCursor = OpenMPD.getDB().rawQuery(SEARCH_QUERY, args);
+                Cursor newCursor = OpenMPD.getDB().rawQuery(getSearchQuery(), args);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
@@ -368,7 +370,7 @@ public class ContactListFragment extends ListFragment {
                 }
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    Cursor newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
+                    Cursor newCursor = OpenMPD.getDB().rawQuery(getBaseQuery(), null);
                     adapter.changeCursor(newCursor);
                     cursor = newCursor;
                     return true;
@@ -382,7 +384,7 @@ public class ContactListFragment extends ListFragment {
         Cursor newCursor = null;
         switch (item.getItemId() ){
             case R.id.menu_filter_all:
-                newCursor = OpenMPD.getDB().rawQuery(BASE_QUERY, null);
+                newCursor = OpenMPD.getDB().rawQuery(getBaseQuery(), null);
                 adapter.changeCursor(newCursor);
                 cursor = newCursor;
                 return true;
@@ -490,6 +492,12 @@ public class ContactListFragment extends ListFragment {
         return total;
     }
 
+    protected String getBaseQuery(){
+        return BASE_QUERY;
+    }
+    protected String getSearchQuery(){
+        return SEARCH_QUERY;
+    }
 
 
     private class ContactListClickListener implements ListView.OnItemClickListener{
