@@ -13,6 +13,34 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <net.bradmont.openmpd.views.FontTextView
+            android:id="@+id/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold"
+            android:gravity="right"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="8dp"
+            />
+        <net.bradmont.openmpd.views.FontTextView
+            android:id="@+id/date"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textColor="@color/text_medium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold"
+            android:gravity="right"
+            android:paddingRight="8dp"
+            />
+    </LinearLayout>
     <net.bradmont.openmpd.views.FontTextView
         android:id="@+id/value"
         android:layout_width="wrap_content"
@@ -22,17 +50,6 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingBottom="8dp"
-        />
-    <net.bradmont.openmpd.views.FontTextView
-        android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#707070"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="bold"
-        android:padding="8dp"
-        android:textAllCaps="true"
-        android:visibility="gone"
         />
 
 </LinearLayout>

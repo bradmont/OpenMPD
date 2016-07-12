@@ -385,7 +385,7 @@ public class Contact {
     public ContactDetail getNoteOrNew(){
         try {
             for (ContactDetail d : getDetails()){
-                if (d.getFromTnt() && d.getType().equals("note")){
+                if (d.getType().equals("note")){
                     return d;
                 }
             }
