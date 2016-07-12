@@ -21,7 +21,7 @@
         android:title="@string/gift_history" 
         android:visible="true"></item>
     <item android:id="@+id/menu_evaluate" 
-        android:icon="@drawable/ic_menu_refresh" 
+        android:icon="@drawable/android_debug_bridge" 
         android:showAsAction="never" 
         android:title="@string/evaluate" 
         android:visible="true"></item>

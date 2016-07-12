@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ public class ContactDetailActivity extends ActionBarActivity {
     private int mContactId = 1;
     private FloatingToolbar mFloatingToolbar = null;
     private FloatingActionButton mFab = null;
+    private ContactDetailFragment mFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +49,19 @@ public class ContactDetailActivity extends ActionBarActivity {
         mFloatingToolbar = (FloatingToolbar) findViewById(R.id.floatingToolbar);
         mFloatingToolbar.attachFab(mFab);
 
-        ContactDetailFragment contactDetailFragment = (ContactDetailFragment) getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment);
-        contactDetailFragment.setContact(mContactId);
+
+        mFragment = (ContactDetailFragment) getSupportFragmentManager().findFragmentById(R.id.contact_detail_fragment);
+        mFragment.setContact(mContactId);
+
+        mFloatingToolbar.setClickListener(new FloatingToolbar.ItemClickListener() {
+            @Override
+            public void onItemClick(MenuItem item) {
+                mFragment.onOptionsItemSelected(item);
+            }
+            @Override
+            public void onItemLongClick(MenuItem item) {
+            }
+        });
 
     }
 
