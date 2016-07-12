@@ -1,56 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
-    <net.bradmont.openmpd.views.FontTextView
-        android:id="@+id/title"
+    <ImageView
+        android:id="@+id/category_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_dark"
-        android:textSize="@dimen/title_text_size"
+        android:src="@drawable/map_marker"
         android:paddingTop="8dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
+        android:tint="@color/special_partner"
         />
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_dark"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:gravity="right"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="8dp"
+                />
+            <net.bradmont.openmpd.views.FontTextView
+                android:id="@+id/date"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textColor="@color/text_medium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textStyle="bold"
+                android:gravity="right"
+                android:paddingRight="8dp"
+                />
+        </LinearLayout>
         <net.bradmont.openmpd.views.FontTextView
-            android:id="@+id/subtitle"
+            android:id="@+id/value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_medium"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:gravity="right"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingLeft="8dp"
-            />
-        <net.bradmont.openmpd.views.FontTextView
-            android:id="@+id/date"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:textColor="@color/text_medium"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:gravity="right"
             android:paddingRight="8dp"
+            android:paddingBottom="8dp"
             />
     </LinearLayout>
-    <net.bradmont.openmpd.views.FontTextView
-        android:id="@+id/value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_medium"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
-        />
 
 </LinearLayout>
 

@@ -218,6 +218,7 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
                     json.put("note", notes_text.getText().toString());
                 } catch (JSONException e){}
                 local_note.setData(json.toString());
+                local_note.setLabel(getActivity().getResources().getString(R.string.Notes));
                 local_note.setAddedDate(new java.util.Date());
                 OpenMPD.getDaoSession().getContactDetailDao().insertOrReplace(local_note);
                 loadDetails();
@@ -228,6 +229,76 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             }
         });
         ad.show();
+    }
+    private void addEmail(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setTitle(R.string.Email);
+        LinearLayout layout = (LinearLayout) ((LayoutInflater) getActivity()
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+            .inflate(R.layout.dialog_new_email, null);
+
+        final EditText emailView = (EditText) layout.findViewById(R.id.email);
+        final Spinner spinner = (Spinner) layout.findViewById(R.id.spinner);
+
+        ad.setView(layout);
+
+        ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ContactDetail detail = new ContactDetail();
+                detail.setContact(contact);
+                detail.setType("email");
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("email", emailView.getText().toString());
+                } catch (JSONException e){}
+                detail.setData(json.toString());
+                detail.setLabel(spinner.getSelectedItem().toString());
+                detail.setAddedDate(new java.util.Date());
+                OpenMPD.getDaoSession().getContactDetailDao().insertOrReplace(detail);
+                loadDetails();
+            }
+        });
+        ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        ad.show();
+    }
+    private void addPhone(){
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setTitle(R.string.Phone);
+        LinearLayout layout = (LinearLayout) ((LayoutInflater) getActivity()
+            .getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+            .inflate(R.layout.dialog_new_phone, null);
+
+        final EditText phoneView = (EditText) layout.findViewById(R.id.phone);
+        final Spinner spinner = (Spinner) layout.findViewById(R.id.spinner);
+
+        ad.setView(layout);
+
+        ad.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ContactDetail detail = new ContactDetail();
+                detail.setContact(contact);
+                detail.setType("phone");
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("number", phoneView.getText().toString());
+                } catch (JSONException e){}
+                detail.setData(json.toString());
+                detail.setLabel(spinner.getSelectedItem().toString());
+                detail.setAddedDate(new java.util.Date());
+                OpenMPD.getDaoSession().getContactDetailDao().insertOrReplace(detail);
+                loadDetails();
+            }
+        });
+        ad.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        ad.show();
+    }
+    private void addAddress(){
     }
 
     @Override
@@ -269,8 +340,18 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             case R.id.menu_notes:
                 editNotes();
                 return true;
+            case R.id.add_email:
+                addEmail();
+                return true;
+            case R.id.add_phone:
+                addPhone();
+                return true;
+            case R.id.add_address:
+                addAddress();
+                return true;
             case R.id.menu_help:
                 HelpDialog.showHelp(getActivity(), R.string.help_contact_title, R.string.help_contact);
+                return true;
             case R.id.menu_evaluate:
                 status = ContactsEvaluator.evaluateContact(contact, false);
                 OpenMPD.getDaoSession().getContactStatusDao().insertOrReplace(status);
@@ -365,9 +446,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     }
 
     private void populateEmailView(ContactDetail detail, 
-            TextView title, TextView value, TextView subtitle, TextView date){
+            ImageView icon, TextView value, TextView subtitle, TextView date){
 
-        title.setText(R.string.Email);
+        icon.setImageResource(R.drawable.at);
         try {
             JSONObject json = new JSONObject(detail.getData());
             value.setText(json.getString("email"));
@@ -378,9 +459,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         date.setText(new SimpleDateFormat("yyyy-MM-dd").format(detail.getAddedDate()));
     }
     private void populatePhoneView(ContactDetail detail, 
-            TextView title, TextView value, TextView subtitle, TextView date){
+            ImageView icon, TextView value, TextView subtitle, TextView date){
 
-        title.setText(R.string.Phone);
+        icon.setImageResource(R.drawable.cellphone_android);
         try {
             JSONObject json = new JSONObject(detail.getData());
             value.setText(json.getString("number"));
@@ -391,9 +472,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
         date.setText(new SimpleDateFormat("yyyy-MM-dd").format(detail.getAddedDate()));
     }
     private void populateAddressView(ContactDetail detail, 
-            TextView title, TextView value, TextView subtitle, TextView date){
+            ImageView icon, TextView value, TextView subtitle, TextView date){
 
-        title.setText(R.string.Address);
+        icon.setImageResource(R.drawable.map_marker);
         try {
             JSONObject json = new JSONObject(detail.getData());
             String address = json.getString("addr1");
@@ -414,9 +495,9 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
     }
 
     private void populateNoteView(ContactDetail detail, 
-            TextView title, TextView value, TextView subtitle, TextView date){
+            ImageView icon, TextView value, TextView subtitle, TextView date){
 
-        title.setText(R.string.Notes);
+        icon.setImageResource(R.drawable.note_text);
         try {
             JSONObject json = new JSONObject(detail.getData());
             value.setText(json.getString("note"));
@@ -434,25 +515,25 @@ public class ContactDetailFragment extends Fragment implements OnClickListener{
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.contact_link_layout, parent, false);
 
-        TextView title = (TextView) rowView.findViewById(R.id.title);
+        ImageView icon = (ImageView) rowView.findViewById(R.id.category_icon);
         TextView value = (TextView) rowView.findViewById(R.id.value);
         TextView subtitle = (TextView) rowView.findViewById(R.id.subtitle);
         TextView date = (TextView) rowView.findViewById(R.id.date);
         if (!showHeader){
-            title.setVisibility(View.GONE);
+            icon.setVisibility(View.INVISIBLE);
         }
         switch (detail.getType()){
             case "email":
-                populateEmailView(detail, title, value, subtitle, date);
+                populateEmailView(detail, icon, value, subtitle, date);
                 break;
             case "phone":
-                populatePhoneView(detail, title, value, subtitle, date);
+                populatePhoneView(detail, icon, value, subtitle, date);
                 break;
             case "address":
-                populateAddressView(detail, title, value, subtitle, date);
+                populateAddressView(detail, icon, value, subtitle, date);
                 break;
             case "note":
-                populateNoteView(detail, title, value, subtitle, date);
+                populateNoteView(detail, icon, value, subtitle, date);
                 break;
         }
 
